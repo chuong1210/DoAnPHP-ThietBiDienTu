@@ -5,8 +5,7 @@
     <title>{{ __('info.register') }}</title>
 
     <!-- Meta tags -->
-    {{--
-    <link rel="icon" type="image/png" href="{{ $system['homepage_favicon'] }}"> --}}
+    <link rel="icon" type="image/png" href="{{ $system['homepage_favicon'] }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -70,9 +69,9 @@
         <div id='stars3'></div>
 
         <!-- copyright -->
-        {{-- <div class="copy-right">
+        <div class="copy-right">
             <p><strong>Copyright</strong> {{ $system['homepage_copyright'] }}&copy; 2024-2030</p>
-        </div> --}}
+        </div>
         <!-- //copyright -->
     </section>
 
