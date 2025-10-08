@@ -58,10 +58,10 @@ class Customer extends Authenticatable
     ];
     public $incrementing = true;
 
-    public function customer_catalogues()
-    {
-        return $this->belongsTo(CustomerCatalogue::class, 'customer_catalogue_id', 'id');
-    }
+    // public function customer_catalogues()
+    // {
+    //     return $this->belongsTo(CustomerCatalogue::class, 'customer_catalogue_id', 'id');
+    // }
 
     public function sources()
     {

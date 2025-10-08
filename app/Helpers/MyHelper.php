@@ -319,8 +319,8 @@ if (!function_exists('renderDiscountInformation')) {
     }
 }
 
-if (!function_exists('frontend_recursive_menu')) {
-    function frontend_recursive_menu($data = [], $parentId = 0, $count = 1, $type = 'html')
+if (!function_exists('client_recursive_menu')) {
+    function client_recursive_menu($data = [], $parentId = 0, $count = 1, $type = 'html')
     {
         if (isset($data) && count($data)) {
             if ($type === 'html') {
@@ -334,7 +334,7 @@ if (!function_exists('frontend_recursive_menu')) {
                     if (count($val['children'])) {
                         $html .= '<div class="dropdown-menu">';
                         $html .= "<ul class='uk-clearfix uk-list $ulClass menu-style'>";
-                        $html .= frontend_recursive_menu($val['children'], $val['item']->parent_id, $count + 1, $type);
+                        $html .= client_recursive_menu($val['children'], $val['item']->parent_id, $count + 1, $type);
                         $html .= '</ul>';
                         $html .= '</div>';
                     }

@@ -49,7 +49,7 @@ class BaseService implements BaseServiceInterface
         $condition = [
             ['module_id', '=', $model->id],
             ['language_id', '=', $languageId],
-            ['controllers', '=', 'App\Http\Controllers\Frontend\\' . $controllerName . '']
+            ['controllers', '=', 'App\Http\Controllers\client\\' . $controllerName . '']
         ];
         $router = $this->routerRepository->findByCondition($condition);
         return $this->routerRepository->update($router->id, $payload);
@@ -60,7 +60,7 @@ class BaseService implements BaseServiceInterface
         return [
             'canonical' => Str::slug($request->input('canonical')), //chuyển đổi một chuỗi văn bản thành dạng mà có thể sử dụng được trong URL
             'module_id' => $model->id,
-            'controllers' => 'App\Http\Controllers\Frontend\\' . $controllerName . '',
+            'controllers' => 'App\Http\Controllers\client\\' . $controllerName . '',
             'language_id' => $languageId,
         ];
     }

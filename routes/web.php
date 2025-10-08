@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Frontend\AuthClientController;
+use App\Http\Controllers\client\AuthClientController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
