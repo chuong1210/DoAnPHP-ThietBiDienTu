@@ -1,67 +1,96 @@
 <?php
-
+// ==========================================
+// app/Models/Order.php
+// ==========================================
 namespace App\Models;
 
-use App\Traits\QueryScopes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    use HasFactory, SoftDeletes, QueryScopes;
-
     protected $fillable = [
-        'customer_id',
-        'code',
-        'fullname',
-        'phone',
-        'email',
-        'province_id',
-        'district_id',
-        'ward_id',
-        'address',
-        'description',
-        'promotion',
-        'cart',
-        'totalPrice',
-        'totalPriceOriginal',
-        'guest_cookie',
-        'method',
-        'confirm',
-        'payment',
-        'delivery',
-        'shipping',
-        'deleted_at',
-        'invoice_date',
-        'delivery_date',
+        'order_number',
+        'user_id',
+        'customer_name',
+        'customer_phone',
+        'customer_email',
+        'shipping_address',
+        'subtotal',
+        'shipping_fee',
+        'discount',
+        'total',
+        'payment_method',
+        'payment_status',
+        'status',
+        'note',
     ];
 
-    protected $table = 'orders';
     protected $casts = [
-        'cart' => 'json',
-        'promotion' => 'json'
+        'subtotal' => 'decimal:2',
+        'shipping_fee' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'total' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-    public function products()
+    // Relationships
+    public function user()
     {
-        return $this->belongsToMany(Product::class, 'order_product', 'order_id', 'product_id')->withPivot(
-            'variant_uuid',
-            'quantity',
-            'price',
-            'priceOriginal',
-            'promotion',
-            'option',
-        )->withTimestamps();;
+        return $this->belongsTo(User::class);
     }
 
-    public function order_products()
+    public function items()
     {
-        return $this->hasMany(OrderProduct::class, 'order_id', 'id');
+        return $this->hasMany(OrderItem::class);
     }
 
-    public function order_payment()
+    // Boot method to generate order number
+    protected static function boot()
     {
-        return $this->hasMany(OrderPayment::class, 'order_id', 'id');
+        parent::boot();
+
+        static::creating(function ($order) {
+            if (empty($order->order_number)) {
+                $order->order_number = 'ORD-' . strtoupper(uniqid());
+            }
+        });
+    }
+
+    // Scopes
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeConfirmed($query)
+    {
+        return $query->where('status', 'confirmed');
+    }
+
+    public function scopeShipping($query)
+    {
+        return $query->where('status', 'shipping');
+    }
+
+    public function scopeDelivered($query)
+    {
+        return $query->where('status', 'delivered');
+    }
+
+    public function scopeCancelled($query)
+    {
+        return $query->where('status', 'cancelled');
+    }
+
+    // Helper methods
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
+
+    public function canCancel()
+    {
+        return in_array($this->status, ['pending', 'confirmed']);
     }
 }

@@ -15,12 +15,8 @@ use Illuminate\Support\Str;
 class BaseService implements BaseServiceInterface
 {
     protected $model;
-    protected $routerRepository;
 
-    public function __construct(RouterRepository $routerRepository)
-    {
-        $this->routerRepository = $routerRepository;
-    }
+    public function __construct() {}
 
 
     public function formatAlbum($album)
@@ -36,25 +32,6 @@ class BaseService implements BaseServiceInterface
         $nestedset->Recursive(0, $nestedset->Set());
         $nestedset->Action();
     }
-
-    public function createRouter($model, $request, $controllerName, $languageId)
-    {
-        $payload = $this->formatRouterPayload($model, $request, $controllerName, $languageId);
-        return $this->routerRepository->create($payload);
-    }
-
-    public function updateRouter($model, $request, $controllerName, $languageId)
-    {
-        $payload = $this->formatRouterPayload($model, $request, $controllerName, $languageId);
-        $condition = [
-            ['module_id', '=', $model->id],
-            ['language_id', '=', $languageId],
-            ['controllers', '=', 'App\Http\Controllers\client\\' . $controllerName . '']
-        ];
-        $router = $this->routerRepository->findByCondition($condition);
-        return $this->routerRepository->update($router->id, $payload);
-    }
-
     public function formatRouterPayload($model, $request, $controllerName, $languageId)
     {
         return [

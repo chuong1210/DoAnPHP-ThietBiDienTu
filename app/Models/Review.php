@@ -1,27 +1,58 @@
 <?php
-
+// ==========================================
+// app/Models/Review.php
+// ==========================================
 namespace App\Models;
 
-use App\Traits\QueryScopes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-    use HasFactory, QueryScopes;
-
     protected $fillable = [
-        'customer_id',
-        'variant_uuid',
-        'publish',
-        'content',
-        'score',
+        'product_id',
+        'user_id',
+        'order_id',
+        'rating',
+        'comment',
+        'status',
     ];
 
-    protected $table = 'reviews';
+    protected $casts = [
+        'rating' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
-    public function product_variants()
+    // Relationships
+    public function product()
     {
-        return $this->belongsTo(ProductVariant::class, 'variant_uuid', 'uuid');
+        return $this->belongsTo(Product::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    // Scopes
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    // Helper methods
+    public function isApproved()
+    {
+        return $this->status === 'approved';
     }
 }

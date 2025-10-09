@@ -1,89 +1,111 @@
 <?php
-
+// ==========================================
+// app/Models/Product.php
+// ==========================================
 namespace App\Models;
 
-use App\Traits\QueryScopes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes, QueryScopes;
-
     protected $fillable = [
-        'product_catalogue_id',
-        'image',
-        'icon',
-        'album',
-        'publish',
-        'order',
-        'user_id',
-        'deleted_at',
-        'follow',
+        'category_id',
+        'brand_id',
+        'name',
+        'slug',
+        'description',
         'price',
-        'code',
-        'made_in',
-        'attributeCatalogue',
-        'attribute',
-        'variant',
-        'warranty_time'
+        'sale_price',
+        'quantity',
+        'image',
+        'images',
+        'status',
+        'is_featured',
+        'view_count',
+        'sold_count',
     ];
 
-    protected $table = 'products';
+    protected $casts = [
+        'price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
+        'quantity' => 'integer',
+        'is_featured' => 'boolean',
+        'view_count' => 'integer',
+        'sold_count' => 'integer',
+        'images' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
-    public function languages()
+    // Relationships
+    public function category()
     {
-        return $this->belongsToMany('product_language', 'product_id', 'language_id')->withPivot(
-            'name',
-            'canonical',
-            'meta_title',
-            'meta_keyword',
-            'meta_description',
-            'description',
-            'content'
-        )->withTimestamps();;
+        return $this->belongsTo(Category::class);
     }
 
-    public function product_catalogues()
+    public function brand()
     {
-        return $this->belongsToMany('product_catalogue_product', 'product_id', 'product_catalogue_id')->withPivot('product_catalogue_id', 'product_id');
+        return $this->belongsTo(Brand::class);
     }
 
-    public function product_variants()
+    public function cartItems()
     {
-        return $this->hasMany('product_id', 'id');
+        return $this->hasMany(CartItem::class);
     }
 
-
-
-    public function promotions()
+    public function orderItems()
     {
-        return $this->belongsToMany(Promotion::class, 'promotion_product_variant', 'product_id', 'promotion_id')->withPivot(
-            'variant_uuid',
-            'model',
-        )->withTimestamps();
+        return $this->hasMany(OrderItem::class);
     }
 
-    public function carts()
+    public function reviews()
     {
-        return $this->hasMany(Cart::class);
+        return $this->hasMany(Review::class);
     }
 
-    public function orders()
+    // Accessors
+    public function getFinalPriceAttribute()
     {
-        return $this->belongsToMany(Order::class, 'order_product', 'product_id', 'order_id')->withPivot(
-            'variant_uuid',
-            'quantity',
-            'price',
-            'priceOriginal',
-            'promotion',
-            'option',
-        )->withTimestamps();;
+        return $this->sale_price ?? $this->price;
     }
 
-    public function attributes()
+    public function getDiscountPercentAttribute()
     {
-        return $this->belongsToMany(Attribute::class, 'product_attribute', 'product_id', 'attribute_id');
+        if ($this->sale_price && $this->price > 0) {
+            return round((($this->price - $this->sale_price) / $this->price) * 100);
+        }
+        return 0;
+    }
+
+    public function getInStockAttribute()
+    {
+        return $this->quantity > 0;
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->where('status', 'approved')->avg('rating') ?? 0;
+    }
+
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    public function scopeInStock($query)
+    {
+        return $query->where('quantity', '>', 0);
+    }
+
+    public function scopeSearch($query, $keyword)
+    {
+        return $query->where('name', 'LIKE', "%{$keyword}%")
+            ->orWhere('description', 'LIKE', "%{$keyword}%");
     }
 }

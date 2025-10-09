@@ -1,95 +1,60 @@
 <?php
 
+// ==========================================
+// app/Models/User.php
+// ==========================================
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
-use App\Traits\QueryScopes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes, QueryScopes; // SoftDeletes: phương thức delete() sẽ xóa mềm (không xóa dữ liệu trong mysql)
+    use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'name',
         'email',
         'password',
+        'full_name',
         'phone',
-        'province_id',
-        'district_id',
-        'ward_id',
-        'address',
-        'birthday',
-        'image',
-        'description',
-        'user_agent',
-        'ip',
-        'user_catalogue_id',
-        'publish'
+        'role',
+        'status',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-
-    // Tên bảng tương ứng trong mysql
-    protected $table = 'users';
-    // Thông báo khóa chính là cột 'code'
-    protected $primaryKey = 'id';
-    // khóa chính không tự động tăng
-    public $incrementing = true;
-    protected $attributes = [
-        'publish' => 1
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-
-
-    public function hasPermission($permissionCanonical)
+    // Relationships
+    public function cart()
     {
-        // từ user => lấy được nhóm user => lấy được danh sách các quyền => kiểm tra $permissionCanonical có tồn tại trong các canonical từ danh sách các quyền đó không
-        return $this->user_catalogues->permissions->contains('canonical', $permissionCanonical);
+        return $this->hasOne(Cart::class);
     }
 
-    public function province()
+    public function orders()
     {
-        return $this->belongsTo(Province::class, 'province_id', 'code');
+        return $this->hasMany(Order::class);
     }
 
-    public function district()
+    public function reviews()
     {
-        return $this->belongsTo(District::class, 'district_id', 'code');
+        return $this->hasMany(Review::class);
     }
 
-    public function ward()
+    // Helper methods
+    public function isAdmin()
     {
-        return $this->belongsTo(Ward::class, 'ward_id', 'code');
+        return $this->role === 'admin';
+    }
+
+    public function isActive()
+    {
+        return $this->status === 'active';
     }
 }

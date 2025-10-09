@@ -1,33 +1,43 @@
 <?php
-
+// ==========================================
+// app/Models/Cart.php
+// ==========================================
 namespace App\Models;
 
-use App\Traits\QueryScopes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
-    use HasFactory, QueryScopes;
-
-    protected $table = 'carts';
-
     protected $fillable = [
-        'id',
-        'customer_id',
-        'product_id',
-        'variant_uuid',
-        'name',
-        'quantity',
+        'user_id',
     ];
 
-    public function customer()
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    // Relationships
+    public function user()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function product()
+    public function items()
     {
-        return $this->belongsTo(Product::class);
+        return $this->hasMany(CartItem::class);
+    }
+
+    // Helper methods
+    public function getTotalAttribute()
+    {
+        return $this->items->sum(function ($item) {
+            return $item->price * $item->quantity;
+        });
+    }
+
+    public function getTotalItemsAttribute()
+    {
+        return $this->items->sum('quantity');
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
-use App\Models\AttributeCatalogue;
 use App\Models\Cart;
 use App\Repositories\Interfaces\CartRepositoryInterface;
+use App\Repositories\BaseRepository;
 
 /**
  * Class AttributeCatalogueRepository
@@ -18,5 +18,15 @@ class CartRepository extends BaseRepository implements CartRepositoryInterface
     {
         $this->model = $cart;
         parent::__construct($this->model);
+    }
+
+    public function getCartByUser($userId)
+    {
+        return $this->model->where('user_id', $userId)->get();
+    }
+
+    public function clearCart($userId)
+    {
+        return $this->model->where('user_id', $userId)->delete();
     }
 }
