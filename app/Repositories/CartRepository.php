@@ -25,8 +25,24 @@ class CartRepository extends BaseRepository implements CartRepositoryInterface
         return $this->model->where('user_id', $userId)->get();
     }
 
+    public function createOrGetCart($userId)
+    {
+        $cart = $this->model->where('user_id', $userId)->first();
+
+        if (!$cart) {
+            $cart = $this->model->create(['user_id' => $userId]);
+        }
+
+        return $cart;
+    }
     public function clearCart($userId)
     {
-        return $this->model->where('user_id', $userId)->delete();
+        $cart = $this->model->where('user_id', $userId)->first();
+
+        if ($cart) {
+            $cart->items()->delete();
+        }
+
+        return true;
     }
 }

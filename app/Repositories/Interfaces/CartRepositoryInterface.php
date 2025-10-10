@@ -9,6 +9,7 @@ namespace App\Repositories\Interfaces;
  */
 interface CartRepositoryInterface extends BaseRepositoryInterface
 {
+    public function createOrGetCart($userId);
     public function getCartByUser($userId);
     public function clearCart($userId);
 }

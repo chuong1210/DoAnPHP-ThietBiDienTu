@@ -17,7 +17,7 @@ class ProductService implements ProductServiceInterface
 
     public function getAll($perPage = 20)
     {
-        return $this->productRepository->pagination(['*'], [], $perPage, ['category', 'brand']);
+        return $this->productRepository->pagination(['*'], [], $perPage, [], ['category', 'brand']);
     }
 
     public function search($keyword, $filters = [])

@@ -32,13 +32,12 @@ class BaseService implements BaseServiceInterface
         $nestedset->Recursive(0, $nestedset->Set());
         $nestedset->Action();
     }
-    public function formatRouterPayload($model, $request, $controllerName, $languageId)
+    public function formatRouterPayload($model, $request, $controllerName)
     {
         return [
             'canonical' => Str::slug($request->input('canonical')), //chuyển đổi một chuỗi văn bản thành dạng mà có thể sử dụng được trong URL
             'module_id' => $model->id,
             'controllers' => 'App\Http\Controllers\client\\' . $controllerName . '',
-            'language_id' => $languageId,
         ];
     }
 

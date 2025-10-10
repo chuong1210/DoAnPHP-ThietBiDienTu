@@ -24,46 +24,53 @@ class BaseRepository implements BaseRepositoryInterface
         return $this->model->select($columns)->with($relations)->findOrFail($id);
     }
 
-    public function findByCondition($conditions = [], $relations = [], $orderBy = ['id', 'DESC'])
+    public function findByCondition($condition = [], $flag = false, $relation = [], $orderBy = ['id', 'DESC'])
     {
         $query = $this->model->newQuery();
 
-        foreach ($conditions as $condition) {
-            $query->where($condition[0], $condition[1], $condition[2]);
+        foreach ($condition as $key => $val) {
+            $query->where($val[0], $val[1], $val[2]);
         }
 
-        if (!empty($relations)) {
-            $query->with($relations);
-        }
+        $query->with($relation);
 
-        if (!empty($orderBy)) {
+        if (isset($orderBy)) {
             $query->orderBy($orderBy[0], $orderBy[1]);
         }
 
-        return $query->first();
+        return $flag == false ? $query->first() : $query->get();
     }
-
-    public function pagination($columns = ['*'], $conditions = [], $perPage = 20, $relations = [], $orderBy = ['id', 'DESC'])
+    public function pagination($column = ['*'], $condition = [], $perpage = 20, $extend = [], $relations = [], $orderBy = ['id', 'DESC'])
     {
-        $query = $this->model->select($columns);
+        $query = $this->model->select($column);
 
-        foreach ($conditions as $condition) {
-            if (isset($condition[0], $condition[1], $condition[2])) {
-                $query->where($condition[0], $condition[1], $condition[2]);
+        // Apply conditions
+        if (isset($condition['keyword']) && !empty($condition['keyword'])) {
+            $keyword = $condition['keyword'];
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'LIKE', "%{$keyword}%")
+                    ->orWhere('description', 'LIKE', "%{$keyword}%");
+            });
+        }
+
+        if (isset($condition['where'])) {
+            foreach ($condition['where'] as $where) {
+                $query->where($where[0], $where[1], $where[2]);
             }
         }
 
+        // Apply relations
         if (!empty($relations)) {
             $query->with($relations);
         }
 
-        if (!empty($orderBy)) {
+        // Apply order
+        if (isset($orderBy)) {
             $query->orderBy($orderBy[0], $orderBy[1]);
         }
 
-        return $query->paginate($perPage);
+        return $query->paginate($perpage)->withQueryString();
     }
-
     public function create($data = [])
     {
         return $this->model->create($data);

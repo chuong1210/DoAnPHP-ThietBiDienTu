@@ -20,14 +20,14 @@ class CartComposer
 
     public function compose(View $view)
     {
-        $carts = $this->cartRepository->findByCondition([
-            ['customer_id', '=', Auth::guard('customers')->id()],
-        ], true);
-        if (isset($carts) && count($carts)) {
-            $cartTotalQuantity = $this->cartService->getTotalQuantity($carts);
-        } else {
-            $cartTotalQuantity = 0;
-        }
-        $view->with('cartTotalQuantity', $cartTotalQuantity);
+        // $carts = $this->cartRepository->findByCondition([
+        //     ['customer_id', '=', Auth::guard('customers')->id()],
+        // ], true);
+        // if (isset($carts) && count($carts)) {
+        //     $cartTotalQuantity = $this->cartService->getTotalQuantity($carts);
+        // } else {
+        //     $cartTotalQuantity = 0;
+        // }
+        // $view->with('cartTotalQuantity', $cartTotalQuantity);
     }
 }

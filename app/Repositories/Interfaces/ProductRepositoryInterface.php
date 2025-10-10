@@ -8,8 +8,19 @@ namespace App\Repositories\Interfaces;
  */
 interface ProductRepositoryInterface extends BaseRepositoryInterface
 {
-    public function searchProducts($keyword, $perPage = 20);
+    public function searchProducts($keyword, $filters = []);
+    public function incrementViewCount($id);
+
+
     public function getProductsByCategory($categoryId, $perPage = 20);
+
+    public function getNewProducts($limit = 10);
+    public function getBestSellingProducts($limit = 10);
+    public function decreaseQuantity($id, $quantity);
+    public function increaseQuantity($id, $quantity);
+
+
+
     public function getProductsByBrand($brandId, $perPage = 20);
     public function getFeaturedProducts($limit = 10);
 }

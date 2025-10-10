@@ -14,4 +14,14 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
         $this->model = $model;
         parent::__construct($this->model);
     }
+
+    public function getParentCategories()
+    {
+        return $this->model->whereNull('parent_id')->where('is_active', true)->orderBy('sort_order')->get();
+    }
+
+    public function getCategoriesWithChildren()
+    {
+        return $this->model->with('children')->whereNull('parent_id')->where('is_active', true)->orderBy('sort_order')->get();
+    }
 }

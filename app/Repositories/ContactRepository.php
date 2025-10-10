@@ -12,4 +12,22 @@ class ContactRepository extends BaseRepository implements ContactRepositoryInter
         $this->model = $model;
         parent::__construct($this->model);
     }
+
+
+    public function getNewContacts()
+    {
+        return $this->model->where('status', 'new')
+            ->orderBy('created_at', 'DESC')
+            ->get();
+    }
+
+    public function markAsReplied($id)
+    {
+        return $this->update($id, ['status' => 'replied']);
+    }
+
+    public function markAsClosed($id)
+    {
+        return $this->update($id, ['status' => 'closed']);
+    }
 }

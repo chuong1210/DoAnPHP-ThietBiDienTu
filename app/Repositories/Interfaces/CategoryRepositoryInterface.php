@@ -4,4 +4,9 @@ namespace App\Repositories\Interfaces;
 
 use App\Repositories\Interfaces\BaseRepositoryInterface;
 
-interface CategoryRepositoryInterface extends BaseRepositoryInterface {}
+interface CategoryRepositoryInterface extends BaseRepositoryInterface
+{
+    public function getParentCategories();
+
+    public function getCategoriesWithChildren();
+}
