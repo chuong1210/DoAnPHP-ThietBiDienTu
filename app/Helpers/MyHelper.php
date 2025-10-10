@@ -492,16 +492,7 @@ if (!function_exists('sortAttributeId')) {
     }
 }
 
-if (!function_exists('getAddress')) {
-    function getAddress($province_id, $district_id, $ward_id, $address)
-    {
-        $province = Province::where('code', $province_id)->value('full_name');
-        $district = District::where('code', $district_id)->value('full_name');
-        $ward = Ward::where('code', $ward_id)->value('full_name');
-        $result = (isset($address) ? $address . ', ' : '') . (isset($ward) ? $ward . ', ' : '') . (isset($district) ? $district . ', ' : '') . (isset($province) ? $province . ', ' : '');
-        return rtrim($result, ', ');
-    }
-}
+
 
 if (!function_exists('vnPayConfig')) {
     function vnPayConfig()
@@ -644,85 +635,3 @@ if (!function_exists('convertRevenueChartData')) {
         return $newArray;
     }
 }
-
-// if (!function_exists('translateContent')) {
-//     function translateContent($content = '', $targetLanguage = 'en')
-//     {
-//         if (empty($content)) {
-//             return '';
-//         }
-
-//         // Tạo đối tượng Google Translate
-//         $tr = new GoogleTranslate($targetLanguage);
-
-//         // Nếu nội dung quá dài, chia nhỏ thành các chunk
-//         $maxLength = 4500; // Giới hạn an toàn (nhỏ hơn 5000 ký tự)
-//         if (strlen($content) > $maxLength) {
-//             $chunks = str_split($content, $maxLength);
-//             $translatedChunks = [];
-
-//             // Dịch từng chunk
-//             foreach ($chunks as $chunk) {
-//                 $translatedChunks[] = $tr->translate($chunk);
-//             }
-
-//             // Ghép lại các đoạn đã dịch
-//             return implode(' ', $translatedChunks);
-//         }
-
-//         // Dịch trực tiếp nếu nội dung không quá dài
-//         return $tr->translate($content);
-//     }
-// }
-
-
-// if (!function_exists('translateContentHasImage')) {
-//     function translateContentHasImage($content = '', $targetLanguage = 'en')
-//     {
-//         if (empty($content)) {
-//             return '';
-//         }
-
-//         // Regex để tìm tất cả các thẻ <img>
-//         $pattern = '/<img[^>]*>/i';
-//         $matches = [];
-
-//         // Tách nội dung
-//         preg_match_all($pattern, $content, $matches); // Lấy tất cả các thẻ <img>
-//         $imageTags = $matches[0]; // Danh sách thẻ ảnh
-//         $textSegments = preg_split($pattern, $content); // Phân đoạn văn bản
-
-//         // Tạo đối tượng GoogleTranslate
-//         $translate = new GoogleTranslate($targetLanguage);
-
-//         // Dịch từng đoạn văn bản
-//         $translatedSegments = [];
-
-//         foreach ($textSegments as $segment) {
-//             if (trim($segment) !== '') {
-//                 // Chia nhỏ đoạn dài thành các chunk tối đa 5000 ký tự
-//                 $chunks = str_split($segment, 4500); // Để tránh giới hạn API
-//                 $translatedText = '';
-
-//                 foreach ($chunks as $chunk) {
-//                     $translatedText .= $translate->translate($chunk); // Dịch từng chunk
-//                 }
-
-//                 $translatedSegments[] = $translatedText; // Lưu kết quả
-//             } else {
-//                 $translatedSegments[] = ''; // Giữ khoảng trống nếu không có nội dung
-//             }
-//         }
-
-//         // Ghép nội dung đã dịch với các thẻ ảnh
-//         $finalContent = '';
-//         foreach ($translatedSegments as $index => $translatedText) {
-//             $finalContent .= $translatedText;
-//             if (isset($imageTags[$index])) {
-//                 $finalContent .= $imageTags[$index]; // Thêm thẻ ảnh sau đoạn văn bản tương ứng
-//             }
-//         }
-
-//         return $finalContent;
-//     }
-// }
