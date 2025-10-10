@@ -20,14 +20,20 @@ class CartComposer
 
     public function compose(View $view)
     {
-        // $carts = $this->cartRepository->findByCondition([
-        //     ['customer_id', '=', Auth::guard('customers')->id()],
-        // ], true);
-        // if (isset($carts) && count($carts)) {
-        //     $cartTotalQuantity = $this->cartService->getTotalQuantity($carts);
-        // } else {
-        //     $cartTotalQuantity = 0;
-        // }
-        // $view->with('cartTotalQuantity', $cartTotalQuantity);
+        $cartTotalQuantity = 0;
+
+        // Chỉ tính giỏ hàng nếu user đăng nhập & không phải admin
+        if (Auth::check() && !Auth::user()->isAdmin()) {
+            $carts = $this->cartRepository->findByCondition([
+                ['customer_id', '=', Auth::id()],
+            ], true);
+
+            if ($carts && count($carts)) {
+                $cartTotalQuantity = $this->cartService->getTotalQuantity($carts);
+            }
+        }
+
+        // Gửi biến sang tất cả view
+        $view->with('cartTotalQuantity', $cartTotalQuantity);
     }
 }

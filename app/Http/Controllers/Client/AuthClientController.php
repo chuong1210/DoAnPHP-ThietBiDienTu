@@ -8,6 +8,7 @@ use App\Http\Requests\AuthRequest;
 use App\Http\Requests\Customer\StoreCustomerRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Services\CustomerService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 class AuthClientController extends clientController
 {
     protected $customerService;
-    public function __construct(CustomerService $customerService)
+    public function __construct(UserService $customerService)
     {
         parent::__construct();
         $this->customerService = $customerService;

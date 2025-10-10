@@ -124,6 +124,14 @@ class CartService implements CartServiceInterface
             throw $e;
         }
     }
+    public function getTotalQuantity($carts)
+    {
+        $totalQuantity = 0;
+        foreach ($carts as $cart) {
+            $totalQuantity += $cart->quantity;
+        }
+        return $totalQuantity;
+    }
 
     public function getCart($userId)
     {
