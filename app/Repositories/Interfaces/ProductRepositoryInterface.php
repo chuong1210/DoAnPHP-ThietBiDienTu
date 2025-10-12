@@ -23,4 +23,9 @@ interface ProductRepositoryInterface extends BaseRepositoryInterface
 
     public function getProductsByBrand($brandId, $perPage = 20);
     public function getFeaturedProducts($limit = 10);
+
+
+    public function getRelatedProducts($categoryId, $excludeId, $limit = 8);
+    public function getProductsByCategorySlug($slug, $perPage = 20);
+    public function getProductBySlug($slug);
 }

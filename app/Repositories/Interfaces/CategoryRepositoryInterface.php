@@ -9,4 +9,7 @@ interface CategoryRepositoryInterface extends BaseRepositoryInterface
     public function getParentCategories();
 
     public function getCategoriesWithChildren();
+    public function getActiveCategories();
+
+    public function getSidebarCategories();
 }

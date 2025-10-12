@@ -19,7 +19,7 @@ class ViewServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Gắn CartComposer vào tất cả các view (hoặc chỉ layout chính)
-        View::composer('*', CartComposer::class);
+        // View::composer('*', CartComposer::class);
         // Nếu muốn chỉ áp dụng cho layout master:
         // View::composer('layouts.master', CartComposer::class);
     }

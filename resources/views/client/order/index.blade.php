@@ -1,4 +1,4 @@
-@extends('client.homepage.layout')
+@extends('client.layouts.client')
 
 @section('content')
     <div id="homepage" class="homepage">

@@ -15,6 +15,12 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
         parent::__construct($this->model);
     }
 
+    public function getActiveCategories()
+    {
+        $condition = [['is_active', '=', true]];
+        return $this->findByCondition($condition, true, [], ['name', 'ASC']);
+    }
+
     public function getParentCategories()
     {
         return $this->model->whereNull('parent_id')->where('is_active', true)->orderBy('sort_order')->get();
@@ -23,5 +29,13 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
     public function getCategoriesWithChildren()
     {
         return $this->model->with('children')->whereNull('parent_id')->where('is_active', true)->orderBy('sort_order')->get();
+    }
+
+    public function getSidebarCategories()
+    {
+        return $this->model->with('children')
+            ->whereNull('parent_id')
+            ->where('is_active', true)
+            ->get();
     }
 }
