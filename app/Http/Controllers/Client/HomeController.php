@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\Controller;
 use App\Repositories\BannerRepository;
 use App\Repositories\BrandRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ProductRepository;
 
-class HomeController extends ClientController
+class HomeController extends Controller
 {
     protected $productRepository;
     protected $categoryRepository;
@@ -25,8 +26,6 @@ class HomeController extends ClientController
         $this->categoryRepository = $categoryRepository;
         $this->brandRepository = $brandRepository;
         $this->bannerRepository = $bannerRepository;
-
-        parent::__construct();
     }
 
     public function index()

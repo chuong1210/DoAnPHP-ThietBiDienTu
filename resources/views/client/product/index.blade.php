@@ -97,8 +97,7 @@
                     <!-- Image -->
                     <a href="{{ route('client.product.show', $product->slug) }}">
                         @if($product->image)
-                            <img src="{{ asset('images/products/' . $product->image) }}" class="card-img-top product-image"
-                                alt="{{ $product->name }}">
+                            <img src="{{ asset($product->image) }}" class="card-img-top product-image" alt="{{ $product->name }}">
                         @else
                             <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
                                 <i class="fas fa-image fa-3x text-muted"></i>

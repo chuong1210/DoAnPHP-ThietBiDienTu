@@ -1,9 +1,5 @@
 
-<!-- ==========================================
-FILE: resources/views/admin/products/edit.blade.php
-FORM SỬA SẢN PHẨM
-========================================== -->
-@extends('layouts.admin')
+@extends('admin.layouts.admin')
 
 @section('title', 'Sửa Sản Phẩm')
 
@@ -108,7 +104,7 @@ FORM SỬA SẢN PHẨM
                             <label class="form-label">Ảnh Đại Diện Hiện Tại</label>
                             @if($product->image)
                                 <div class="mb-2">
-                                    <img src="{{ asset('images/products/' . $product->image) }}"
+                                    <img src="{{ asset($product->image) }}"
                                          alt="{{ $product->name }}"
                                          class="img-thumbnail"
                                          style="max-width: 200px;">

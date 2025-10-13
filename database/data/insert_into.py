@@ -4,9 +4,15 @@ import time
 from pathlib import Path
 import re
 from datetime import datetime
+import os
+from urllib.parse import urlparse
+
 class GearVNSQLGenerator:
     def __init__(self, base_path="C:\\Users\\chuon\\PHP\\doanPHP\\database\\data"):
         self.base_path = Path(base_path)
+        self.images_path = self.base_path / "images"
+        self.images_path.mkdir(exist_ok=True)  # Tạo thư mục images nếu chưa có
+
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -137,6 +143,43 @@ class GearVNSQLGenerator:
 
         return text
 
+    def download_image(self, image_url, product_id, is_main=False):
+        """Tải ảnh về và lưu vào thư mục images, trả về đường dẫn tương đối"""
+        if not image_url:
+            return None
+
+        try:
+            # Lấy extension từ URL
+            parsed_url = urlparse(image_url)
+            ext = Path(parsed_url.path).suffix.lower()
+            if not ext:
+                ext = '.jpg'  # Mặc định
+
+            if is_main:
+                filename = f"product_{product_id}_main{ext}"
+            else:
+                filename = f"product_{product_id}_{hash(image_url) % 10000}{ext}"  # Hash để tránh trùng
+
+            filepath = self.images_path / filename
+            relative_path = f"images/{filename}"
+
+            if filepath.exists():
+                print(f"    Ảnh đã tồn tại: {filename}")
+                return relative_path
+
+            response = self.session.get(image_url, timeout=15)
+            response.raise_for_status()
+
+            with open(filepath, 'wb') as f:
+                f.write(response.content)
+
+            print(f"    Đã tải ảnh: {filename}")
+            return relative_path
+
+        except Exception as e:
+            print(f"    Lỗi tải ảnh {image_url}: {str(e)}")
+            return image_url  # Fallback to original URL if download fails
+
     def generate_categories_sql(self):
         """Tạo SQL cho categories"""
         print("Đang tạo SQL cho categories...")
@@ -252,19 +295,36 @@ class GearVNSQLGenerator:
                                 sale_price = float(compare_price) / 100
                             quantity = first_variant.get('inventory_quantity', 0)
 
-                        # Lấy ảnh
-                        image = ''
-                        images_json = 'NULL'
+                        # Lấy ảnh và tải về, sử dụng đường dẫn tương đối hoặc URL gốc
+                        main_image_path = None
+                        images_paths = []
 
                         main_image = product.get('image')
-                        if main_image:
-                            image = main_image.get('src', '')
+                        main_image_url = main_image.get('src', '') if main_image else ''
+                        if main_image_url:
+                            main_image_path = self.download_image(main_image_url, self.product_counter, is_main=True)
 
                         product_images = product.get('images', [])
                         if product_images:
-                            img_list = [img.get('src', '') for img in product_images if img.get('src')]
-                            if img_list:
-                                images_json = self.clean_sql_string(json.dumps(img_list[:5]))  # Tối đa 5 ảnh
+                            for img in product_images:
+                                img_url = img.get('src', '')
+                                if img_url and img_url != main_image_url:  # Bỏ qua ảnh chính nếu trùng
+                                    img_path = self.download_image(img_url, self.product_counter)
+                                    if img_path:
+                                        images_paths.append(img_path)
+                                if len(images_paths) >= 5:  # Tối đa 5 ảnh
+                                    break
+
+                            # Nếu không có ảnh phụ, thêm ảnh chính nếu có
+                            if not images_paths and main_image_path:
+                                images_paths.append(main_image_path)
+
+                        # Nếu vẫn không có, dùng URL gốc cho images
+                        if not images_paths and product_images:
+                            img_urls = [img.get('src', '') for img in product_images[:5]]
+                            images_paths = [url if isinstance(url, str) else url for url in img_urls]
+
+                        images_json = self.clean_sql_string(json.dumps(images_paths[:5])) if images_paths else 'NULL'
 
                         # Mô tả (lấy từ body_html và làm sạch HTML)
                         description = product.get('body_html', '')
@@ -280,13 +340,20 @@ class GearVNSQLGenerator:
                         # Featured (random một số sản phẩm)
                         is_featured = 'TRUE' if products_added % 5 == 0 else 'FALSE'
 
-                        # Tạo SQL INSERT
+                        # Tạo SQL INSERT (sử dụng đường dẫn tương đối hoặc URL cho image)
+                        if main_image_path:
+                            image_sql = self.clean_sql_string(main_image_path)
+                        else:
+                            image_sql = self.clean_sql_string(main_image_url) if main_image_url else 'NULL'
+
                         sql = f"""INSERT INTO products (id, category_id, brand_id, name, slug, description, price, sale_price, quantity, image, images, status, is_featured, view_count, sold_count)
-VALUES ({self.product_counter}, {category_id}, {brand_id}, {self.clean_sql_string(name)}, {self.clean_sql_string(slug)}, {self.clean_sql_string(description)}, {price}, {sale_price if sale_price > 0 else 'NULL'}, {max(0, quantity)}, {self.clean_sql_string(image)}, {images_json}, '{status}', {is_featured}, 0, 0);"""
+VALUES ({self.product_counter}, {category_id}, {brand_id}, {self.clean_sql_string(name)}, {self.clean_sql_string(slug)}, {self.clean_sql_string(description)}, {price}, {sale_price if sale_price > 0 else 'NULL'}, {max(0, quantity)}, {image_sql}, {images_json}, '{status}', {is_featured}, 0, 0);"""
 
                         self.product_inserts.append(sql)
                         self.product_counter += 1
                         products_added += 1
+
+                        time.sleep(0.5)  # Delay nhỏ giữa các sản phẩm để tránh rate limit
 
                     except Exception as e:
                         print(f"    Lỗi xử lý sản phẩm: {str(e)}")
@@ -328,6 +395,8 @@ VALUES ({self.product_counter}, {category_id}, {brand_id}, {self.clean_sql_strin
         print(f"- Categories: {len(self.category_inserts)}")
         print(f"- Brands: {len(self.brand_inserts)}")
         print(f"- Products: {len(self.product_inserts)}")
+        print(f"- Images downloaded to: {self.images_path}")
+        print(f"- Image paths in SQL: relative to current directory (e.g., 'images/product_1_main.jpg') or original URLs")
         print("=" * 60)
 
     def save_sql_file(self):
@@ -389,6 +458,8 @@ VALUES ({self.product_counter}, {category_id}, {brand_id}, {self.clean_sql_strin
                 f.write(f"-- Categories: {len(self.category_inserts)}\n")
                 f.write(f"-- Brands: {len(self.brand_inserts)}\n")
                 f.write(f"-- Products: {len(self.product_inserts)}\n")
+                f.write(f"-- Images path: {self.images_path}\n")
+                f.write("-- Image URLs in DB: relative paths like 'images/filename.jpg' or original remote URLs\n")
                 f.write("-- ==========================================\n")
 
             print(f"✓ Đã lưu file SQL thành công!")
@@ -397,6 +468,8 @@ VALUES ({self.product_counter}, {category_id}, {brand_id}, {self.clean_sql_strin
             print(f"1. Mở MySQL/phpMyAdmin")
             print(f"2. Chọn database ShopOnlineDB")
             print(f"3. Import file: {output_file.name}")
+            print(f"4. Ảnh được lưu tại: {self.images_path}")
+            print(f"5. Trong web app, configure để serve thư mục images từ URL hiện tại (e.g., /data/images/)")
 
         except Exception as e:
             print(f"✗ Lỗi khi lưu file: {str(e)}")
@@ -409,6 +482,8 @@ VALUES ({self.product_counter}, {category_id}, {brand_id}, {self.clean_sql_strin
             'categories': {slug: id for slug, id in self.category_map.items()},
             'brands': {name: id for name, id in self.brand_map.items()},
             'total_products': len(self.product_inserts),
+            'images_path': str(self.images_path),
+            'image_url_base': 'images/',  # Relative URL base for local images
             'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
 
@@ -424,7 +499,8 @@ def main():
     print("GEARVN TO SQL GENERATOR")
     print("=" * 60)
     print("Script này sẽ crawl dữ liệu từ GearVN")
-    print("và tạo file SQL để import vào database ShopOnlineDB")
+    print("tạo file SQL để import vào database ShopOnlineDB")
+    print("và tải ảnh về thư mục images với đường dẫn tương đối trong SQL")
     print("=" * 60)
     print()
 
@@ -440,6 +516,9 @@ def main():
 
         print("\n" + "=" * 60)
         print("HOÀN TẤT!")
+        print(f"✓ SQL: {generator.base_path / 'gearvn_data_insert.sql'}")
+        print(f"✓ Mapping: {generator.base_path / 'gearvn_mapping.json'}")
+        print(f"✓ Images: {generator.images_path} (URLs in DB: relative 'images/...')")
         print("=" * 60)
 
     except KeyboardInterrupt:

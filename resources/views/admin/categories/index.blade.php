@@ -1,21 +1,15 @@
-<!DOCTYPE html>
-<html lang="vi">
+@extends('admin.layouts.admin')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh Mục</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body>
-    <div class="container mt-5">
-        <div class="row mb-3">
+@section('title', 'Quản Lý danh mục')
+@section('content')
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row mb-4">
             <div class="col-md-6">
-                <h1>Quản Lý Danh Mục</h1>
+                <h1 class="h3 mb-0">Quản Lý Danh Mục</h1>
             </div>
             <div class="col-md-6 text-end">
-                <a href="{{ route('categories.create') }}" class="btn btn-primary">Thêm Danh Mục</a>
+                <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">Thêm Danh Mục</a>
             </div>
         </div>
 
@@ -52,11 +46,11 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('categories.show', $category->id) }}"
+                                    <a href="{{ route('admin.categories.index', $category->id) }}"
                                         class="btn btn-sm btn-info">Xem</a>
-                                    <a href="{{ route('categories.edit', $category->id) }}"
+                                    <a href="{{ route('admin.categories.edit', $category->id) }}"
                                         class="btn btn-sm btn-warning">Sửa</a>
-                                    <form action="{{ route('categories.destroy', $category->id) }}" method="POST"
+                                    <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST"
                                         style="display:inline" onsubmit="return confirm('Xác nhận xóa?')">
                                         @csrf
                                         @method('DELETE')
@@ -74,13 +68,16 @@
 
                 <!-- Phân trang -->
                 <div class="mt-3">
-                    {{ $categories->links() }}
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div class="pagination-info">
+                            {{ $categories->appends(request()->query())->onEachSide(1)->render() }}
+                            <!-- Custom render nếu cần -->
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+@endsection

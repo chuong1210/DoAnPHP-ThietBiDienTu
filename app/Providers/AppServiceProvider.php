@@ -10,6 +10,7 @@ use App\Repositories\CartRepository;
 use App\Repositories\Interfaces\CartRepositoryInterface;
 use Carbon\Carbon;
 use DateTime;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
@@ -29,5 +30,8 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void {}
+    public function boot(): void
+    {
+        Paginator::useBootstrapFive();
+    }
 }

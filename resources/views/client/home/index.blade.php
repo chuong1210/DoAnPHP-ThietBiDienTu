@@ -37,7 +37,7 @@
                 <div class="col-md-3 mb-4">
                     <div class="card product-card">
                         @if($product->image)
-                            <img src="{{  $product->image }}" class="card-img-top product-image" alt="{{ $product->name }}">
+                            <img src="{{ asset($product->image) }}" class="card-img-top product-image" alt="{{ $product->name }}">
                         @else
                             <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
                                 <i class="fas fa-image fa-3x text-muted"></i>
@@ -78,7 +78,7 @@
                 <div class="col-md-3 mb-4">
                     <div class="card product-card">
                         @if($product->image)
-                            <img src="{{ $product->image }}" class="card-img-top product-image" alt="{{ $product->name }}">
+                            <img src="{{ asset($product->image) }}" class="card-img-top product-image" alt="{{ $product->name }}">
                         @endif
 
                         <div class="card-body">

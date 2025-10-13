@@ -52,7 +52,7 @@ Route::prefix('client')->name('client.')->group(function () {
 
     Route::get('/product/{slug}', [ClientsProductController::class, 'show'])->name('product.show');
     Route::get('/search', [ClientsProductController::class, 'search'])->name('search');
-    Route::get('/category/{slug}', [ClientsProductController::class, 'category'])->name('product.category.index');
+    Route::get('/category/{slug}', action: [ClientsProductController::class, 'category'])->name('product.category.index');
 
     Route::get('/home', [HomeController::class, 'index'])->name('home.index');
 

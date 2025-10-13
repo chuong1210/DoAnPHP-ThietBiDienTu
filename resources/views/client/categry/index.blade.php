@@ -62,7 +62,7 @@
                         <div class="col-md-4 mb-4">
                             <div class="card product-card h-100">
                                 @if($product->image)
-                                    <img src="{{ asset('images/products/' . $product->image) }}" class="card-img-top product-image"
+                                    <img src="{{  asset($product->image) }}" class="card-img-top product-image"
                                         alt="{{ $product->name }}" loading="lazy">
                                 @else
                                     <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">

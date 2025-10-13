@@ -65,7 +65,7 @@ class ProductController extends Controller
         $categories = $this->categoryRepository->getActiveCategories();
         $brands = $this->brandRepository->getActiveBrands();
 
-        return view('admin.product.index', compact('products', 'categories', 'brands'));
+        return view('admin.products.index', compact('products', 'categories', 'brands'));
     }
 
     /**
@@ -78,7 +78,7 @@ class ProductController extends Controller
         $categories = $this->categoryRepository->getActiveCategories();
         $brands = $this->brandRepository->getActiveBrands();
 
-        return view('admin.product.create', compact('categories', 'brands'));
+        return view('admin.products.create', compact('categories', 'brands'));
     }
 
     /**
@@ -129,8 +129,9 @@ class ProductController extends Controller
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $imageName = time() . '_' . str()->random(10) . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images/products'), $imageName);
-                $validated['image'] = $imageName;
+                $image->move(public_path('images/'), $imageName);
+                $validated['image'] = 'images/' . $imageName; // ✔ lưu kèm thư mục
+
             }
 
             // Xử lý upload nhiều ảnh
@@ -138,8 +139,8 @@ class ProductController extends Controller
                 $uploadedImages = [];
                 foreach ($request->file('images') as $image) {
                     $imageName = time() . '_' . str()->random(10) . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('images/products'), $imageName);
-                    $uploadedImages[] = $imageName;
+                    $image->move(public_path('images/'), $imageName);
+                    $uploadedImages[] = 'images/' . $imageName; // ✔ Lưu kèm folder
                 }
                 $validated['images'] = json_encode($uploadedImages);
             }
@@ -152,7 +153,7 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.product.index')
+            return redirect()->route('admin.products.index')
                 ->with('success', 'Thêm sản phẩm thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -171,7 +172,7 @@ class ProductController extends Controller
     {
         $product = $this->productRepository->findById($id, ['*'], ['category', 'brand', 'reviews.user']);
 
-        return view('admin.product.show', compact('product'));
+        return view('admin.products.show', compact('product'));
     }
 
     /**
@@ -186,7 +187,7 @@ class ProductController extends Controller
         $categories = $this->categoryRepository->getActiveCategories();
         $brands = $this->brandRepository->getActiveBrands();
 
-        return view('admin.product.edit', compact('product', 'categories', 'brands'));
+        return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
 
     /**
@@ -226,15 +227,16 @@ class ProductController extends Controller
             // Xử lý upload ảnh mới
             if ($request->hasFile('image')) {
                 // Xóa ảnh cũ
-                if ($product->image && file_exists(public_path('images/products/' . $product->image))) {
-                    unlink(public_path('images/products/' . $product->image));
+                if ($product->image && file_exists(public_path($product->image))) {
+                    unlink(public_path($product->image));
                 }
 
                 // Upload ảnh mới
                 $image = $request->file('image');
                 $imageName = time() . '_' . str()->random(10) . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images/products'), $imageName);
-                $validated['image'] = $imageName;
+                $image->move(public_path('images/'), $imageName);
+                $validated['image'] = 'images/' . $imageName; // ✔ lưu kèm thư mục
+
             }
 
             // Xử lý checkbox is_featured
@@ -245,7 +247,7 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.product.index')
+            return redirect()->route('admin.products.index')
                 ->with('success', 'Cập nhật sản phẩm thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -267,16 +269,16 @@ class ProductController extends Controller
             $product = $this->productRepository->findById($id);
 
             // Xóa ảnh
-            if ($product->image && file_exists(public_path('images/products/' . $product->image))) {
-                unlink(public_path('images/products/' . $product->image));
+            if ($product->image && file_exists(public_path($product->image))) {
+                unlink(public_path($product->image));
             }
 
             // Xóa nhiều ảnh
             if ($product->images) {
                 $images = json_decode($product->images, true);
                 foreach ($images as $image) {
-                    if (file_exists(public_path('images/products/' . $image))) {
-                        unlink(public_path('images/products/' . $image));
+                    if (file_exists(public_path($image))) {
+                        unlink(public_path($image));
                     }
                 }
             }
@@ -286,7 +288,7 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.product.index')
+            return redirect()->route('admin.products.index')
                 ->with('success', 'Xóa sản phẩm thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
