@@ -12,7 +12,7 @@
             </div> --}}
 
             <!-- Main content -->
-            <div class="col-lg-9 col-md-8">
+            <div class="col-lg-12 col-md-8">
                 <div class="row">
                     <div class="col-12">
                         <h1 class="mb-4">Tất cả sản phẩm</h1>

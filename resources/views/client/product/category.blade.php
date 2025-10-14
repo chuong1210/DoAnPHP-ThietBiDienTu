@@ -6,7 +6,7 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('client.home') }}">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}">Trang chủ</a></li>
             <li class="breadcrumb-item active">{{ $category['name'] }}</li>
         </ol>
     </nav>

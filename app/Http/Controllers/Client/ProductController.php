@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Repositories\BrandRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ProductRepository;
+use App\Repositories\ReviewRepository;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
 
@@ -17,26 +18,30 @@ class ProductController extends Controller
 
     protected $productRepository;
     protected $productService;
-
     protected $categoryRepository;
     protected $categoryService;
-
     protected $brandRepository;
     protected $brandService;
+    protected $reviewRepository;
 
-    public function __construct(ProductRepository $productRepository, ProductService $productService, CategoryRepository $categoryRepository, BrandRepository $brandRepository)
-    {
+    public function __construct(
+        ProductRepository $productRepository,
+        ProductService $productService,
+        CategoryRepository $categoryRepository,
+        BrandRepository $brandRepository,
+        ReviewRepository $reviewRepository
+    ) {
         $this->productRepository = $productRepository;
         $this->productService = $productService;
         $this->categoryRepository = $categoryRepository;
         $this->brandRepository = $brandRepository;
+        $this->reviewRepository = $reviewRepository;
     }
     /**
      * Danh sách sản phẩm với filter
      */
     public function index(Request $request)
     {
-        // Lấy categories cho sidebar
         // Lấy categories cho sidebar
         $categories = $this->categoryRepository->getCategoriesWithChildren();
 
@@ -65,6 +70,7 @@ class ProductController extends Controller
     /**
      * Chi tiết sản phẩm
      */
+
     public function show($slug)
     {
         // Lấy sản phẩm theo slug qua ProductService/Repository
@@ -80,12 +86,25 @@ class ProductController extends Controller
             8
         );
 
+        // Lấy đánh giá đã duyệt (paginated)
+        $reviews = $this->reviewRepository->getApprovedReviewsByProduct($product->id, 5);
+
+        // Tính điểm trung bình
+        $averageRating = $this->reviewRepository->getAverageRating($product->id);
+
+        // Tính discount percent nếu có sale_price
+        $discountPercent = $product->sale_price ? round((($product->price - $product->sale_price) / $product->price) * 100) : 0;
+
         // Categories cho sidebar
         $categories = $this->categoryRepository->getCategoriesWithChildren();
+
         return view('client.product.show', compact(
             'product',
             'relatedProducts',
-            'categories'
+            'categories',
+            'reviews',
+            'averageRating',
+            'discountPercent'
         ));
     }
 

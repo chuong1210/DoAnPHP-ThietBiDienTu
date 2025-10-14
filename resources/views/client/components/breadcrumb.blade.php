@@ -3,7 +3,7 @@
 <nav aria-label="breadcrumb" {{ $attributes->merge(['class' => 'mb-4']) }}>
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{{ route('client.home') }}">
+            <a href="{{ route('client.home.index') }}">
                 <i class="fas fa-home"></i> Trang chủ
             </a>
         </li>

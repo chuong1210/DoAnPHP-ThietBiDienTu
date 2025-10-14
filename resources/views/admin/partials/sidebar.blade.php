@@ -31,7 +31,7 @@
 
         <hr class="bg-secondary">
 
-        <a href="{{ route('client.home') }}" class="nav-link" target="_blank">
+        <a href="{{ route('client.home.index') }}" class="nav-link" target="_blank">
             <i class="fas fa-globe"></i> Xem Trang Client
         </a>
     </nav>

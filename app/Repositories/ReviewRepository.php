@@ -18,48 +18,21 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
     }
 
     /**
-     * Lấy reviews đã duyệt cho sản phẩm (client)
+     * Lấy đánh giá đã duyệt của sản phẩm (paginated)
      */
-    public function getApprovedReviewsByProduct($productId, $limit = 10)
+    public function getApprovedReviewsByProduct($productId, $perPage = 10)
     {
-        return $this->model->with('user')
+        return $this->model->with(['user'])
             ->where('product_id', $productId)
             ->where('status', 'approved')
             ->orderBy('created_at', 'DESC')
-            ->limit($limit)
-            ->get();
+            ->paginate($perPage);
     }
 
     /**
-     * Lấy reviews đang chờ duyệt (admin)
+     * Tính điểm đánh giá trung bình của sản phẩm
      */
-    public function getPendingReviews($perPage = 20)
-    {
-        return $this->pagination(
-            ['*'],
-            ['where' => [['status', '=', 'pending']]],
-            $perPage,
-            [],
-            ['user', 'product'],
-            ['created_at', 'DESC']
-        );
-    }
-
-    /**
-     * Lấy reviews của user
-     */
-    public function getReviewsByUser($userId)
-    {
-        return $this->model->with(['product', 'product.brand'])
-            ->where('user_id', $userId)
-            ->orderBy('created_at', 'DESC')
-            ->get();
-    }
-
-    /**
-     * Tính điểm đánh giá trung bình cho sản phẩm
-     */
-    public function getAverageRatingByProduct($productId)
+    public function getAverageRating($productId)
     {
         return $this->model->where('product_id', $productId)
             ->where('status', 'approved')
@@ -67,37 +40,34 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
     }
 
     /**
-     * Tạo review mới (client, sau khi mua hàng)
+     * Tạo đánh giá mới (kiểm tra điều kiện)
      */
     public function createReview($data)
     {
         DB::beginTransaction();
         try {
-            // Kiểm tra user đã mua sản phẩm chưa (qua order_items)
-            $hasPurchased = DB::table('order_items')
+            // Kiểm tra user đã mua sản phẩm chưa (giả sử qua order_items)
+            $hasOrdered = DB::table('order_items')
                 ->join('orders', 'order_items.order_id', '=', 'orders.id')
                 ->where('orders.user_id', Auth::id())
                 ->where('order_items.product_id', $data['product_id'])
-                ->whereIn('orders.status', ['delivered'])
+                ->where('orders.status', 'delivered') // Chỉ review sau khi nhận hàng
                 ->exists();
 
-            if (!$hasPurchased) {
-                throw new \Exception('Bạn chỉ có thể đánh giá sản phẩm đã mua.');
+            if (!$hasOrdered) {
+                throw new \Exception('Bạn chưa mua sản phẩm này để có thể đánh giá.');
             }
 
             // Kiểm tra user chưa review sản phẩm này
-            $existingReview = $this->model->where('user_id', Auth::id())
-                ->where('product_id', $data['product_id'])
-                ->whereIn('status', ['approved', 'pending'])
+            $existingReview = $this->model->where('product_id', $data['product_id'])
+                ->where('user_id', Auth::id())
                 ->first();
 
             if ($existingReview) {
                 throw new \Exception('Bạn đã đánh giá sản phẩm này rồi.');
             }
 
-            $data['status'] = 'pending'; // Chờ duyệt
             $review = $this->create($data);
-
             DB::commit();
             return $review;
         } catch (\Exception $e) {
@@ -107,7 +77,18 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
     }
 
     /**
-     * Duyệt review (admin)
+     * Lấy danh sách review đang chờ duyệt (cho admin, paginated)
+     */
+    public function getPendingReviews($perPage = 20)
+    {
+        return $this->model->with(['user', 'product'])
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'DESC')
+            ->paginate($perPage);
+    }
+
+    /**
+     * Duyệt review
      */
     public function approveReview($id)
     {
@@ -115,22 +96,21 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
     }
 
     /**
-     * Từ chối review (admin)
+     * Từ chối review
      */
-    public function rejectReview($id, $reason = null)
+    public function rejectReview($id)
     {
-        $data = ['status' => 'rejected'];
-        if ($reason) {
-            $data['comment'] = $reason; // Có thể append reason vào comment
-        }
-        return $this->update($id, $data);
+        return $this->update($id, ['status' => 'rejected']);
     }
 
     /**
-     * Xóa review (admin)
+     * Lấy đánh giá của user (cho client profile)
      */
-    public function deleteReview($id)
+    public function getReviewsByUser($userId, $perPage = 10)
     {
-        return $this->delete($id);
+        return $this->model->with(['product'])
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'DESC')
+            ->paginate($perPage);
     }
 }

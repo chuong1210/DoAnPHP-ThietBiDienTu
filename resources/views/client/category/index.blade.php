@@ -6,7 +6,7 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('client.home') }}">Trang Chủ</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}">Trang Chủ</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ $category['name'] }}</li>
         </ol>
     </nav>
@@ -22,7 +22,7 @@
                     <ul class="list-group list-group-flush">
                         @foreach($categories as $parentCategory)
                             <li class="list-group-item">
-                                <a href="{{ route('client.category.index', $parentCategory->slug) }}"
+                                <a href="{{ route('client.product.category.index', $parentCategory->slug) }}"
                                     class="d-flex justify-content-between align-items-center {{ request()->segment(2) == $parentCategory->slug ? 'fw-bold text-primary' : '' }}">
                                     {{ $parentCategory->name }}
                                     @if($parentCategory->children->count() > 0)
@@ -34,7 +34,7 @@
                                     <ul class="list-unstyled ms-3 mt-1">
                                         @foreach($parentCategory->children as $childCategory)
                                             <li>
-                                                <a href="{{ route('client.category.index', $childCategory->slug) }}"
+                                                <a href="{{ route('client.product.category.index', $childCategory->slug) }}"
                                                     class="text-muted small {{ request()->segment(2) == $childCategory->slug ? 'text-primary' : '' }}">
                                                     {{ $childCategory->name }}
                                                 </a>

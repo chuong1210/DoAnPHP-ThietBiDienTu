@@ -7,7 +7,7 @@ use App\Repositories\ProductRepository;
 use App\Repositories\ReviewRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class ReviewController extends Controller
 {
@@ -23,75 +23,88 @@ class ReviewController extends Controller
     }
 
     /**
-     * Hiển thị form đánh giá sản phẩm (client)
-     * GET /products/{slug}/reviews/create
+     * Hiển thị form đánh giá sản phẩm (chỉ nếu đã mua)
+     * GET /products/{slug}/review
      */
     public function create($slug)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Vui lòng đăng nhập để đánh giá.');
-        }
-
         $product = $this->productRepository->getProductBySlug($slug);
 
-        return view('client.reviews.create', compact('product'));
+        // Kiểm tra user đã mua chưa (sử dụng logic từ repository)
+        try {
+            $hasOrdered = DB::table('order_items')
+                ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                ->where('orders.user_id', Auth::id())
+                ->where('order_items.product_id', $product->id)
+                ->where('orders.status', 'delivered')
+                ->exists();
+
+            if (!$hasOrdered) {
+                return redirect()->route('client.product.show', $slug)
+                    ->with('error', 'Bạn chưa mua sản phẩm này để có thể đánh giá.');
+            }
+
+            // Kiểm tra đã review chưa
+            $existingReview = $this->reviewRepository->findByCondition(
+                [['product_id', '=', $product->id], ['user_id', '=', Auth::id()]],
+                false
+            );
+
+            if ($existingReview) {
+                return redirect()->route('client.product.show', $slug)
+                    ->with('error', 'Bạn đã đánh giá sản phẩm này rồi.');
+            }
+
+            return view('client.reviews.create', compact('product'));
+        } catch (\Exception $e) {
+            return redirect()->route('client.product.show', $slug)
+                ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Lưu đánh giá mới (client)
-     * POST /products/{slug}/reviews
+     * Lưu đánh giá mới
+     * POST /products/{slug}/review
      */
     public function store(Request $request, $slug)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Vui lòng đăng nhập để đánh giá.');
-        }
-
         $product = $this->productRepository->getProductBySlug($slug);
 
-        $validator = Validator::make($request->all(), [
-            'rating' => 'required|integer|between:1,5',
-            'comment' => 'required|max:1000',
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
         ], [
             'rating.required' => 'Vui lòng chọn điểm đánh giá.',
-            'rating.between' => 'Điểm đánh giá phải từ 1 đến 5.',
-            'comment.required' => 'Vui lòng nhập nội dung đánh giá.',
-            'comment.max' => 'Nội dung đánh giá không được vượt quá 1000 ký tự.',
+            'rating.integer' => 'Điểm đánh giá phải là số nguyên từ 1-5.',
+            'comment.max' => 'Nhận xét không được vượt quá 1000 ký tự.',
         ]);
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
+        $validated['product_id'] = $product->id;
+        $validated['user_id'] = Auth::id();
+        $validated['status'] = 'pending'; // Chờ admin duyệt
 
         try {
-            $data = [
-                'product_id' => $product->id,
-                'user_id' => Auth::id(),
-                'rating' => $request->rating,
-                'comment' => $request->comment,
-            ];
-
-            $this->reviewRepository->createReview($data);
+            $this->reviewRepository->createReview($validated);
 
             return redirect()->route('client.product.show', $slug)
                 ->with('success', 'Đánh giá của bạn đã được gửi và đang chờ duyệt!');
         } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage())->withInput();
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
     }
 
     /**
-     * Hiển thị danh sách đánh giá của user (client)
-     * GET /my-reviews
+     * Hiển thị danh sách đánh giá của user (profile)
+     * GET /profile/reviews
      */
-    public function myReviews()
-    {
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
+    // public function userReviews()
+    // {
+    //     if (!Auth::check()) {
+    //         return redirect()->route('client.login')->with('error', 'Vui lòng đăng nhập.');
+    //     }
 
-        $reviews = $this->reviewRepository->getReviewsByUser(Auth::id());
+    //     $reviews = $this->reviewRepository->getReviewsByUser(Auth::id());
 
-        return view('client.reviews.my-reviews', compact('reviews'));
-    }
+    //     return view('client.profile.reviews', compact('reviews'));
+    // }
 }

@@ -1,4 +1,4 @@
-@extends('client.homepage.layout')
+@extends('client.layouts.client')
 @section('content')
     <div class="cart-success">
         <div class="panel-head">
@@ -6,7 +6,7 @@
                 <span>{{ __('info.order_successful') }}</span>
             </h2>
             <div class="discover-text">
-                <a href="{{ route('home.index') }}">{{ __('info.explore_more_products') }}</a>
+                <a href="{{ route('client.home.index') }}">{{ __('info.explore_more_products') }}</a>
             </div>
         </div>
         <div class="panel-body">
@@ -96,7 +96,8 @@
                 </div>
                 <div>
                     {{ __('info.address') }}:
-                    <span>{{ getAddress($order->province_id, $order->district_id, $order->ward_id, $order->address) }}</span>
+                    {{-- <span>{{ getAddress($order->province_id, $order->district_id, $order->ward_id, $order->address)
+                        }}</span> --}}
                 </div>
                 <div>
                     {{ __('info.phone') }}: <span>{{ $order->phone }}</span>

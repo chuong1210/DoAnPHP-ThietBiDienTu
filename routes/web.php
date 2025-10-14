@@ -1,35 +1,27 @@
 <?php
 
-use App\Http\Controllers\Client\ProductController as ClientsProductController;
 use App\Http\Controllers\Admin\BrandController as AdminBrandController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BrandController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\client\AuthAdminController;
-use App\Http\Controllers\client\AuthClientController;
 use App\Http\Controllers\Client\BrandController as ClientBrandController;
-use App\Http\Controllers\client\CartController;
-use App\Http\Controllers\client\CheckoutController;
-use App\Http\Controllers\client\HomeClientController;
-use App\Http\Controllers\client\HomeController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProductController;
-use App\Models\Category;
+use App\Http\Controllers\Client\CartController;
+use App\Http\Controllers\Client\CheckoutController;
+use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\OrderController;
+use App\Http\Controllers\Client\ProductController as ClientsProductController;
+use App\Http\Controllers\Client\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-
-
 /*
 |--------------------------------------------------------------------------
-| User UnAuthenticated Routes (Người dùng chưa đăng nhập)
+| Guest Routes (Người dùng chưa đăng nhập)
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
@@ -39,31 +31,17 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('auth.register.post');
 });
 
-
-// Route::get('/products', [HomeController::class, 'products'])->name('products.list');
-// Route::get('/products/{slug}', [HomeController::class, 'productDetail'])->name('products.detail');
-// Route::get('/category/{slug}', [HomeController::class, 'category'])->name('category.show');
-// Route::get('/brand/{slug}', [HomeController::class, 'brand'])->name('brand.show');
-
-
+/*
+|--------------------------------------------------------------------------
+| Client Public Routes (Công khai - Không cần đăng nhập)
+|--------------------------------------------------------------------------
+*/
 Route::prefix('client')->name('client.')->group(function () {
-    // Route::get('/products', [ClientsProductController::class, 'products'])->name('product.index');
+    Route::get('/home', [HomeController::class, 'index'])->name('home.index');
     Route::get('/products', [ClientsProductController::class, 'all'])->name('product.index');
-
     Route::get('/product/{slug}', [ClientsProductController::class, 'show'])->name('product.show');
     Route::get('/search', [ClientsProductController::class, 'search'])->name('search');
-    Route::get('/category/{slug}', action: [ClientsProductController::class, 'category'])->name('product.category.index');
-
-    Route::get('/home', [HomeController::class, 'index'])->name('home.index');
-
-    Route::prefix('cart')->name('cart.')->group(function () {
-        Route::get('/', [CartController::class, 'index'])->name('index');
-        Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
-        Route::put('/update/{item}', [CartController::class, 'update'])->name('update');
-        Route::delete('/remove/{item}', [CartController::class, 'remove'])->name('remove');
-    });
-
-
+    Route::get('/category/{slug}', [ClientsProductController::class, 'category'])->name('product.category.index');
 
     Route::prefix('brands')->name('brand.')->group(function () {
         Route::get('{slug}', [ClientBrandController::class, 'index'])->name('index');
@@ -72,41 +50,55 @@ Route::prefix('client')->name('client.')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| User Authenticated Routes (Người dùng đã đăng nhập)
+| Client Authenticated Routes (Người dùng đã đăng nhập)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
+    // Auth actions
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/profile', [AuthController::class, 'profile'])->name('profile.index');
+    Route::put('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/profile/update/password', [AuthController::class, 'updatePassword'])->name('profile.update.password');
 
+    // Reviews
+    Route::get('/products/{slug}/review', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/products/{slug}/review', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/profile/reviews', [ReviewController::class, 'userReviews'])->name('profile.reviews');
 
-    Route::prefix('checkout')->name('checkout.')->group(function () {
+    // Cart
+    Route::prefix('client/cart')->name('client.cart.')->group(function () {
+        Route::get('/', [CartController::class, 'index'])->name('index');
+        Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
+        Route::put('/update/{item}', [CartController::class, 'update'])->name('update');
+        Route::delete('/remove/{item}', [CartController::class, 'remove'])->name('remove');
+    });
+
+    // Checkout
+    Route::prefix('client/checkout')->name('client.checkout.')->group(function () {
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
+        Route::post('/apply-coupon', [CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
+        Route::post('/remove-coupon', [CheckoutController::class, 'removeCoupon'])->name('remove-coupon');
         Route::post('/process', [CheckoutController::class, 'process'])->name('process');
         Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
     });
 
-    Route::get('/my-orders', [CheckoutController::class, 'myOrders'])->name('my-orders');
-    Route::get('/my-orders/{order}', [CheckoutController::class, 'orderDetail'])->name('order-detail');
+    // Orders
+    Route::prefix('client/my-orders')->name('client.my-orders.')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+        Route::post('/{id}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+    });
 });
-
-Route::middleware('auth')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
-    Route::put('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
-});
-Route::get('/home', [HomeController::class, 'index'])->name('client.home');
-
 
 /*
 |--------------------------------------------------------------------------
 | Admin Routes (Quản trị viên)
 |--------------------------------------------------------------------------
 */
-
 Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth', 'admin'])
     ->group(function () {
-
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('products', AdminProductController::class);

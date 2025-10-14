@@ -6,10 +6,9 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('client.home') }}">Trang chủ</a></li>
-            {{-- <li class="breadcrumb-item"><a href="{{ route('client.category', $product->category->slug) }}">{{
-                    $product->category->name }}</a></li>
-            <li class="breadcrumb-item active">{{ $product->name }}</li> --}}
+            <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('client.product.category.index', $product->category->slug) }}">{{ $product->category->name }}</a></li>
+            <li class="breadcrumb-item active">{{ $product->name }}</li>
         </ol>
     </nav>
 
@@ -19,7 +18,7 @@
             <div class="card">
                 <div class="card-body">
                     @if($product->image)
-                        <img src="{{ asset( $product->image) }}" class="img-fluid rounded mb-3"
+                        <img src="{{ asset($product->image) }}" class="img-fluid rounded mb-3"
                             alt="{{ $product->name }}" id="mainImage">
                     @else
                         <div class="bg-light text-center py-5 rounded mb-3">
@@ -28,17 +27,16 @@
                     @endif
 
                     <!-- Gallery -->
-               @if(!empty($product->images))
-    <div class="row g-2">
-        @foreach($product->images as $image)
-            <div class="col-3">
-                <img src="{{ asset( $image) }}" class="img-thumbnail cursor-pointer"
-                    onclick="changeMainImage(this.src)" alt="Gallery">
-            </div>
-        @endforeach
-    </div>
-@endif
-
+                    @if(!empty($product->images))
+                        <div class="row g-2">
+                            @foreach($product->images as $image)
+                                <div class="col-3">
+                                    <img src="{{ asset( $image) }}" class="img-thumbnail cursor-pointer"
+                                        onclick="changeMainImage(this.src)" alt="Gallery">
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -61,15 +59,15 @@
                     <!-- Rating -->
                     <div class="mb-3">
                         @for($i = 1; $i <= 5; $i++)
-                            @if($i <= $product->average_rating)
+                            @if($i <= $averageRating)
                                 <i class="fas fa-star text-warning"></i>
                             @else
                                 <i class="far fa-star text-warning"></i>
                             @endif
                         @endfor
                         <span class="ms-2">
-                            <strong>{{ number_format($product->average_rating, 1) }}</strong>
-                            ({{ $product->reviews->count() }} đánh giá)
+                            <strong>{{ number_format($averageRating, 1) }}</strong>
+                            ({{ $reviews->total() }} đánh giá)
                         </span>
                         <span class="ms-3 text-muted">
                             <i class="fas fa-eye"></i> {{ number_format($product->view_count) }} lượt xem
@@ -83,8 +81,10 @@
                         @if($product->sale_price)
                             <div class="d-flex align-items-center gap-3">
                                 <span class="h2 text-danger mb-0">{{ number_format($product->sale_price) }}đ</span>
-                                <span class="h5 price-old mb-0">{{ number_format($product->price) }}đ</span>
-                                <span class="badge bg-danger">-{{ $product->discount_percent }}%</span>
+                                <span class="h5 price-old mb-0 text-decoration-line-through">{{ number_format($product->price) }}đ</span>
+                                @if($discountPercent > 0)
+                                    <span class="badge bg-danger">-{{ $discountPercent }}%</span>
+                                @endif
                             </div>
                         @else
                             <span class="h2 text-primary mb-0">{{ number_format($product->price) }}đ</span>
@@ -131,7 +131,7 @@
                                 <button type="submit" class="btn btn-primary btn-lg">
                                     <i class="fas fa-cart-plus"></i> Thêm Vào Giỏ Hàng
                                 </button>
-                                <button type="button" class="btn btn-outline-primary btn-lg">
+                                <button type="button" class="btn btn-outline-primary btn-lg" onclick="buyNow()">
                                     <i class="fas fa-bolt"></i> Mua Ngay
                                 </button>
                             </div>
@@ -177,7 +177,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#reviews">
-                                <i class="fas fa-star"></i> Đánh Giá ({{ $product->reviews->count() }})
+                                <i class="fas fa-star"></i> Đánh Giá ({{ $reviews->total() }})
                             </a>
                         </li>
                     </ul>
@@ -197,30 +197,69 @@
 
                         <!-- Reviews Tab -->
                         <div class="tab-pane fade" id="reviews">
-                            @foreach($product->reviews->where('status', 'approved') as $review)
-                                <div class="review-item mb-4 pb-4 border-bottom">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <strong>{{ $review->user->full_name }}</strong>
-                                            <div class="text-warning">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    @if($i <= $review->rating)
-                                                        <i class="fas fa-star"></i>
-                                                    @else
-                                                        <i class="far fa-star"></i>
+                            @if($reviews->count() > 0)
+                                <div class="reviews-list">
+                                    @foreach($reviews as $review)
+                                        <div class="review-item mb-4 pb-4 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <strong class="me-2">{{ $review->user->full_name }}</strong>
+                                                        <div class="text-warning">
+                                                            @for($i = 1; $i <= 5; $i++)
+                                                                @if($i <= $review->rating)
+                                                                    <i class="fas fa-star"></i>
+                                                                @else
+                                                                    <i class="far fa-star"></i>
+                                                                @endif
+                                                            @endfor
+                                                        </div>
+                                                    </div>
+                                                    @if($review->comment)
+                                                        <p class="mt-2 mb-0 text-muted">{{ $review->comment }}</p>
                                                     @endif
-                                                @endfor
+                                                </div>
+                                                <small class="text-muted ms-2">{{ $review->created_at->format('d/m/Y H:i') }}</small>
                                             </div>
                                         </div>
-                                        <small class="text-muted">{{ $review->created_at->diffForHumans() }}</small>
-                                    </div>
-                                    <p class="mt-2 mb-0">{{ $review->comment }}</p>
+                                    @endforeach
                                 </div>
-                            @endforeach
 
-                            @if($product->reviews->where('status', 'approved')->count() == 0)
-                                <p class="text-muted text-center py-4">Chưa có đánh giá nào</p>
+                                <!-- Pagination -->
+                                <div class="d-flex justify-content-center">
+                                    {{ $reviews->links() }}
+                                </div>
+                            @else
+                                <p class="text-muted text-center py-4">Chưa có đánh giá nào cho sản phẩm này.</p>
                             @endif
+
+                            <!-- Add Review Button (nếu user đã mua) -->
+                            @auth
+                                @php
+                                    $hasReviewed = $reviews->where('user_id', auth()->id())->count() > 0;
+                                    $hasOrdered = \DB::table('order_items')
+                                        ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                                        ->where('orders.user_id', auth()->id())
+                                        ->where('order_items.product_id', $product->id)
+                                        ->where('orders.status', 'delivered')
+                                        ->exists();
+                                @endphp
+                                @if($hasOrdered && !$hasReviewed)
+                                    <div class="mt-4 text-center">
+                                        <a href="{{ route('reviews.create', $product->slug) }}" class="btn btn-primary">
+                                            <i class="fas fa-star"></i> Viết Đánh Giá Của Bạn
+                                        </a>
+                                    </div>
+                                @elseif($hasReviewed)
+                                    <div class="alert alert-info text-center mt-4">
+                                        <i class="fas fa-check"></i> Bạn đã đánh giá sản phẩm này rồi.
+                                    </div>
+                                @endif
+                            @else
+                                <div class="alert alert-info text-center mt-4">
+                                    <i class="fas fa-sign-in-alt"></i> <a href="{{ route('auth.login') }}">Đăng nhập</a> để viết đánh giá.
+                                </div>
+                            @endauth
                         </div>
                     </div>
                 </div>
@@ -235,20 +274,32 @@
             <div class="row">
                 @foreach($relatedProducts as $related)
                     <div class="col-md-3 mb-4">
-                        <div class="card product-card">
+                        <div class="card product-card h-100">
                             <a href="{{ route('client.product.show', $related->slug) }}">
                                 @if($related->image)
                                     <img src="{{ asset( $related->image) }}" class="card-img-top product-image"
-                                        alt="{{ $related->name }}">
+                                        alt="{{ $related->name }}" loading="lazy">
+                                @else
+                                    <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-image fa-3x text-muted"></i>
+                                    </div>
                                 @endif
                             </a>
-                            <div class="card-body">
+                            <div class="card-body d-flex flex-column">
                                 <h6 class="card-title">{{ Str::limit($related->name, 50) }}</h6>
-                                <div class="mb-2">
-                                    <span class="h6 text-primary">{{ number_format($related->final_price) }}đ</span>
+                                <p class="text-muted small mb-2">{{ $related->brand->name ?? 'N/A' }}</p>
+                                <div class="mb-auto">
+                                    <span class="h6 text-primary mb-0">
+                                        @if($related->sale_price)
+                                            {{ number_format($related->sale_price) }}đ
+                                            <small class="text-decoration-line-through">{{ number_format($related->price) }}đ</small>
+                                        @else
+                                            {{ number_format($related->price) }}đ
+                                        @endif
+                                    </span>
                                 </div>
                                 <a href="{{ route('client.product.show', $related->slug) }}"
-                                    class="btn btn-outline-primary btn-sm w-100">
+                                    class="btn btn-outline-primary btn-sm mt-auto">
                                     Xem Chi Tiết
                                 </a>
                             </div>
@@ -281,6 +332,12 @@
             if (current > 1) {
                 input.value = current - 1;
             }
+        }
+
+        function buyNow() {
+            // Set quantity to 1 and submit form for buy now (có thể redirect to checkout)
+            document.getElementById('quantity').value = 1;
+            document.querySelector('form[action*="cart.add"]').submit();
         }
     </script>
 @endsection
