@@ -80,6 +80,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/remove-coupon', [CheckoutController::class, 'removeCoupon'])->name('remove-coupon');
         Route::post('/process', [CheckoutController::class, 'process'])->name('process');
         Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
+
+        Route::post('/apply-voucher', [CheckoutController::class, 'applyVoucher'])->name('apply-voucher');
     });
 
     // Orders

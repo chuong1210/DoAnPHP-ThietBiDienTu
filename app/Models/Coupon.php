@@ -14,6 +14,8 @@ class Coupon extends Model
         'type',
         'value',
         'min_order',
+        'max_discount',
+
         'max_uses',
         'used_count',
         'start_date',
@@ -25,6 +27,8 @@ class Coupon extends Model
         'value' => 'decimal:2',
         'min_order' => 'decimal:2',
         'max_uses' => 'integer',
+        'max_discount' => 'decimal:2',
+
         'used_count' => 'integer',
         'is_active' => 'boolean',
         'start_date' => 'datetime',
@@ -58,11 +62,25 @@ class Coupon extends Model
             return 0;
         }
 
+        $discount = 0;
+
         if ($this->type === 'fixed') {
-            return $this->value;
+            $discount = $this->value;
         } else { // percent
-            return ($orderTotal * $this->value) / 100;
+            $discount = ($orderTotal * $this->value) / 100;
+
+            // Áp dụng giảm giá tối đa
+            if ($this->max_discount && $discount > $this->max_discount) {
+                $discount = $this->max_discount;
+            }
         }
+
+        // Đảm bảo không vượt quá tổng tiền
+        if ($discount > $orderTotal) {
+            $discount = $orderTotal;
+        }
+
+        return $discount;
     }
 
     public function incrementUsage()
