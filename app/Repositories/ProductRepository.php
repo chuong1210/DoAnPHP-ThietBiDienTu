@@ -95,12 +95,15 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         }
 
         // Filter by price range
-        if (!empty($filters['price_from'])) {
-            $query->where('price', '>=', $filters['price_from']);
+        if (!empty($filters['price_from'] ?? null)) {
+            $query->where('price', '>=', (int) $filters['price_from']);
         }
-        if (!empty($filters['price_to'])) {
-            $query->where('price', '<=', $filters['price_to']);
+
+        if (!empty($filters['price_to'] ?? null)) {
+            $query->where('price', '<=', (int) $filters['price_to']);
         }
+
+
 
         // Sorting
         $sortBy = $filters['sort_by'] ?? 'created_at';

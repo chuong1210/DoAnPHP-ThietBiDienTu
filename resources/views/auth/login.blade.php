@@ -77,8 +77,8 @@
                     <div class="card-body">
                         <h6>Tài khoản Demo:</h6>
                         <small class="text-muted">
-                            <strong>Admin:</strong> admin@shop.com / admin123<br>
-                            <strong>User:</strong> user1@gmail.com / user123
+                            <strong>Admin:</strong> admin@shop.com / Admin1234<br>
+                            <strong>User:</strong> user1@gmail.com / User1234
                         </small>
                     </div>
                 </div>

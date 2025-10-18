@@ -58,7 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile.index');
     Route::put('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
-    Route::put('/profile/update/password', [AuthController::class, 'updatePassword'])->name('profile.update.password');
+    Route::post('/profile/update/password', [AuthController::class, 'updatePassword'])->name('profile.update.password');
 
     // Reviews
     Route::get('/products/{slug}/review', [ReviewController::class, 'create'])->name('reviews.create');
@@ -81,7 +81,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/process', [CheckoutController::class, 'process'])->name('process');
         Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
 
-        Route::post('/apply-voucher', [CheckoutController::class, 'applyVoucher'])->name('apply-voucher');
+        Route::post('/apply-coupon', [CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
     });
 
     // Orders

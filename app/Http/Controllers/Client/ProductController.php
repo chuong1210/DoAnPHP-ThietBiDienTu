@@ -47,16 +47,16 @@ class ProductController extends Controller
 
         $brands = $this->brandRepository->getActiveBrands();
 
-        // Gọi service để lấy products (không xử lý DB ở Controller nữa)
-        $products = $this->productService->search(
+        $products = $this->productRepository->searchProducts(
             $request->get('keyword'),  // keyword tìm kiếm (nếu có)
             [
                 'category_id' => $request->get('category_id'),
                 'brand_id'    => $request->get('brand_id'),
                 'price_from'  => $request->get('price_from'),
                 'price_to'    => $request->get('price_to'),
-                'sort'        => $request->get('sort', 'created_at'),
-                'order'       => $request->get('order', 'DESC'),
+                'sort_by'     => $request->get('sort', 'created_at'),
+                'sort_order'  => $request->get('order', 'DESC'),
+                'per_page'    => $request->get('per_page', 20),
             ]
         );
 
@@ -116,13 +116,13 @@ class ProductController extends Controller
         $keyword = $request->get('q');
 
         $filters = [
-            'category_id' => $request->category_id,
-            'brand_id'    => $request->brand_id,
-            'price_from'  => $request->price_from,
-            'price_to'    => $request->price_to,
+            'category_id' => $request->get('category_id'),
+            'brand_id'    => $request->get('brand_id'),
+            'price_from'  => $request->get('price_from'),
+            'price_to'    => $request->get('price_to'),
             'sort_by'     => $request->get('sort', 'created_at'),
             'sort_order'  => $request->get('order', 'DESC'),
-            'per_page'    => 20
+            'per_page'    => $request->get('per_page', 20),
         ];
 
         $products = $this->productRepository->searchProducts($keyword, $filters);
@@ -142,6 +142,7 @@ class ProductController extends Controller
     {
         // Lấy category + products qua service
         $data = $this->productRepository->getProductsByCategorySlug($slug, 20);
+
 
         // Lấy categories cho sidebar
         $categories = $this->categoryRepository->getSidebarCategories();
