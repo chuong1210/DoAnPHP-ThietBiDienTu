@@ -9,14 +9,11 @@ class BannerRepository extends BaseRepository implements BannerRepositoryInterfa
 {
     public function __construct(Banner $model)
     {
-        $this->model = $model;
-        parent::__construct($this->model);
+        parent::__construct($model);
     }
 
     public function getActiveBanners()
     {
-        return $this->model->where('is_active', true)
-            ->orderBy('sort_order')
-            ->get();
+        return $this->model->where('is_active', 1)->get();
     }
 }

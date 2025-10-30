@@ -28,7 +28,23 @@
             class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
             <i class="fas fa-shopping-cart"></i> Quản Lý Đơn Hàng
         </a>
-
+        <a href="{{ route('admin.banners.index') }}"
+            class="nav-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+            <i class="fas fa-image"></i> Quản Lý Banner
+        </a>
+        <a href="{{ route('admin.reviews.index') }}"
+            class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+            <i class="fas fa-image"></i> Quản Lý Reviews
+        </a>
+        
+        <a href="{{ route('admin.contact.index') }}" 
+            class="nav-link {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}">
+            <i class="fas fa-headset"></i> Quản Lý Liên Hệ
+        </a>
+        <a href="{{ route('admin.faqs.index') }}"
+                class="nav-link {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}">
+                <i class="fas fa-question-circle"></i> Quản Lý Câu Hỏi Thường Gặp
+         </a>
         <hr class="bg-secondary">
 
         <a href="{{ route('client.home.index') }}" class="nav-link" target="_blank">

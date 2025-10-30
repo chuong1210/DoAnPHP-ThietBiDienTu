@@ -46,12 +46,12 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
     {
         DB::beginTransaction();
         try {
-            // Kiểm tra user đã mua sản phẩm chưa (giả sử qua order_items)
+            // Kiểm tra user đã mua sản phẩm chưa
             $hasOrdered = DB::table('order_items')
                 ->join('orders', 'order_items.order_id', '=', 'orders.id')
                 ->where('orders.user_id', Auth::id())
                 ->where('order_items.product_id', $data['product_id'])
-                ->where('orders.status', 'delivered') // Chỉ review sau khi nhận hàng
+                ->where('orders.status', 'delivered')
                 ->exists();
 
             if (!$hasOrdered) {
@@ -67,7 +67,13 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
                 throw new \Exception('Bạn đã đánh giá sản phẩm này rồi.');
             }
 
+            // ✅ Nếu có 'comment' thì ánh xạ sang 'content' để khớp với cột DB
+            if (isset($data['comment']) && !isset($data['content'])) {
+                $data['content'] = $data['comment'];
+            }
+
             $review = $this->create($data);
+
             DB::commit();
             return $review;
         } catch (\Exception $e) {
@@ -75,6 +81,7 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
             throw $e;
         }
     }
+
 
     /**
      * Lấy danh sách review đang chờ duyệt (cho admin, paginated)
@@ -92,13 +99,18 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
      */
     public function approveReview($id)
     {
-        return $this->update($id, ['status' => 'approved']);
+        return $this->update($id, [
+            'status' => 'approved',
+            'is_active' => true,
+            'reject_reason' => null // reset lý do cũ nếu có
+        ]);
     }
+
 
     /**
      * Từ chối review
      */
-    public function rejectReview($id)
+    public function rejectReview($id,$reason = null)
     {
         return $this->update($id, ['status' => 'rejected']);
     }

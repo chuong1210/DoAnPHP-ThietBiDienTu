@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Admin\BrandController as AdminBrandController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Client\BrandController as ClientBrandController;
 use App\Http\Controllers\Client\CartController;
@@ -14,7 +16,9 @@ use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\ProductController as ClientsProductController;
 use App\Http\Controllers\Client\ReviewController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\FaqController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -97,15 +101,37 @@ Route::middleware('auth')->group(function () {
 | Admin Routes (Quản trị viên)
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')
-    ->name('admin.')
-    ->middleware(['auth', 'admin'])
-    ->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        Route::resource('products', AdminProductController::class);
-        Route::resource('categories', AdminCategoryController::class);
-        Route::resource('brands', AdminBrandController::class);
-        Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
-        Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+    // Resource
+    Route::resource('products', AdminProductController::class);
+    Route::resource('categories', AdminCategoryController::class);
+    Route::resource('brands', AdminBrandController::class);
+    Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
+    Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::resource('banners', BannerController::class);
+    Route::resource('reviews', AdminReviewController::class);
+
+    // **Chỉ cần xóa group lồng nhau**
+    Route::get('contact', [ContactController::class, 'index'])->name('contact.index'); 
+    Route::get('contact/{id}', [ContactController::class, 'show'])->name('contact.show'); 
+    Route::post('contact/{id}/send', [ContactController::class, 'sendEmail'])->name('contact.send'); 
+
+    Route::prefix('faqs')->group(function () {
+        Route::get('/', [FaqController::class, 'index'])->name('faqs.index'); // Tất cả FAQ
+        Route::get('/{category}', [FaqController::class, 'showByCategory'])->name('faqs.category'); 
+
+        Route::prefix('faqs')->name('faqs.')->group(function () {
+            Route::get('/', [FaqController::class, 'index'])->name('index'); 
+            Route::get('/create', [FaqController::class, 'create'])->name('create'); 
+            Route::post('/', [FaqController::class, 'store'])->name('store'); 
+            Route::get('/{faq}/edit', [FaqController::class, 'edit'])->name('edit'); 
+            Route::put('/{faq}', [FaqController::class, 'update'])->name('update'); 
+            Route::delete('/{faq}', [FaqController::class, 'destroy'])->name('destroy'); 
+            Route::get('/{faq}', [FaqController::class, 'show'])->name('show'); 
+            Route::get('/category/{category}', [FaqController::class, 'showByCategory'])->name('category'); 
+        });
     });
+});
