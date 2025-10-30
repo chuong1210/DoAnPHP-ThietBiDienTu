@@ -4,48 +4,67 @@
 
 @section('styles')
     <style>
+        :root {
+            --primary: #0066FF;
+            --secondary: #00B4D8;
+            --bg: #F8FAFC;
+            --text: #1E293B;
+            --neutral: #CBD5E1;
+            --danger: #EF4444;
+        }
+
         .checkout-step {
             position: relative;
-            padding: 20px;
+            padding: 1.5rem;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--neutral);
+            transition: all 0.3s ease;
+        }
+
+        .checkout-step:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary);
         }
 
         .step-number {
             position: absolute;
-            top: -15px;
-            left: 20px;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            top: -10px;
+            left: 1.5rem;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
         }
 
         .payment-method {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
+            border: 2px solid var(--neutral);
+            border-radius: 12px;
+            padding: 1.25rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            background: white;
         }
 
         .payment-method:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
+            border-color: var(--primary);
+            background: var(--bg);
+            transform: translateY(-2px);
         }
 
         .payment-method.active {
-            border-color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.08), rgba(0, 180, 216, 0.08));
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.15);
         }
 
         .order-summary {
@@ -54,58 +73,127 @@
         }
 
         .coupon-badge {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, var(--danger), #DC2626);
             color: white;
-            padding: 8px 15px;
+            padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 14px;
-            display: inline-block;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .voucher-item {
-            border: 2px dashed #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
+            border: 2px dashed var(--neutral);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            background: white;
         }
 
         .voucher-item:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
+            border-color: var(--primary);
+            background: var(--bg);
+            transform: translateX(4px);
         }
 
         .voucher-item.active {
-            border-color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.08), rgba(0, 180, 216, 0.08));
         }
 
         .progress-bar {
-            background: #e9ecef;
-            height: 4px;
-            border-radius: 2px;
+            background: var(--neutral);
+            height: 6px;
+            border-radius: 3px;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            width: 50%; /* Adjust based on step */
-            transition: width 0.3s ease;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 66%;
+            /* Step 2/3 */
+            transition: width 0.4s ease;
+        }
+
+        /* Modern Form Controls */
+        .form-control,
+        .form-select {
+            border: 2px solid var(--neutral);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1);
+            outline: none;
+        }
+
+        .btn-modern {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--neutral);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 @endsection
 
 @section('content')
+    @php
+        \Log::info('Available coupons:', [$availablecoupons ?? null]);
+    @endphp
     <div class="container py-5">
+        <hr class="my-3" id="discount-hr">
+
+        <!-- Dòng giảm giá sẽ được JS chèn vào -->
+        <div id="discount-row" class="d-flex justify-content-between mb-2 text-success" style="display: none;">
+            <span class="fw-semibold">Giảm giá:</span>
+            <strong id="discount" class="text-success">-0đ</strong>
+        </div>
+
+        <hr class="my-3">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('client.cart.index') }}">Giỏ hàng</a></li>
-                <li class="breadcrumb-item active">Thanh toán</li>
+            <ol class="breadcrumb bg-white rounded-3 p-3 shadow-sm">
+                <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}" class="text-primary"><i
+                            class="fas fa-home me-1"></i> Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('client.cart.index') }}" class="text-primary">Giỏ hàng</a>
+                </li>
+                <li class="breadcrumb-item active text-text" aria-current="page">Thanh toán</li>
             </ol>
         </nav>
 
@@ -116,24 +204,24 @@
                     <div class="progress-fill"></div>
                 </div>
                 <div class="d-flex justify-content-between position-relative" style="z-index: 1;">
-                    <div class="text-center" style="flex: 1;">
-                        <div class="bg-success text-white rounded-circle mx-auto mb-2"
-                            style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-shopping-cart fa-lg"></i>
+                    <div class="text-center flex-1">
+                        <div class="bg-success text-white rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-shopping-cart"></i>
                         </div>
                         <small class="text-success fw-bold">Giỏ Hàng</small>
                     </div>
-                    <div class="text-center" style="flex: 1;">
-                        <div class="bg-primary text-white rounded-circle mx-auto mb-2"
-                            style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-credit-card fa-lg"></i>
+                    <div class="text-center flex-1">
+                        <div class="bg-primary text-white rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-credit-card"></i>
                         </div>
                         <small class="text-primary fw-bold">Thanh Toán</small>
                     </div>
-                    <div class="text-center" style="flex: 1;">
-                        <div class="bg-secondary text-white rounded-circle mx-auto mb-2"
-                            style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-check fa-lg"></i>
+                    <div class="text-center flex-1">
+                        <div class="bg-secondary text-white rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-check"></i>
                         </div>
                         <small class="text-muted">Hoàn Thành</small>
                     </div>
@@ -142,124 +230,133 @@
         </div>
 
         @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                <i class="fas fa-check-circle"></i> {{ session('success') }}
+            <div class="alert alert-success alert-dismissible fade show rounded-3 border-0">
+                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
 
         @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show">
-                <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+            <div class="alert alert-danger alert-dismissible fade show rounded-3 border-0">
+                <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-        @enderror
+        @endif
 
         <form action="{{ route('client.checkout.process') }}" method="POST" id="checkoutForm">
             @csrf
-
+            {{-- Trên cùng form, ngay dưới @csrf --}}
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
             <div class="row">
                 <!-- Left Column - Checkout Steps -->
                 <div class="col-lg-8">
                     <!-- Step 1: Thông tin giao hàng -->
                     <div class="checkout-step">
                         <div class="step-number">1</div>
-                        <h5 class="mb-4 mt-2">Thông Tin Giao Hàng</h5>
+                        <h5 class="mb-4 mt-2 text-text fw-bold">Thông Tin Giao Hàng</h5>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-text">Họ và tên <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" name="customer_name"
                                     class="form-control @error('customer_name') is-invalid @enderror"
-                                    value="{{ old('customer_name', Auth::user()->full_name) }}" required>
-                                @error('customer_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                    value="{{ old('customer_name', Auth::user()->full_name ?? '') }}" required>
+                                @error('customer_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-text">Số điện thoại <span
+                                        class="text-danger">*</span></label>
                                 <input type="tel" name="customer_phone"
                                     class="form-control @error('customer_phone') is-invalid @enderror"
-                                    value="{{ old('customer_phone', Auth::user()->phone) }}" required>
-                                @error('customer_phone')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                    value="{{ old('customer_phone', Auth::user()->phone ?? '') }}" required>
+                                @error('customer_phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Email</label>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-text">Email</label>
                                 <input type="email" name="customer_email"
                                     class="form-control @error('customer_email') is-invalid @enderror"
-                                    value="{{ old('customer_email', Auth::user()->email) }}">
-                                @error('customer_email')
+                                    value="{{ old('customer_email', Auth::user()->email ?? '') }}">
+                                @error('customer_email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+
+                            <!-- Tỉnh/Thành phố -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-text">Tỉnh/Thành phố <span
+                                        class="text-danger">*</span></label>
+                                <select name="shipping_province" id="provinceSelect"
+                                    class="form-select @error('shipping_province') is-invalid @enderror" required>
+                                    <option value="">Chọn tỉnh/thành phố</option>
+                                </select>
+                                @error('shipping_province')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
-                                <textarea name="shipping_address"
-                                    class="form-control @error('shipping_address') is-invalid @enderror" rows="3"
-                                    required>{{ old('shipping_address') }}</textarea>
-                                @error('shipping_address')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Phường/Xã <span class="text-danger">*</span></label>
-                                <input type="text" name="shipping_ward"
-                                    class="form-control @error('shipping_ward') is-invalid @enderror"
-                                    value="{{ old('shipping_ward') }}" required>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-text">Phường/Xã <span
+                                        class="text-danger">*</span></label>
+                                <select name="shipping_ward" id="wardSelect"
+                                    class="form-select @error('shipping_ward') is-invalid @enderror" disabled required>
+                                    <option value="">Chọn phường/xã</option>
+                                </select>
                                 @error('shipping_ward')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Quận/Huyện <span class="text-danger">*</span></label>
-                                <input type="text" name="shipping_district"
-                                    class="form-control @error('shipping_district') is-invalid @enderror"
-                                    value="{{ old('shipping_district') }}" required>
-                                @error('shipping_district')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-text">Địa chỉ chi tiết <span
+                                        class="text-danger">*</span></label>
+                                <textarea name="shipping_address"
+                                    class="form-control @error('shipping_address') is-invalid @enderror" rows="3"
+                                    placeholder="Số nhà, tên đường, tòa nhà,..."
+                                    required>{{ old('shipping_address') }}</textarea>
+                                @error('shipping_address') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Tỉnh/Thành phố <span class="text-danger">*</span></label>
-                                <input type="text" name="shipping_city"
-                                    class="form-control @error('shipping_city') is-invalid @enderror"
-                                    value="{{ old('shipping_city', 'TP. Hồ Chí Minh') }}" required>
-                                @error('shipping_city')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                            <!-- Hidden fields cho codes -->
+                            <input type="hidden" name="shipping_province_code" id="provinceCode"
+                                value="{{ old('shipping_province_code') }}">
+                            <input type="hidden" name="shipping_ward_code" id="wardCode"
+                                value="{{ old('shipping_ward_code') }}">
+                            <input type="hidden" name="shipping_ward_name" id="wardName"
+                                value="{{ old('shipping_ward_name') }}">
 
-                            <div class="col-md-12">
-                                <label class="form-label">Ghi chú đơn hàng</label>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-text">Ghi chú đơn hàng</label>
                                 <textarea name="note" class="form-control" rows="2"
                                     placeholder="Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn.">{{ old('note') }}</textarea>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Step 2: Phương thức thanh toán -->
+                    <!-- Step 2: Phương thức thanh toán (giữ nguyên, chỉ update style) -->
                     <div class="checkout-step">
                         <div class="step-number">2</div>
-                        <h5 class="mb-4 mt-2">Phương Thức Thanh Toán</h5>
+                        <h5 class="mb-4 mt-2 text-text fw-bold">Phương Thức Thanh Toán</h5>
 
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="payment-method active" onclick="selectPayment(this, 'cod')">
                                     <input type="radio" name="payment_method" value="cod" checked class="d-none">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="fas fa-money-bill-wave fa-3x text-success"></i>
+                                        <div class="flex-shrink-0 me-3">
+                                            <i class="fas fa-money-bill-wave fa-2x text-success"></i>
                                         </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h6 class="mb-1">Thanh toán khi nhận hàng</h6>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1 fw-bold text-text">Thanh toán khi nhận hàng</h6>
                                             <small class="text-muted">Thanh toán bằng tiền mặt khi nhận hàng</small>
                                         </div>
                                     </div>
@@ -270,11 +367,11 @@
                                 <div class="payment-method" onclick="selectPayment(this, 'bank_transfer')">
                                     <input type="radio" name="payment_method" value="bank_transfer" class="d-none">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="fas fa-university fa-3x text-primary"></i>
+                                        <div class="flex-shrink-0 me-3">
+                                            <i class="fas fa-university fa-2x text-primary"></i>
                                         </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h6 class="mb-1">Chuyển khoản ngân hàng</h6>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1 fw-bold text-text">Chuyển khoản ngân hàng</h6>
                                             <small class="text-muted">Chuyển khoản qua ngân hàng</small>
                                         </div>
                                     </div>
@@ -285,11 +382,11 @@
                                 <div class="payment-method" onclick="selectPayment(this, 'momo')">
                                     <input type="radio" name="payment_method" value="momo" class="d-none">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="fas fa-mobile-alt fa-3x text-danger"></i>
+                                        <div class="flex-shrink-0 me-3">
+                                            <i class="fas fa-mobile-alt fa-2x text-danger"></i>
                                         </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h6 class="mb-1">Ví MoMo</h6>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1 fw-bold text-text">Ví MoMo</h6>
                                             <small class="text-muted">Thanh toán qua ví điện tử MoMo</small>
                                         </div>
                                     </div>
@@ -300,11 +397,11 @@
                                 <div class="payment-method" onclick="selectPayment(this, 'vnpay')">
                                     <input type="radio" name="payment_method" value="vnpay" class="d-none">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="fas fa-credit-card fa-3x text-info"></i>
+                                        <div class="flex-shrink-0 me-3">
+                                            <i class="fas fa-credit-card fa-2x text-info"></i>
                                         </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h6 class="mb-1">VNPay</h6>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1 fw-bold text-text">VNPay</h6>
                                             <small class="text-muted">Thanh toán qua VNPay</small>
                                         </div>
                                     </div>
@@ -316,132 +413,138 @@
                     <!-- Step 3: Xác nhận -->
                     <div class="checkout-step">
                         <div class="step-number">3</div>
-                        <h5 class="mb-4 mt-2">Xác Nhận Đơn Hàng</h5>
+                        <h5 class="mb-4 mt-2 text-text fw-bold">Xác Nhận Đơn Hàng</h5>
 
-                        <div class="form-check mb-3">
+                        <div class="form-check mb-4">
                             <input class="form-check-input" type="checkbox" id="agreeTerms" required>
-                            <label class="form-check-label" for="agreeTerms">
-                                Tôi đã đọc và đồng ý với <a href="#" class="text-primary">Điều khoản và Điều kiện</a> của
-                                website
+                            <label class="form-check-label fw-semibold text-text" for="agreeTerms">
+                                Tôi đã đọc và đồng ý với <a href="#" class="text-primary fw-bold">Điều khoản và Điều
+                                    kiện</a> của website
                             </label>
                         </div>
 
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i>
-                            <strong>Lưu ý:</strong> Đơn hàng sẽ được xử lý trong vòng 24h.
-                            Vui lòng kiểm tra email và số điện thoại để nhận thông tin đơn hàng.
+                        <div class="alert alert-info rounded-3 border-0">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            <strong>Lưu ý:</strong> Đơn hàng sẽ được xử lý trong vòng 24h. Vui lòng kiểm tra email và số
+                            điện thoại để nhận thông tin đơn hàng.
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column - Order Summary -->
+                <!-- Right Column - Order Summary (giữ nguyên, update style) -->
                 <div class="col-lg-4">
                     <div class="order-summary">
                         <!-- Voucher/Coupon Section -->
-                        <div class="card mb-3 border-0 shadow-sm">
-                            <div class="card-body">
-                                <h6 class="mb-3">
-                                    <i class="fas fa-ticket-alt text-warning"></i> Mã Giảm Giá
+                        <div class="card mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                            <div class="card-body p-4">
+                                <h6 class="mb-3 fw-bold text-text">
+                                    <i class="fas fa-ticket-alt me-2 text-warning"></i> Mã Giảm Giá
                                 </h6>
 
-                                <!-- Applied Coupon -->
                                 @if(session('coupon'))
-                                    <div class="alert alert-success d-flex justify-content-between align-items-center mb-3">
+                                    <div
+                                        class="alert alert-success d-flex justify-content-between align-items-center mb-3 rounded-3 border-0">
                                         <div>
-                                            <strong>{{ session('coupon.code') }}</strong>
-                                            <br>
-                                            <small>-{{ number_format(session('coupon.discount')) }}đ</small>
+                                            <strong class="text-text">{{ session('coupon.code') }}</strong>
+                                            <br><small
+                                                class="text-success">-{{ number_format(session('coupon.discount')) }}đ</small>
                                         </div>
-                                        <form action="{{ route('client.checkout.remove-coupon') }}" method="POST">
+                                        <form action="{{ route('client.checkout.remove-coupon') }}" method="POST"
+                                            class="d-inline">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </form>
                                     </div>
                                 @endif
 
-                                <!-- Coupon Input -->
                                 <div class="input-group mb-3">
-                                    <input type="text" id="couponCode" class="form-control" placeholder="Nhập mã giảm giá">
-                                    <button type="button" class="btn btn-primary" onclick="applyCoupon()">
-                                        Áp Dụng
+                                    <input type="text" id="couponCode" class="form-control rounded-end-0"
+                                        placeholder="Nhập mã giảm giá">
+                                    <button type="button" class="btn btn-modern rounded-start-0" onclick="applyCoupon()">
+                                        <i class="fas fa-check me-1"></i> Áp Dụng
                                     </button>
                                 </div>
 
-                                <!-- Available Vouchers Button -->
-                                <button type="button" class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="modal"
-                                    data-bs-target="#voucherModal">
-                                    <i class="fas fa-gift"></i> Xem Voucher Có Sẵn
+                                <button type="button" class="btn btn-outline-primary btn-sm w-100 rounded-3"
+                                    data-bs-toggle="modal" data-bs-target="#voucherModal">
+                                    <i class="fas fa-gift me-1"></i> Xem Voucher Có Sẵn
                                 </button>
                             </div>
                         </div>
 
                         <!-- Order Summary Card -->
-                        <div class="card border-0 shadow">
-                            <div class="card-header bg-gradient text-white"
-                                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-receipt"></i> Thông Tin Đơn Hàng
+                        <div class="card border-0 shadow rounded-3 overflow-hidden">
+                            <div class="card-header text-white p-4"
+                                style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                                <h5 class="mb-0 fw-bold">
+                                    <i class="fas fa-receipt me-2"></i> Thông Tin Đơn Hàng
                                 </h5>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body p-4">
                                 <!-- Cart Items -->
-                                <div class="mb-3">
-                                    <h6 class="mb-3">Sản phẩm ({{ $cart->items->count() }})</h6>
+                                <div class="mb-4">
+                                    <h6 class="mb-3 fw-bold text-text">Sản phẩm ({{ $cart->items->count() }})</h6>
                                     @foreach($cart->items as $item)
-                                        <div class="d-flex mb-3 pb-3 border-bottom">
-                                            <img src="{{ asset( $item->product->image) }}" alt="{{ $item->product->name }}"
-                                                style="width: 60px; height: 60px; object-fit: cover;" class="rounded">
-                                            <div class="ms-3 flex-grow-1">
-                                                <h6 class="mb-1 small">{{ Str::limit($item->product->name, 40) }}</h6>
+                                        <div class="d-flex mb-3 pb-3 border-bottom border-neutral">
+                                            <img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}"
+                                                style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;"
+                                                class="me-3">
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1 small fw-bold text-text">
+                                                    {{ Str::limit($item->product->name, 40) }}
+                                                </h6>
                                                 <div class="d-flex justify-content-between">
                                                     <span class="text-muted small">SL: {{ $item->quantity }}</span>
-                                                    <strong class="small">{{ number_format($item->subtotal) }}đ</strong>
+                                                    <strong
+                                                        class="small text-primary">{{ number_format($item->subtotal) }}đ</strong>
                                                 </div>
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
 
-                                <hr>
+                                <hr class="my-3">
 
                                 <!-- Price Breakdown -->
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span>Tạm tính:</span>
-                                    <strong id="subtotal">{{ number_format($cart->total) }}đ</strong>
+                                    <span class="fw-semibold text-text">Tạm tính:</span>
+                                    <strong id="subtotal" class="text-primary">{{ number_format($cart->total) }}đ</strong>
                                 </div>
 
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span>Phí vận chuyển:</span>
-                                    <strong id="shipping">30,000đ</strong>
+                                    <span class="fw-semibold text-text">Phí vận chuyển:</span>
+                                    <strong id="shipping" class="text-primary">30,000đ</strong>
                                 </div>
 
                                 @if(session('coupon'))
                                     <div class="d-flex justify-content-between mb-2 text-success">
-                                        <span>Giảm giá ({{ session('coupon.code') }}):</span>
-                                        <strong id="discount">-{{ number_format(session('coupon.discount')) }}đ</strong>
+                                        <span class="fw-semibold">Giảm giá ({{ session('coupon.code') }}):</span>
+                                        <strong id="discount"
+                                            class="text-success">-{{ number_format(session('coupon.discount')) }}đ</strong>
                                     </div>
                                 @endif
 
-                                <hr>
+                                <hr class="my-3">
 
                                 <div class="d-flex justify-content-between mb-4">
-                                    <h5>Tổng cộng:</h5>
-                                    <h5 class="text-danger" id="total">
+                                    <h5 class="fw-bold text-text">Tổng cộng:</h5>
+                                    <h5 class="fw-bold text-danger" id="total">
                                         {{ number_format($cart->total + 30000 - (session('coupon.discount') ?? 0)) }}đ
+
+
                                     </h5>
                                 </div>
 
                                 <!-- Submit Button -->
-                                <button type="submit" class="btn btn-lg w-100 text-white"
-                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                    <i class="fas fa-check-circle"></i> Xác Nhận Đặt Hàng
+                                <button type="submit" class="btn btn-lg w-100 text-white fw-bold rounded-3 mb-3 btn-modern">
+                                    <i class="fas fa-check-circle me-2"></i> Xác Nhận Đặt Hàng
                                 </button>
 
-                                <div class="text-center mt-3">
-                                    <small class="text-muted">
-                                        <i class="fas fa-shield-alt text-success"></i> Thanh toán an toàn & bảo mật
+                                <div class="text-center">
+                                    <small class="text-muted fw-semibold">
+                                        <i class="fas fa-shield-alt me-1 text-success"></i> Thanh toán an toàn & bảo mật
                                     </small>
                                 </div>
                             </div>
@@ -452,43 +555,41 @@
         </form>
     </div>
 
-    <!-- Voucher Modal -->
+    <!-- Voucher Modal (giữ nguyên, update style) -->
     <div class="modal fade" id="voucherModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-gift text-warning"></i> Voucher Có Sẵn
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-text">
+                        <i class="fas fa-gift me-2 text-warning"></i> Voucher Có Sẵn
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    @if(isset($availableVouchers) && $availableVouchers->count() > 0)
-                        @foreach($availableVouchers as $voucher)
+                <div class="modal-body p-4">
+                    @if(isset($availablecoupons) && $availablecoupons->count() > 0)
+                        @foreach($availablecoupons as $voucher)
                             <div class="voucher-item" onclick="applyVoucher('{{ $voucher->code }}')">
                                 <div class="row align-items-center">
                                     <div class="col-md-3 text-center">
                                         <div class="coupon-badge">
-                                            <i class="fas fa-ticket-alt fa-2x"></i>
+                                            <i class="fas fa-ticket-alt"></i> {{ $voucher->code }}
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <h6 class="mb-1">{{ $voucher->code }}</h6>
-                                        <p class="mb-1 small">
+                                        <h6 class="mb-1 fw-bold text-text">{{ $voucher->name }}</h6>
+                                        <p class="mb-1 small text-primary">
                                             Giảm
                                             {{ $voucher->type === 'percent' ? $voucher->value . '%' : number_format($voucher->value) . 'đ' }}
                                         </p>
                                         <p class="mb-0 small text-muted">
                                             Đơn tối thiểu: {{ number_format($voucher->min_order) }}đ
-                                            @if($voucher->end_date)
-                                                - Hết hạn: {{ $voucher->end_date->format('d/m/Y') }}
-                                            @endif
+                                            @if($voucher->end_date) - Hết hạn: {{ $voucher->end_date->format('d/m/Y') }} @endif
                                         </p>
                                     </div>
                                     <div class="col-md-3 text-end">
-                                        <button type="button" class="btn btn-primary btn-sm"
+                                        <button type="button" class="btn btn-modern btn-sm"
                                             onclick="applyVoucher('{{ $voucher->code }}')">
-                                            Áp Dụng
+                                            <i class="fas fa-check me-1"></i> Áp Dụng
                                         </button>
                                     </div>
                                 </div>
@@ -497,7 +598,7 @@
                     @else
                         <div class="text-center py-5">
                             <i class="fas fa-gift fa-4x text-muted mb-3"></i>
-                            <p class="text-muted">Hiện tại không có voucher khả dụng</p>
+                            <p class="text-muted fw-semibold">Hiện tại không có voucher khả dụng</p>
                         </div>
                     @endif
                 </div>
@@ -505,66 +606,224 @@
         </div>
     </div>
 @endsection
-
 @section('scripts')
     <script>
-        function selectPayment(element, method) {
-            // Remove active class from all
-            document.querySelectorAll('.payment-method').forEach(el => {
-                el.classList.remove('active');
-            });
+        // ==== API V2 (2025) ====
+        const API_BASE = 'https://provinces.open-api.vn/api/v2/';
 
-            // Add active class to selected
-            element.classList.add('active');
+        // Load khi trang sẵn sàng
+        document.addEventListener('DOMContentLoaded', function () {
+            loadProvinces();
 
-            // Check the radio button
-            element.querySelector('input[type="radio"]').checked = true;
+            // Default: TP. Hồ Chí Minh (code 79)
+            setTimeout(() => {
+                const select = document.getElementById('provinceSelect');
+                if (select.options.length > 1) {
+                    select.value = '79';
+                    loadWards(79);
+                }
+            }, 800);
+        });
+
+        // ==== 1. Load Tỉnh/Thành ====
+        function loadProvinces() {
+            fetch(`${API_BASE}`)
+                .then(r => r.json())
+                .then(data => {
+                    const select = document.getElementById('provinceSelect');
+                    select.innerHTML = '<option value="">Chọn tỉnh/thành phố</option>';
+
+                    data.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.code;
+                        opt.textContent = p.name;
+                        select.appendChild(opt);
+                    });
+                })
+                .catch(err => {
+                    console.error('Lỗi load tỉnh:', err);
+                    alert('Không thể tải danh sách tỉnh/thành phố');
+                });
+        }
+
+        // ==== 2. Khi chọn tỉnh → Load Phường/Xã ====
+        document.getElementById('provinceSelect').addEventListener('change', function () {
+            const code = this.value;
+            const wardSelect = document.getElementById('wardSelect');
+
+            // Reset
+            wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+            wardSelect.disabled = true;
+            document.getElementById('wardCode').value = '';
+            document.getElementById('wardName').value = '';
+
+            if (!code) return;
+
+            loadWards(code);
+        });
+
+        function loadWards(provinceCode) {
+            const wardSelect = document.getElementById('wardSelect');
+            wardSelect.innerHTML = '<option value="">Đang tải phường/xã...</option>';
+            wardSelect.disabled = true;
+
+            // DÙNG ENDPOINT /w/?province=
+            fetch(`${API_BASE}w/?province=${provinceCode}`)
+                .then(r => r.json())
+                .then(wards => {
+                    wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+
+                    if (Array.isArray(wards) && wards.length > 0) {
+                        wards.forEach(w => {
+                            const opt = document.createElement('option');
+                            opt.value = w.code;
+                            opt.textContent = w.name;
+                            wardSelect.appendChild(opt);
+                        });
+                    } else {
+                        wardSelect.innerHTML = '<option value="">Không có phường/xã</option>';
+                    }
+
+                    wardSelect.disabled = false;
+                })
+                .catch(err => {
+                    console.error('Lỗi load phường/xã:', err);
+                    wardSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+                });
+        }
+
+        // ==== 3. Khi chọn phường → Lưu code + tên ====
+        // Khi chọn phường
+        document.getElementById('wardSelect').addEventListener('change', function () {
+            const provinceCode = document.getElementById('provinceSelect').value;
+            const wardCode = this.value;
+            const wardName = this.options[this.selectedIndex].text;
+
+            document.getElementById('provinceCode').value = provinceCode;   // không cần
+            document.getElementById('wardCode').value = wardCode;       // không cần
+            document.getElementById('wardName').value = wardName;       // cần
+        });
+
+        // Form submit – chỉ chặn nếu thiếu điều khoản hoặc địa chỉ
+        document.getElementById('checkoutForm').addEventListener('submit', function (e) {
+            const agree = document.getElementById('agreeTerms').checked;
+            const prov = document.getElementById('provinceSelect').value;
+            const ward = document.getElementById('wardSelect').value;
+
+            if (!agree || !prov || !ward) {
+                e.preventDefault();
+                alert('Vui lòng đồng ý điều khoản và chọn đầy đủ địa chỉ');
+                return false;
+            }
+            // để Laravel xử lý validation, không cần preventDefault nữa
+        });
+
+        // ==== Giữ nguyên các hàm cũ (payment, coupon...) ====
+        function selectPayment(el, method) {
+            document.querySelectorAll('.payment-method').forEach(e => e.classList.remove('active'));
+            el.classList.add('active');
+            el.querySelector('input[type="radio"]').checked = true;
         }
 
         function applyCoupon() {
             const code = document.getElementById('couponCode').value.trim();
-            if (!code) {
-                alert('Vui lòng nhập mã giảm giá');
-                return;
-            }
+            if (!code) return alert('Vui lòng nhập mã giảm giá');
 
-            // AJAX call to apply coupon
             fetch('{{ route("client.checkout.apply-coupon") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify({ code: code })
+                body: JSON.stringify({ code })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Áp dụng thành công! Giảm ' + data.discount + 'đ');
-                    location.reload(); // Reload to update summary
-                } else {
-                    alert('Lỗi: ' + data.message);
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) {
+                        alert('Áp dụng mã giảm giá thành công! Giảm ' + d.discount + 'đ');
+                        location.reload(); // QUAN TRỌNG: RELOAD ĐỂ BLADE ĐỌC SESSION MỚI
+                    } else {
+                        alert('Lỗi: ' + d.message);
+                    }
+                })
+                .catch(() => alert('Lỗi kết nối, vui lòng thử lại'));
+        }
+        function updateOrderSummary(discount, newTotal) {
+            // Cập nhật dòng "Giảm giá"
+            let discountRow = document.querySelector('#discount-row');
+            if (!discountRow) {
+                const hr = document.querySelector('#discount-hr');
+                if (hr) {
+                    discountRow = document.createElement('div');
+                    discountRow.id = 'discount-row';
+                    discountRow.className = 'd-flex justify-content-between mb-2 text-success';
+                    discountRow.innerHTML = `
+                                <span class="fw-semibold">Giảm giá:</span>
+                                <strong id="discount" class="text-success">-0đ</strong>
+                            `;
+                    hr.insertAdjacentElement('afterend', discountRow);
                 }
-            })
-            .catch(err => {
-                alert('Lỗi kết nối: ' + err);
-            });
+            }
+            document.getElementById('discount').textContent = '-' + discount + 'đ';
+
+            // Cập nhật Tổng cộng
+            document.getElementById('total').textContent = newTotal + 'đ';
         }
 
+        function showAppliedCoupon(code, discount) {
+            let couponAlert = document.querySelector('#applied-coupon-alert');
+            if (!couponAlert) {
+                const inputGroup = document.querySelector('.input-group');
+                couponAlert = document.createElement('div');
+                couponAlert.id = 'applied-coupon-alert';
+                couponAlert.className = 'alert alert-success d-flex justify-content-between align-items-center mb-3 rounded-3 border-0';
+                couponAlert.innerHTML = `
+                            <div>
+                                <strong class="text-text">${code}</strong><br>
+                                <small class="text-success">-${discount}đ</small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removeCoupon()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                inputGroup.insertAdjacentElement('beforebegin', couponAlert);
+            } else {
+                couponAlert.querySelector('strong').textContent = code;
+                couponAlert.querySelector('small').textContent = '-' + discount + 'đ';
+            }
+        }
         function applyVoucher(code) {
-            // Set code to input and call applyCoupon
             document.getElementById('couponCode').value = code;
             applyCoupon();
         }
 
-        // Form validation
-        document.getElementById('checkoutForm').addEventListener('submit', function (e) {
-            const agreeTerms = document.getElementById('agreeTerms');
-            if (!agreeTerms.checked) {
-                e.preventDefault();
-                alert('Vui lòng đồng ý với điều khoản và điều kiện');
-                return false;
-            }
-        });
+
+        function removeCoupon() {
+            fetch('{{ route("client.checkout.remove-coupon") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+                .then(() => {
+                    // Xóa alert
+                    const alert = document.querySelector('#applied-coupon-alert');
+                    if (alert) alert.remove();
+
+                    // Xóa dòng discount
+                    const row = document.querySelector('#discount-row');
+                    if (row) row.style.display = 'none';
+
+                    // Reset tổng
+                    const subtotal = {{ $cart->total }};
+                    document.getElementById('total').textContent = number_format(subtotal + 30000) + 'đ';
+                    location.reload(); // Reload để cập nhật tổng
+                });
+        }
+
+        // Helper format số
+        function number_format(number) {
+            return new Intl.NumberFormat('vi-VN').format(number);
+        }
     </script>
 @endsection

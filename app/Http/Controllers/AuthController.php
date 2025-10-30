@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Repositories\CategoryRepository;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -56,6 +58,59 @@ class AuthController extends Controller
             'email' => 'Email hoặc mật khẩu không chính xác.',
         ])->onlyInput('email');
     }
+    /**
+     * Redirect to Google login
+     */
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+
+
+
+    /**
+     * Handle Google callback
+     */
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+            $user = User::where('google_id', $googleUser->getId())->orWhere('email', $googleUser->getEmail())->first();
+
+            if ($user) {
+                // Update avatar nếu thay đổi
+                if ($user->avatar !== $googleUser->getAvatar()) {
+                    $user->avatar = $googleUser->getAvatar();
+                    $user->save();
+                }
+
+                Auth::login($user);
+                return redirect()->route('client.home.index')
+                    ->with('success', 'đăng nhập bằng Google thành công!');
+                // Redirect dựa trên role...
+            } else {
+                // Tạo user mới
+                $user = User::create([
+                    'full_name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'role' => 'user',
+                    'status' => 'active',
+                    // Không set password cho Google user
+                ]);
+
+                Auth::login($user);
+                return redirect()->route('client.home.index')
+                    ->with('success', 'Tạo tài khoản và đăng nhập bằng Google thành công!');
+            }
+        } catch (Exception $e) {
+            return redirect()->route('auth.login')
+                ->with('error', 'Lỗi đăng nhập Google: ' . $e->getMessage());
+        }
+    }
+
 
     public function showRegisterForm()
     {
@@ -143,12 +198,14 @@ class AuthController extends Controller
         $user->phone = $validated['phone'];
 
         // Nếu đổi mật khẩu
+        // Nếu đổi mật khẩu
         if ($request->filled('current_password')) {
             if (!Hash::check($request->current_password, $user->password)) {
                 return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác']);
             }
 
-            $user->password = Hash::make($request->new_password);
+            // Gán new_password (mutator sẽ hash tự động)
+            $user->new_password = $validated['new_password']; // Sử dụng field tạm, mutator setPasswordAttribute sẽ handle
         }
 
         $user->save();
@@ -175,14 +232,15 @@ class AuthController extends Controller
         ]);
 
         $user = Auth::user();
-
         // Kiểm tra mật khẩu hiện tại
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác']);
         }
 
-        // Cập nhật mật khẩu mới
-        $user->password = Hash::make($request->password);
+        // Gán password mới (mutator sẽ hash)
+        $user->fill(['password' => $request->password]);
+        // $user->setPasswordAttribute($request->password);
+
         $user->save();
 
         return back()->with('success', 'Đổi mật khẩu thành công!');

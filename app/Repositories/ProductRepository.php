@@ -85,8 +85,22 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         }
 
         // Filter by category
+        // Filter by category (bao gồm cả danh mục con)
         if (!empty($filters['category_id'])) {
-            $query->where('category_id', $filters['category_id']);
+            $categoryId = $filters['category_id'];
+
+            // Lấy tất cả ID của danh mục con (và cả chính nó)
+            $categoryIds = Category::where('id', $categoryId)
+                ->orWhere('parent_id', $categoryId)
+                ->pluck('id')
+                ->toArray();
+
+            // Nếu có danh mục con cấp sâu hơn (nếu bạn hỗ trợ đa cấp)
+            // Dùng recursive hoặc closure table nếu cần, nhưng tạm thời giả sử 2 cấp
+            $childIds = Category::whereIn('parent_id', $categoryIds)->pluck('id')->toArray();
+            $categoryIds = array_merge($categoryIds, $childIds);
+
+            $query->whereIn('category_id', $categoryIds);
         }
 
         // Filter by brand
@@ -95,20 +109,47 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         }
 
         // Filter by price range
-        if (!empty($filters['price_from'] ?? null)) {
-            $query->where('price', '>=', (int) $filters['price_from']);
+        // FIX: Xét cả sale_price
+        if (!empty($filters['price_from'])) {
+            $priceFrom = (int) $filters['price_from'];
+            $query->where(function ($q) use ($priceFrom) {
+                $q->where(function ($sub) use ($priceFrom) {
+                    // Nếu có sale_price thì check sale_price
+                    $sub->whereNotNull('sale_price')
+                        ->where('sale_price', '>=', $priceFrom);
+                })->orWhere(function ($sub) use ($priceFrom) {
+                    // Nếu không có sale_price thì check price
+                    $sub->whereNull('sale_price')
+                        ->where('price', '>=', $priceFrom);
+                });
+            });
         }
 
-        if (!empty($filters['price_to'] ?? null)) {
-            $query->where('price', '<=', (int) $filters['price_to']);
+        if (!empty($filters['price_to'])) {
+            $priceTo = (int) $filters['price_to'];
+            $query->where(function ($q) use ($priceTo) {
+                $q->where(function ($sub) use ($priceTo) {
+                    $sub->whereNotNull('sale_price')
+                        ->where('sale_price', '<=', $priceTo);
+                })->orWhere(function ($sub) use ($priceTo) {
+                    $sub->whereNull('sale_price')
+                        ->where('price', '<=', $priceTo);
+                });
+            });
         }
-
-
 
         // Sorting
         $sortBy = $filters['sort_by'] ?? 'created_at';
         $sortOrder = $filters['sort_order'] ?? 'DESC';
-        $query->orderBy($sortBy, $sortOrder);
+
+        // FIX: Sort theo price cũng xét sale_price
+        if ($sortBy === 'price') {
+            $query->orderByRaw('COALESCE(sale_price, price) ' . $sortOrder);
+        } else {
+            $query->orderBy($sortBy, $sortOrder);
+        }
+
+        // DEBUG: Uncomment để xem SQL thực tế
 
         // Pagination
         $perPage = $filters['per_page'] ?? 20;

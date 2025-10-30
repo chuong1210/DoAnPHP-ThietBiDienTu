@@ -26,8 +26,8 @@
                     <!-- Product Preview -->
                     <div class="text-center mb-4">
                         @if($product->image)
-                            <img src="{{ asset('images/products/' . $product->image) }}" class="img-fluid rounded"
-                                alt="{{ $product->name }}" style="max-width: 200px; max-height: 200px;">
+                            <img src="{{ asset($product->image) }}" class="img-fluid rounded" alt="{{ $product->name }}"
+                                style="max-width: 200px; max-height: 200px;">
                         @else
                             <div class="bg-light d-inline-block p-4 rounded">
                                 <i class="fas fa-image fa-3x text-muted"></i>
@@ -38,7 +38,7 @@
                     </div>
 
                     <!-- Review Form -->
-                    <form action="{{ route('client.reviews.store', $product->slug) }}" method="POST">
+                    <form action="{{ route('reviews.store', $product->slug) }}" method="POST">
                         @csrf
                         <div class="mb-4">
                             <label class="form-label fw-bold">Điểm đánh giá của bạn <span

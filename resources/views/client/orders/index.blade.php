@@ -234,8 +234,8 @@
                             @foreach($order->items->take(3) as $item)
                                 <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
                                     @if($item->product_image)
-                                        <img src="{{ asset('images/products/' . $item->product_image) }}"
-                                            alt="{{ $item->product_name }}" class="product-mini-img me-3">
+                                        <img src="{{ asset($item->product_image) }}" alt="{{ $item->product_name }}"
+                                            class="product-mini-img me-3">
                                     @endif
                                     <div class="flex-grow-1">
                                         <h6 class="mb-1">{{ Str::limit($item->product_name, 50) }}</h6>

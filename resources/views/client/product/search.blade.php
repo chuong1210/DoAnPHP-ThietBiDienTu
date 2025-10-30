@@ -78,7 +78,7 @@
                     </div>
                 </div>
 
-                <a href="{{ route('client.product.index') }}" class="btn btn-primary mt-4">
+                <a href="{{ route('client.product.all') }}" class="btn btn-primary mt-4">
                     <i class="fas fa-shopping-bag"></i> Xem Tất Cả Sản Phẩm
                 </a>
             </div>

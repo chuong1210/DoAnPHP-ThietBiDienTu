@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\CategoryRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\ReviewRepository;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class ReviewController extends Controller
      * Hiển thị form đánh giá sản phẩm (chỉ nếu đã mua)
      * GET /products/{slug}/review
      */
-    public function create($slug)
+    public function create($slug, CategoryRepository $categoryRepository)
     {
         $product = $this->productRepository->getProductBySlug($slug);
 
@@ -55,7 +56,9 @@ class ReviewController extends Controller
                     ->with('error', 'Bạn đã đánh giá sản phẩm này rồi.');
             }
 
-            return view('client.reviews.create', compact('product'));
+            $categories = $categoryRepository->getSidebarCategories();
+
+            return view('client.reviews.create', compact('product', 'categories'));
         } catch (\Exception $e) {
             return redirect()->route('client.product.show', $slug)
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());

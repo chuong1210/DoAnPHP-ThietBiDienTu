@@ -17,149 +17,154 @@
             @endif
 
             @if($cart && $cart->items->count() > 0)
-                <div class="row">
-                    <!-- Cart Items -->
-                    <div class="col-md-8">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table align-middle">
-                                        <thead>
-                                            <tr>
-                                                <th>Sản Phẩm</th>
-                                                <th>Đơn Giá</th>
-                                                <th style="width: 150px;">Số Lượng</th>
-                                                <th>Thành Tiền</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($cart->items as $item)
+                    <div class="row">
+                        <!-- Cart Items -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle">
+                                            <thead>
                                                 <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            @if($item->product->image)
-                                                                <img src="{{ asset($item->product->image) }}"
-                                                                    alt="{{ $item->product->name }}"
-                                                                    style="width: 80px; height: 80px; object-fit: cover;"
-                                                                    class="rounded me-3">
-                                                            @endif
-                                                            <div>
-                                                                <h6 class="mb-1">
-                                                                    <a href="{{ route('client.product.show', $item->product->slug) }}"
-                                                                        class="text-decoration-none text-dark">
-                                                                        {{ $item->product->name }}
-                                                                    </a>
-                                                                </h6>
-                                                                <small class="text-muted">{{ $item->product->brand->name }}</small>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <strong>{{ number_format($item->price) }}đ</strong>
-                                                    </td>
-                                                    <td>
-                                                        <form action="{{ route('client.cart.update', $item->id) }}" method="POST"
-                                                            class="d-inline">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <div class="input-group input-group-sm">
-                                                                <button type="button" class="btn btn-outline-secondary"
-                                                                    onclick="updateQty({{ $item->id }}, -1, {{ $item->product->quantity }})">
-                                                                    <i class="fas fa-minus"></i>
-                                                                </button>
-                                                                <input type="number" name="quantity" id="qty{{ $item->id }}"
-                                                                    class="form-control text-center" value="{{ $item->quantity }}"
-                                                                    min="1" max="{{ $item->product->quantity }}"
-                                                                    onchange="this.form.submit()">
-                                                                <button type="button" class="btn btn-outline-secondary"
-                                                                    onclick="updateQty({{ $item->id }}, 1, {{ $item->product->quantity }})">
-                                                                    <i class="fas fa-plus"></i>
-                                                                </button>
-                                                            </div>
-                                                        </form>
-                                                    </td>
-                                                    <td>
-                                                        <strong class="text-danger">
-                                                            {{ number_format($item->subtotal) }}đ
-                                                        </strong>
-                                                    </td>
-                                                    <td>
-                                                        <form action="{{ route('client.cart.remove', $item->id) }}" method="POST"
-                                                            onsubmit="return confirm('Xóa sản phẩm này khỏi giỏ hàng?')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </td>
+                                                    <th>Sản Phẩm</th>
+                                                    <th>Đơn Giá</th>
+                                                    <th style="width: 150px;">Số Lượng</th>
+                                                    <th>Thành Tiền</th>
+                                                    <th></th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($cart->items as $item)
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                @if($item->product->image)
+                                                                    <img src="{{ asset($item->product->image) }}"
+                                                                        alt="{{ $item->product->name }}"
+                                                                        style="width: 80px; height: 80px; object-fit: cover;"
+                                                                        class="rounded me-3">
+                                                                @endif
+                                                                <div>
+                                                                    <h6 class="mb-1">
+                                                                        <a href="{{ route('client.product.show', $item->product->slug) }}"
+                                                                            class="text-decoration-none text-dark">
+                                                                            {{ $item->product->name }}
+                                                                        </a>
+                                                                    </h6>
+                                                                    <small class="text-muted">{{ $item->product->brand->name }}</small>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <strong>{{ number_format($item->price) }}đ</strong>
+                                                        </td>
+                                                        <td>
+                                                            <form action="{{ route('client.cart.update', $item->id) }}" method="POST"
+                                                                class="d-inline">
+                                                                @csrf
+                                                                @method('PUT')
+                                                                <div class="input-group input-group-sm">
+                                                                    <button type="button" class="btn btn-outline-secondary"
+                                                                        onclick="updateQty({{ $item->id }}, -1, {{ $item->product->quantity }})">
+                                                                        <i class="fas fa-minus"></i>
+                                                                    </button>
+                                                                    <input type="number" name="quantity" id="qty{{ $item->id }}"
+                                                                        class="form-control text-center" value="{{ $item->quantity }}"
+                                                                        min="1" max="{{ $item->product->quantity }}"
+                                                                        onchange="this.form.submit()">
+                                                                    <button type="button" class="btn btn-outline-secondary"
+                                                                        onclick="updateQty({{ $item->id }}, 1, {{ $item->product->quantity }})">
+                                                                        <i class="fas fa-plus"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </td>
+                                                        <td>
+                                                            <strong class="text-danger">
+                                                                {{ number_format($item->subtotal) }}đ
+                                                            </strong>
+                                                        </td>
+                                                        <td>
+                                                            <form action="{{ route('client.cart.remove', $item->id) }}" method="POST"
+                                                                onsubmit="return confirm('Xóa sản phẩm này khỏi giỏ hàng?')">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <a href="{{ route('client.product.index') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-left"></i> Tiếp Tục Mua Sắm
+                                </a>
                             </div>
                         </div>
 
-                        <div class="mt-3">
-                            <a href="{{ route('client.product.index') }}" class="btn btn-outline-primary">
-                                <i class="fas fa-arrow-left"></i> Tiếp Tục Mua Sắm
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Cart Summary -->
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0">Thông Tin Đơn Hàng</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Tạm tính:</span>
-                                    <strong>{{ number_format($cart->total) }}đ</strong>
+                        <!-- Cart Summary -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Thông Tin Đơn Hàng</h5>
                                 </div>
-
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Phí vận chuyển:</span>
-                                    <strong>30,000đ</strong>
-                                </div>
-
-                                @if(session('coupon'))
+                                <div class="card-body">
                                     <div class="d-flex justify-content-between mb-3">
-                                        <span>Mã giảm giá ({{ session('coupon.code') }}):</span>
-                                        <strong class="text-success">-{{ number_format(session('coupon.discount')) }}đ</strong>
+                                        <span>Tạm tính:</span>
+                                        <strong>{{ number_format($cart->total) }}đ</strong>
                                     </div>
-                                @endif
 
-                                <hr>
-
-                                <div class="d-flex justify-content-between mb-4">
-                                    <h5>Tổng cộng:</h5>
-                                    <h5 class="text-danger">
-                                        {{ number_format($cart->total + 30000 - (session('coupon.discount') ?? 0)) }}đ
-                                    </h5>
-                                </div>
-
-                                <div class="d-grid gap-2">
-                                    <a href="{{ route('client.checkout.index') }}" class="btn btn-primary btn-lg">
-                                        <i class="fas fa-credit-card"></i> Thanh Toán
-                                    </a>
-                                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal"
-                                        data-bs-target="#couponModal">
-                                        <i class="fas fa-tag"></i> Nhập Mã Giảm Giá
-                                    </button>
-                                </div>
-
-                                <!-- Payment Methods -->
-                                <div class="mt-4 pt-3 border-top">
-                                    <h6 class="mb-3">Phương thức thanh toán</h6>
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <img src="https://via.placeholder.com/50x30?text=COD" alt="COD">
-                                        <img src="https://via.placeholder.com/50x30?text=MOMO" alt="Momo">
-                                        <img src="https://via.placeholder.com/50x30?text=VISA" alt="Visa">
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <span>Phí vận chuyển:</span>
+                                        <strong>30,000đ</strong>
                                     </div>
+
+                                    @if(session('coupon'))
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <span>Mã giảm giá ({{ session('coupon.code') }}):</span>
+                                            <strong class="text-success">-{{ number_format(session('coupon.discount')) }}đ</strong>
+                                        </div>
+                                    @endif
+
+                                    <hr>
+
+                                    <div class="d-flex justify-content-between mb-4">
+                                        <h5>Tổng cộng:</h5>
+                                        <h5 class="text-danger">
+                                            {{ number_format($cart->total + 30000 - (session('coupon.discount') ?? 0)) }}đ
+                                        </h5>
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <a href="{{ route('client.checkout.index') }}" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-credit-card"></i> Thanh Toán
+                                        </a>
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal"
+                                            data-bs-target="#couponModal">
+                                            <i class="fas fa-tag"></i> Nhập Mã Giảm Giá
+                                        </button>
+                                    </div>
+
+                                    <!-- Payment Methods -->
+                                    <div class="mt-4 pt-3 border-top text-center">
+                                        <h6 class="mb-3">Phương thức thanh toán</h6>
+                                        <div class="d-flex gap-3 justify-content-center">
+                                            <img src="https://static.vecteezy.com/system/resources/previews/019/053/701/original/money-symbol-icon-png.png"
+                                                alt="COD" style="height: 35px; object-fit: contain;">
+                                            <img src="https://developers.momo.vn/v3/assets/images/icon-52bd5808cecdb1970e1aeec3c31a3ee1.png"
+                                                alt="Momo" style="height: 35px; object-fit: contain;">
+                                            <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg"
+                                                alt="VNPay" style="height: 35px; object-fit: contain;">
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -179,19 +184,19 @@
                 </div>
 
             @else
-                <!-- Empty Cart -->
-                <div class="card">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
-                        <h4>Giỏ Hàng Trống</h4>
-                        <p class="text-muted mb-4">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
-                        <a href="{{ route('client.product.index') }}" class="btn btn-primary">
-                            <i class="fas fa-shopping-bag"></i> Mua Sắm Ngay
-                        </a>
-                    </div>
+            <!-- Empty Cart -->
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+                    <h4>Giỏ Hàng Trống</h4>
+                    <p class="text-muted mb-4">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+                    <a href="{{ route('client.product.index') }}" class="btn btn-primary">
+                        <i class="fas fa-shopping-bag"></i> Mua Sắm Ngay
+                    </a>
                 </div>
-            @endif
-        </div>
+            </div>
+        @endif
+    </div>
     </div>
 
     <!-- Coupon Modal -->
