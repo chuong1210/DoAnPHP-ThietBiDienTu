@@ -231,6 +231,7 @@
     </section>
 
     <!-- Newsletter Section -->
+    <!-- Newsletter Section -->
     <section class="newsletter-section mb-5">
         <div class="container">
             <div class="newsletter-wrapper">
@@ -240,16 +241,19 @@
                     </div>
                     <div>
                         <h3>Đăng Ký Nhận Tin</h3>
-                        <p>Nhận thông tin ưu đãi và sản phẩm mới nhất</p>
+                        <p>Nhận ưu đãi độc quyền & sản phẩm mới</p>
                     </div>
                 </div>
-                <form class="newsletter-form">
-                    <input type="email" class="form-control" placeholder="Nhập email của bạn...">
+                <form id="newsletterForm" class="newsletter-form">
+                    @csrf
+                    <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
                     <button type="submit" class="btn-subscribe">
-                        <i class="fas fa-paper-plane"></i> Đăng Ký
+                        <span class="text">Đăng Ký</span>
+                        <i class="fas fa-spinner fa-spin d-none"></i>
                     </button>
                 </form>
             </div>
+            <div id="newsletterMessage" class="mt-3"></div>
         </div>
     </section>
 @endsection
@@ -779,3 +783,57 @@
         }
     }
 </style>
+
+@section('scripts')
+    <script>
+        document.getElementById('newsletterForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const form = this;
+            const email = form.email.value.trim();
+            const btn = form.querySelector('button');
+            const text = btn.querySelector('.text');
+            const spinner = btn.querySelector('.fa-spinner');
+            const msg = document.getElementById('newsletterMessage');
+
+            if (!email) return;
+
+            // Loading
+            btn.disabled = true;
+            text.classList.add('d-none');
+            spinner.classList.remove('d-none');
+
+            fetch('{{ route("newsletter.subscribe") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    msg.innerHTML = data.success
+                        ? `<div class="alert alert-success alert-dismissible fade show">
+                        <i class="fas fa-check-circle"></i> ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                       </div>`
+                        : `<div class="alert alert-danger alert-dismissible fade show">
+                        <i class="fas fa-times-circle"></i> ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                       </div>`;
+
+                    if (data.success) form.reset();
+                })
+                .catch(() => {
+                    msg.innerHTML = `<div class="alert alert-danger">Lỗi kết nối. Vui lòng thử lại!</div>`;
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    text.classList.remove('d-none');
+                    spinner.classList.add('d-none');
+                });
+        });
+    </script>
+@endsection

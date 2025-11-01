@@ -137,8 +137,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link modern-nav-link" href="#">
-                                <i class="fas fa-headset"></i>
+                            <a class="nav-link modern-nav-link {{ request()->routeIs('client.support.index') ? 'active' : '' }}"
+                                href="{{ route('client.support.index') }}"> <i class="fas fa-headset"></i>
                                 <span>Hỗ Trợ</span>
                             </a>
                         </li>
