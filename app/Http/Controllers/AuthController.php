@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Order;
 use App\Repositories\CategoryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -109,9 +110,19 @@ class AuthController extends Controller
     public function profile(CategoryRepository $categoryRepository)
     {
         $user = Auth::user();
-        $categories = $categoryRepository->getSidebarCategories(); // Pass categories for layout sidebar
+        $categories = $categoryRepository->getSidebarCategories();
 
-        return view('client.profile.index', compact('user', 'categories'));
+        $orders = [];
+
+        if ($user) {
+
+            $orders = Order::where('user_id', $user->id)
+                ->orderByDesc('created_at')
+                ->paginate(10);
+        }
+
+
+        return view('client.profile.index', compact('user', 'categories', 'orders'));
     }
 
     /**

@@ -17,7 +17,7 @@
                         placeholder="Tìm kiếm sản phẩm..." value="{{ request('q') }}"
                         style="border: 1px solid #dee2e6;">
                     <button class="btn btn-primary rounded-pill px-4" type="submit">
-                        <i class="fas fa-search"></i> Tìm Kiếm
+                        <i class="fas fa-search"></i>
                     </button>
                 </form>
             </div>
@@ -32,7 +32,7 @@
                             <i class="fas fa-user me-1"></i> {{ Str::limit(Auth::user()->full_name, 15) }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-start shadow-sm" style="min-width: 200px;">
-                            @if(Auth::user()->role === 'admin')
+                            @if (Auth::user()->role === 'admin')
                                 <li>
                                     <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
                                         <i class="fas fa-tachometer-alt me-2"></i> Bảng Điều Khiển
@@ -84,7 +84,7 @@
                     <i class="fas fa-shopping-cart"></i>
                     @auth
                         @php $cartItemsCount = Auth::user()->cart ? Auth::user()->cart->items->sum('quantity') : 0; @endphp
-                        @if($cartItemsCount > 0)
+                        @if ($cartItemsCount > 0)
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                 {{ $cartItemsCount }}
                                 <span class="visually-hidden">số lượng sản phẩm trong giỏ</span>

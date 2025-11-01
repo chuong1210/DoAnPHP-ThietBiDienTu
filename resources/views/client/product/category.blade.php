@@ -12,10 +12,10 @@
     </nav>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>
-            <i class="fas fa-list"></i> {{ $category['name'] }}
+        <h4>
+            {{ $category['name'] }}
             <small class="text-muted">({{ $products->total() }} sản phẩm)</small>
-        </h3>
+        </h4>
     </div>
 
     <div class="row">
@@ -23,8 +23,9 @@
             <div class="col-md-4 mb-4">
                 <div class="card product-card h-100">
                     <a href="{{ route('client.product.show', $product->slug) }}">
-                        @if($product->image)
-                            <img src="{{ asset($product->image) }}" class="card-img-top product-image" alt="{{ $product->name }}">
+                        @if ($product->image)
+                            <img src="{{ asset($product->image) }}" class="card-img-top product-image"
+                                alt="{{ $product->name }}">
                         @endif
                     </a>
 
@@ -33,7 +34,7 @@
                         <h6 class="card-title">{{ Str::limit($product->name, 60) }}</h6>
 
                         <div class="mb-3">
-                            @if($product->sale_price)
+                            @if ($product->sale_price)
                                 <span class="h5 text-danger mb-0">{{ number_format($product->sale_price) }}đ</span>
                                 <br>
                                 <span class="price-old small">{{ number_format($product->price) }}đ</span>
@@ -43,7 +44,8 @@
                         </div>
 
                         <div class="mt-auto d-grid gap-2">
-                            <a href="{{ route('client.product.show', $product->slug) }}" class="btn btn-outline-primary btn-sm">
+                            <a href="{{ route('client.product.show', $product->slug) }}"
+                                class="btn btn-outline-primary btn-sm">
                                 Xem Chi Tiết
                             </a>
                         </div>

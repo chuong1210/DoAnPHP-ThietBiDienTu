@@ -9,7 +9,11 @@ class ChatMessage extends Model
 {
     use HasFactory;
 
-    public $timestamps = false; // Chỉ dùng created_at
+    // Bật timestamps
+    public $timestamps = true;
+
+    // Nhưng không muốn dùng updated_at
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'room_id',
@@ -25,7 +29,6 @@ class ChatMessage extends Model
         'is_read' => 'boolean',
     ];
 
-    // Relationships
     public function room()
     {
         return $this->belongsTo(ChatRoom::class);
@@ -36,13 +39,11 @@ class ChatMessage extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Scope cho unread messages
     public function scopeUnread($query)
     {
         return $query->where('is_read', false);
     }
 
-    // Mark as read
     public function markAsRead()
     {
         $this->update(['is_read' => true]);

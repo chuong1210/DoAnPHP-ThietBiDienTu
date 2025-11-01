@@ -1,4 +1,4 @@
-@extends('client.layouts.client')
+@extends('client.layouts.home')
 
 @section('title', 'Đơn Hàng Của Tôi')
 
@@ -180,14 +180,14 @@
         </div>
 
         <!-- Success/Error Messages -->
-        @if(session('success'))
+        @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show">
                 <i class="fas fa-check-circle"></i> {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
 
-        @if(session('error'))
+        @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show">
                 <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -231,9 +231,9 @@
                                 <i class="fas fa-shopping-bag text-primary"></i> Sản phẩm đã đặt
                             </h6>
 
-                            @foreach($order->items->take(3) as $item)
+                            @foreach ($order->items->take(3) as $item)
                                 <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
-                                    @if($item->product_image)
+                                    @if ($item->product_image)
                                         <img src="{{ asset('images/products/' . $item->product_image) }}"
                                             alt="{{ $item->product_name }}" class="product-mini-img me-3">
                                     @endif
@@ -249,7 +249,7 @@
                                 </div>
                             @endforeach
 
-                            @if($order->items->count() > 3)
+                            @if ($order->items->count() > 3)
                                 <div class="text-center">
                                     <a href="{{ route('client.my-orders.show', $order->id) }}"
                                         class="btn btn-sm btn-outline-primary">
@@ -267,7 +267,7 @@
                                     <i class="fas fa-info-circle text-primary"></i> Trạng thái
                                 </h6>
                                 <div class="d-flex flex-wrap gap-2">
-                                    @if($order->status === 'pending')
+                                    @if ($order->status === 'pending')
                                         <span class="status-badge bg-warning text-dark">
                                             <i class="fas fa-clock"></i> Chờ xác nhận
                                         </span>
@@ -289,7 +289,7 @@
                                         </span>
                                     @endif
 
-                                    @if($order->payment_status === 'paid')
+                                    @if ($order->payment_status === 'paid')
                                         <span class="status-badge bg-success text-white">
                                             <i class="fas fa-credit-card"></i> Đã thanh toán
                                         </span>
@@ -321,7 +321,7 @@
                                     <i class="fas fa-wallet text-primary"></i> Thanh toán
                                 </h6>
                                 <div class="bg-light p-2 rounded">
-                                    @if($order->payment_method === 'cod')
+                                    @if ($order->payment_method === 'cod')
                                         <i class="fas fa-money-bill-wave text-success"></i> Thanh toán khi nhận hàng
                                     @elseif($order->payment_method === 'bank_transfer')
                                         <i class="fas fa-university text-primary"></i> Chuyển khoản ngân hàng
@@ -337,14 +337,14 @@
                                     <i class="fas fa-eye"></i> Xem Chi Tiết
                                 </a>
 
-                                @if(in_array($order->status, ['pending', 'confirmed']))
+                                @if (in_array($order->status, ['pending', 'confirmed']))
                                     <button type="button" class="btn btn-outline-danger"
                                         onclick="showCancelModal({{ $order->id }}, '{{ $order->order_number }}')">
                                         <i class="fas fa-times"></i> Hủy Đơn Hàng
                                     </button>
                                 @endif
 
-                                @if($order->status === 'delivered')
+                                @if ($order->status === 'delivered')
                                     <button type="button" class="btn btn-outline-success">
                                         <i class="fas fa-star"></i> Đánh Giá
                                     </button>
@@ -354,7 +354,7 @@
                     </div>
 
                     <!-- Order Summary -->
-                    @if($order->discount > 0)
+                    @if ($order->discount > 0)
                         <div class="alert alert-success mt-3 mb-0">
                             <i class="fas fa-tag"></i> Bạn đã tiết kiệm được
                             <strong>{{ number_format($order->discount) }}đ</strong> từ đơn hàng này
@@ -399,7 +399,7 @@
         @endforelse
 
         <!-- Pagination -->
-        @if($orders->hasPages())
+        @if ($orders->hasPages())
             <div class="d-flex justify-content-center">
                 {{ $orders->appends(request()->query())->links() }}
             </div>
@@ -428,8 +428,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Lý do hủy (tùy chọn)</label>
-                            <textarea class="form-control" name="cancel_reason" rows="3"
-                                placeholder="Nhập lý do hủy đơn hàng..."></textarea>
+                            <textarea class="form-control" name="cancel_reason" rows="3" placeholder="Nhập lý do hủy đơn hàng..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -451,9 +450,9 @@
         // Filter orders by status
         function filterOrders(status) {
             if (status === 'all') {
-                window.location.href = '{{ route("client.my-orders.index") }}';
+                window.location.href = '{{ route('client.my-orders.index') }}';
             } else {
-                window.location.href = '{{ route("client.my-orders.index") }}?status=' + status;
+                window.location.href = '{{ route('client.my-orders.index') }}?status=' + status;
             }
         }
 
@@ -467,8 +466,8 @@
         }
 
         // Auto hide alerts
-        setTimeout(function () {
-            document.querySelectorAll('.alert').forEach(function (alert) {
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             });

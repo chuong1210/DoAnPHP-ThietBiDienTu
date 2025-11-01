@@ -1,4 +1,4 @@
-@extends('client.layouts.client')
+@extends('client.layouts.home')
 
 @section('title', 'Trang Chủ')
 

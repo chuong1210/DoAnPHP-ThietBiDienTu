@@ -17,7 +17,7 @@ class ChatRoom extends Model
     ];
 
     protected $casts = [
-        'status' => 'string', // open/closed
+        'status' => 'string', 
     ];
 
     // Relationships
@@ -36,7 +36,7 @@ class ChatRoom extends Model
         return $this->hasMany(ChatMessage::class)->orderBy('created_at');
     }
 
-    // Scope cho open rooms
+
     public function scopeOpen($query)
     {
         return $query->where('status', 'open');

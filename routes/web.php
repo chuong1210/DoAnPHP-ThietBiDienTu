@@ -14,6 +14,8 @@ use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\ProductController as ClientsProductController;
 use App\Http\Controllers\Client\ReviewController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -109,3 +111,22 @@ Route::prefix('admin')
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
     });
+
+
+/*
+|--------------------------------------------------------------------------
+| Chat
+|--------------------------------------------------------------------------
+*/
+
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chat', [ChatController::class, 'room'])->name('chat.room');
+    Route::post('/chat/send/{room}', [ChatController::class, 'send']);
+    Route::get('/chat/messages/{room}', [ChatController::class, 'messages']);
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/chats', [ChatController::class, 'listRooms'])->name('admin.chat.list');
+});

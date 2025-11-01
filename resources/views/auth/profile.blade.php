@@ -13,14 +13,14 @@
             <div class="col-md-8 offset-md-2">
                 <h2 class="mb-4">Thông Tin Cá Nhân</h2>
 
-                @if(session('success'))
+                @if (session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
 
-                @if($errors->any())
+                @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul class="mb-0">
-                            @foreach($errors->all() as $error)
+                            @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>
@@ -51,25 +51,13 @@
                                     value="{{ old('phone', $user->phone) }}">
                             </div>
 
-                            <hr>
-
-                            <h5>Đổi Mật Khẩu (Tùy chọn)</h5>
-
                             <div class="mb-3">
-                                <label class="form-label">Mật khẩu hiện tại</label>
-                                <input type="password" name="current_password" class="form-control">
+                                <label class="form-label">Địa chỉ</label>
+                                <input type="text" name="address" class="form-control"
+                                    value="{{ old('address', $user->address ?? '') }}" placeholder="Nhập địa chỉ">
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Mật khẩu mới</label>
-                                <input type="password" name="new_password" class="form-control">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Xác nhận mật khẩu mới</label>
-                                <input type="password" name="new_password_confirmation" class="form-control">
-                            </div>
-
+    
                             <button type="submit" class="btn btn-primary">Cập Nhật</button>
                             <a href="/" class="btn btn-secondary">Quay lại</a>
                         </form>
