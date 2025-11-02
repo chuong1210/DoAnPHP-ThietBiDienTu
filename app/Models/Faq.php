@@ -22,15 +22,48 @@ class Faq extends Model
         'sort_order' => 'integer',
     ];
 
-    // Scope cho active FAQs
+    // 🔹 Danh sách nhóm FAQ hợp lệ (category => [Tên tiếng Việt, Icon])
+    public const GROUPS = [
+        'order'    => ['Đặt hàng', 'fas fa-shopping-bag'],
+        'payment'  => ['Thanh toán', 'fas fa-credit-card'],
+        'shipping' => ['Giao hàng', 'fas fa-truck'],
+        'warranty' => ['Bảo hành', 'fas fa-shield-alt'],
+        'return'   => ['Đổi trả', 'fas fa-sync-alt'],
+    ];
+
+    // 🔹 Chỉ lấy các FAQ đang kích hoạt
     public function scopeActive($query)
     {
         return $query->where('is_active', true)->orderBy('sort_order');
     }
 
-    // Scope theo category
+    // 🔹 Lọc theo category
     public function scopeByCategory($query, $category)
     {
         return $query->where('category', $category);
+    }
+
+    // 🔹 Lấy tên tiếng Việt của category
+    public function getCategoryLabelAttribute()
+    {
+        return self::GROUPS[$this->category][0] ?? 'Khác';
+    }
+
+    // 🔹 Lấy icon tương ứng của category
+    public function getCategoryIconAttribute()
+    {
+        return self::GROUPS[$this->category][1] ?? 'fas fa-question-circle';
+    }
+
+    // 🔹 Kiểm tra category có hợp lệ không
+    public static function isValidCategory($category)
+    {
+        return array_key_exists($category, self::GROUPS);
+    }
+
+    // 🔹 Lấy danh sách category để hiển thị trong form (option select)
+    public static function getCategoryOptions()
+    {
+        return self::GROUPS;
     }
 }

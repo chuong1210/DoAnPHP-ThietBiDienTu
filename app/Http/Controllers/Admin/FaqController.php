@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 
 class FaqController extends Controller
 {
-    // Hiển thị danh sách FAQ
+   // Hiển thị tất cả các FAQ đang hoạt động
     public function index()
     {
         $faqs = Faq::active()->get();
-        return view('admin.faqs.index', compact('faqs')); // sửa đường dẫn view
+    $categories = Faq::getCategoryOptions(); // Lấy danh sách nhóm (đặt hàng, thanh toán, ...)
+    return view('admin.faqs.index', compact('faqs', 'categories'));
+
     }
 
     // Hiển thị FAQ theo danh mục

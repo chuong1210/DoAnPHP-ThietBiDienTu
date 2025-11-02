@@ -1,48 +1,33 @@
-@extends('admin.layouts.admin')
-
-@section('title', 'Danh sách FAQ')
+@extends('layouts.app')
 
 @section('content')
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">📝 Danh sách câu hỏi thường gặp</h1>
-        <a href="{{ route('admin.faqs.create') }}" class="btn btn-success">
-            <i class="fas fa-plus"></i> Thêm FAQ
-        </a>
-    </div>
+    <h2 class="mb-4 text-center">Câu hỏi thường gặp (FAQ)</h2>
 
-    @foreach($faqs->groupBy('category') as $category => $faqGroup)
-        <div class="card mb-4 shadow-sm border-0">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                {{ $category ?? 'Khác' }}
-                <a href="{{ route('admin.faqs.category', $category) }}" class="btn btn-light btn-sm">
-                    Xem chi tiết
-                </a>
+    @foreach($groups as $key => [$label, $icon])
+     <tr>
+        <td><i class="{{ $faq->category_icon }}"></i> {{ $faq->category_label }}</td>
+        <td>{{ $faq->question }}</td>
+        <td>{{ $faq->answer }}</td>
+    </tr>
+        @if(isset($faqs[$key]) && count($faqs[$key]) > 0)
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="{{ $icon }} me-2"></i>
+                    <strong>{{ $label }}</strong>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        @foreach($faqs[$key] as $faq)
+                            <li class="list-group-item">
+                                <strong class="text-dark">{{ $faq->question }}</strong>
+                                <p class="mb-0 text-muted">{{ $faq->answer }}</p>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
-
-            <div class="card-body">
-                <ul class="list-group">
-                    @foreach($faqGroup as $faq)
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ $faq->question }}
-                            <div>
-                                <a href="{{ route('admin.faqs.edit', $faq) }}" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('admin.faqs.destroy', $faq) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
-                                </form>
-                                <a href="{{ route('admin.faqs.show', $faq) }}" class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
+        @endif
     @endforeach
 </div>
 @endsection

@@ -101,7 +101,7 @@ Route::middleware('auth')->group(function () {
 | Admin Routes (Quản trị viên)
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -114,24 +114,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
     Route::resource('banners', BannerController::class);
     Route::resource('reviews', AdminReviewController::class);
 
-    // **Chỉ cần xóa group lồng nhau**
-    Route::get('contact', [ContactController::class, 'index'])->name('contact.index'); 
-    Route::get('contact/{id}', [ContactController::class, 'show'])->name('contact.show'); 
-    Route::post('contact/{id}/send', [ContactController::class, 'sendEmail'])->name('contact.send'); 
+    // Contact
+    Route::get('contact', [ContactController::class, 'index'])->name('contact.index');
+    Route::get('contact/{id}', [ContactController::class, 'show'])->name('contact.show');
+    Route::post('contact/{id}/send', [ContactController::class, 'sendEmail'])->name('contact.send');
 
-    Route::prefix('faqs')->group(function () {
-        Route::get('/', [FaqController::class, 'index'])->name('faqs.index'); // Tất cả FAQ
-        Route::get('/{category}', [FaqController::class, 'showByCategory'])->name('faqs.category'); 
-
-        Route::prefix('faqs')->name('faqs.')->group(function () {
-            Route::get('/', [FaqController::class, 'index'])->name('index'); 
-            Route::get('/create', [FaqController::class, 'create'])->name('create'); 
-            Route::post('/', [FaqController::class, 'store'])->name('store'); 
-            Route::get('/{faq}/edit', [FaqController::class, 'edit'])->name('edit'); 
-            Route::put('/{faq}', [FaqController::class, 'update'])->name('update'); 
-            Route::delete('/{faq}', [FaqController::class, 'destroy'])->name('destroy'); 
-            Route::get('/{faq}', [FaqController::class, 'show'])->name('show'); 
-            Route::get('/category/{category}', [FaqController::class, 'showByCategory'])->name('category'); 
-        });
+    // 🔹 FAQ Routes (Đồng bộ chuẩn, không lồng trùng)
+    Route::prefix('faqs')->name('faqs.')->group(function () {
+        Route::get('/', [FaqController::class, 'index'])->name('index');               // Danh sách tất cả FAQ
+        Route::get('/create', [FaqController::class, 'create'])->name('create');       // Form thêm mới
+        Route::post('/', [FaqController::class, 'store'])->name('store');              // Lưu FAQ mới
+        Route::get('/{faq}/edit', [FaqController::class, 'edit'])->name('edit');       // Form sửa
+        Route::put('/{faq}', [FaqController::class, 'update'])->name('update');        // Cập nhật
+        Route::delete('/{faq}', [FaqController::class, 'destroy'])->name('destroy');   // Xóa
+        Route::get('/{faq}', [FaqController::class, 'show'])->name('show');            // Xem chi tiết
+        Route::get('/category/{category}', [FaqController::class, 'showByCategory'])->name('category'); // Lọc theo category
     });
 });
