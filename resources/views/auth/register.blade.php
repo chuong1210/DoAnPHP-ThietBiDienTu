@@ -6,6 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Ký - Tech Shop</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -264,7 +266,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('auth.register.post') }}">
+                <form method="POST" action="{{ route('register') }}">
                     @csrf
 
                     <!-- Họ tên -->
@@ -340,6 +342,12 @@
                                 placeholder="Nhập lại mật khẩu" required>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                        @if($errors->has('g-recaptcha-response'))
+                            <div class="server-error">{{ $errors->first('g-recaptcha-response') }}</div>
+                        @endif
+                    </div>
 
                     <!-- Điều khoản -->
                     <div class="mb-3 form-check">
@@ -368,7 +376,7 @@
                     <div class="text-center mt-4">
                         <p class="mb-0" style="color: #64748B;">
                             Đã có tài khoản?
-                            <a href="{{ route('auth.login') }}">Đăng nhập ngay</a>
+                            <a href="{{ route('login') }}">Đăng nhập ngay</a>
                         </p>
                     </div>
                 </form>

@@ -38,7 +38,9 @@ class ChatController extends Controller
                     'id' => $msg->id,
                     'message' => $msg->message,
                     'is_admin' => $msg->is_admin,
-                    'created_at' => $msg->created_at->format('H:i'),
+                    // 'created_at' => $msg->created_at->format('H:i'),
+                    'created_at' => $msg->created_at->toIso8601String(), // SỬA Ở ĐÂY
+
                     'user' => [
                         'full_name' => $msg->user->full_name
                     ]
@@ -105,7 +107,9 @@ class ChatController extends Controller
                 'id' => $message->id,
                 'message' => $message->message,
                 'is_admin' => $message->is_admin,
-                'created_at' => $message->created_at->format('H:i'),
+                // 'created_at' => $message->created_at->format('H:i'),
+                'created_at' => $message->created_at->toIso8601String(), // VÀ SỬA Ở ĐÂY
+
                 'user' => [
                     'full_name' => $message->user->full_name
                 ]

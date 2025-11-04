@@ -331,9 +331,13 @@
                                 value="{{ old('shipping_province_code') }}">
                             <input type="hidden" name="shipping_ward_code" id="wardCode"
                                 value="{{ old('shipping_ward_code') }}">
+
+
+                            <!-- THÊM 2 TRƯỜNG NÀY -->
+                            <input type="hidden" name="shipping_province_name" id="provinceName"
+                                value="{{ old('shipping_province_name') }}">
                             <input type="hidden" name="shipping_ward_name" id="wardName"
                                 value="{{ old('shipping_ward_name') }}">
-
                             <div class="col-12">
                                 <label class="form-label fw-semibold text-text">Ghi chú đơn hàng</label>
                                 <textarea name="note" class="form-control" rows="2"
@@ -608,20 +612,25 @@
         const API_BASE = 'http://provinces.open-api.vn/api/v2/';
 
         // Load khi trang sẵn sàng
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     loadProvinces();
+
+        //     // Default: TP. Hồ Chí Minh (code 79)
+        //     setTimeout(() => {
+        //         const select = document.getElementById('provinceSelect');
+        //         if (select.options.length > 1) {
+        //             select.value = '79';
+        //             loadWards(79);
+        //         }
+        //     }, 800);
+        // });
         document.addEventListener('DOMContentLoaded', function () {
             loadProvinces();
-
-            // Default: TP. Hồ Chí Minh (code 79)
-            setTimeout(() => {
-                const select = document.getElementById('provinceSelect');
-                if (select.options.length > 1) {
-                    select.value = '79';
-                    loadWards(79);
-                }
-            }, 800);
         });
-
         // ==== 1. Load Tỉnh/Thành ====
+        // resources/views/client/checkout/index.blade.php -> section('scripts')
+
+        // Sửa lại hàm này
         function loadProvinces() {
             fetch(`${API_BASE}`)
                 .then(r => r.json())
@@ -635,6 +644,21 @@
                         opt.textContent = p.name;
                         select.appendChild(opt);
                     });
+
+                    // === PHẦN SỬA ĐỔI QUAN TRỌNG ===
+                    // Sau khi đã có danh sách tỉnh, hãy thiết lập giá trị mặc định
+                    const defaultProvinceCode = '79'; // Mã TP.HCM
+                    if (select.querySelector(`option[value="${defaultProvinceCode}"]`)) {
+                        select.value = defaultProvinceCode;
+
+                        // Chủ động kích hoạt sự kiện 'change'
+                        // Điều này sẽ làm cho tất cả logic trong event listener chạy
+                        // bao gồm cả việc cập nhật provinceName và tải phường/xã.
+                        const event = new Event('change');
+                        select.dispatchEvent(event);
+                    }
+                    // ===============================
+
                 })
                 .catch(err => {
                     console.error('Lỗi load tỉnh:', err);
@@ -642,22 +666,44 @@
                 });
         }
 
+        // resources/views/client/checkout/index.blade.php -> section('scripts')
+
         // ==== 2. Khi chọn tỉnh → Load Phường/Xã ====
         document.getElementById('provinceSelect').addEventListener('change', function () {
             const code = this.value;
+            const name = this.options[this.selectedIndex].text; // Lấy tên tỉnh
             const wardSelect = document.getElementById('wardSelect');
+
+            // Cập nhật trường hidden với tên tỉnh
+            document.getElementById('provinceName').value = name;
 
             // Reset
             wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
             wardSelect.disabled = true;
-            document.getElementById('wardCode').value = '';
             document.getElementById('wardName').value = '';
 
-            if (!code) return;
+            if (!code) {
+                document.getElementById('provinceName').value = ''; // Reset nếu không chọn gì
+                return;
+            }
 
             loadWards(code);
         });
 
+
+
+        // Bỏ phần code cũ không cần thiết này đi
+        /*
+        document.getElementById('wardSelect').addEventListener('change', function () {
+            const provinceCode = document.getElementById('provinceSelect').value;
+            const wardCode = this.value;
+            const wardName = this.options[this.selectedIndex].text;
+
+            document.getElementById('provinceCode').value = provinceCode;   // không cần
+            document.getElementById('wardCode').value = wardCode;       // không cần
+            document.getElementById('wardName').value = wardName;       // cần
+        });
+        */
         function loadWards(provinceCode) {
             const wardSelect = document.getElementById('wardSelect');
             wardSelect.innerHTML = '<option value="">Đang tải phường/xã...</option>';
@@ -691,14 +737,20 @@
         // ==== 3. Khi chọn phường → Lưu code + tên ====
         // Khi chọn phường
         document.getElementById('wardSelect').addEventListener('change', function () {
-            const provinceCode = document.getElementById('provinceSelect').value;
-            const wardCode = this.value;
-            const wardName = this.options[this.selectedIndex].text;
+            const wardName = this.options[this.selectedIndex].text; // Lấy tên phường/xã
 
-            document.getElementById('provinceCode').value = provinceCode;   // không cần
-            document.getElementById('wardCode').value = wardCode;       // không cần
-            document.getElementById('wardName').value = wardName;       // cần
+            // Cập nhật trường hidden với tên phường/xã
+            document.getElementById('wardName').value = wardName;
         });
+        // document.getElementById('wardSelect').addEventListener('change', function () {
+        //     const provinceCode = document.getElementById('provinceSelect').value;
+        //     const wardCode = this.value;
+        //     const wardName = this.options[this.selectedIndex].text;
+
+        //     document.getElementById('provinceCode').value = provinceCode;   // không cần
+        //     document.getElementById('wardCode').value = wardCode;       // không cần
+        //     document.getElementById('wardName').value = wardName;       // cần
+        // });
 
         // Form submit – chỉ chặn nếu thiếu điều khoản hoặc địa chỉ
         document.getElementById('checkoutForm').addEventListener('submit', function (e) {
@@ -759,9 +811,9 @@
                     discountRow.id = 'discount-row';
                     discountRow.className = 'd-flex justify-content-between mb-2 text-success';
                     discountRow.innerHTML = `
-                                                                                                <span class="fw-semibold">Giảm giá:</span>
-                                                                                                <strong id="discount" class="text-success">-0đ</strong>
-                                                                                            `;
+                                                                                                                                            <span class="fw-semibold">Giảm giá:</span>
+                                                                                                                                            <strong id="discount" class="text-success">-0đ</strong>
+                                                                                                                                        `;
                     hr.insertAdjacentElement('afterend', discountRow);
                 }
             }
@@ -779,14 +831,14 @@
                 couponAlert.id = 'applied-coupon-alert';
                 couponAlert.className = 'alert alert-success d-flex justify-content-between align-items-center mb-3 rounded-3 border-0';
                 couponAlert.innerHTML = `
-                                                                                            <div>
-                                                                                                <strong class="text-text">${code}</strong><br>
-                                                                                                <small class="text-success">-${discount}đ</small>
-                                                                                            </div>
-                                                                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removeCoupon()">
-                                                                                                <i class="fas fa-times"></i>
-                                                                                            </button>
-                                                                                        `;
+                                                                                                                                        <div>
+                                                                                                                                            <strong class="text-text">${code}</strong><br>
+                                                                                                                                            <small class="text-success">-${discount}đ</small>
+                                                                                                                                        </div>
+                                                                                                                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removeCoupon()">
+                                                                                                                                            <i class="fas fa-times"></i>
+                                                                                                                                        </button>
+                                                                                                                                    `;
                 inputGroup.insertAdjacentElement('beforebegin', couponAlert);
             } else {
                 couponAlert.querySelector('strong').textContent = code;

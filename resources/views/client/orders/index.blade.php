@@ -785,12 +785,33 @@
                                         <i class="fas fa-times"></i> Hủy Đơn Hàng
                                     </button>
                                 @endif
+<!-- Thay thế đoạn nút Đánh Giá cũ -->
+@if($order->status === 'delivered' && $order->items->where('reviewed', false)->count() > 0)
+    <div class="mt-3">
+        <h6 class="mb-2">
+            <i class="fas fa-star text-warning"></i> Đánh giá sản phẩm
+        </h6>
+        <div class="d-grid gap-2">
+            @foreach($order->items->where('reviewed', false)->take(3) as $item)
+                <a href="{{ route('client.reviews.create', $item->product->slug) }}"
+                   class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-star"></i>
+                    Đánh giá: {{ Str::limit($item->product_name, 30) }}
+                </a>
+            @endforeach
 
-                                @if($order->status === 'delivered')
-                                    <button type="button" class="btn btn-outline-success">
-                                        <i class="fas fa-star"></i> Đánh Giá
-                                    </button>
-                                @endif
+            @if($order->items->where('reviewed', false)->count() > 3)
+                <small class="text-muted text-center">
+                    Còn {{ $order->items->where('reviewed', false)->count() - 3 }} sản phẩm chưa đánh giá
+                </small>
+            @endif
+        </div>
+    </div>
+@elseif($order->status === 'delivered')
+    <small class="text-success">
+        <i class="fas fa-check"></i> Bạn đã đánh giá tất cả sản phẩm
+    </small>
+@endif
                             </div>
                         </div>
                     </div>

@@ -10,9 +10,70 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
+    public function showVerificationNotice()
+    {
+        return view('auth.verify');
+    }
+
+    /**
+     * Xử lý yêu cầu xác thực email (khi người dùng click vào link).
+     */
+    // public function verifyEmail(EmailVerificationRequest $request)
+    // {
+    //     $request->fulfill();
+
+    //     return redirect()->route('client.home.index')->with('success', 'Email của bạn đã được xác thực thành công!');
+    // }
+
+    public function verifyEmail(Request $request) // <-- Thay đổi ở đây
+    {
+        // Tìm người dùng dựa trên ID trong URL
+        $user = User::find($request->route('id'));
+
+        // Kiểm tra xem người dùng có tồn tại và email đã được xác thực chưa
+        if (! $user || $user->hasVerifiedEmail()) {
+            // Nếu đã xác thực hoặc không tìm thấy user, chuyển hướng đến login
+            return redirect()->route('login')->with('info', 'Tài khoản không tồn tại hoặc đã được xác thực.');
+        }
+
+        // Kiểm tra chữ ký của URL (rất quan trọng để bảo mật)
+        if (! hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
+            // Chữ ký không hợp lệ, từ chối yêu cầu
+            return redirect()->route('login')->with('error', 'Liên kết xác thực không hợp lệ.');
+        }
+
+        // Đánh dấu email đã được xác thực
+        if ($user->markEmailAsVerified()) {
+            // Kích hoạt sự kiện Verified
+            event(new \Illuminate\Auth\Events\Verified($user));
+        }
+
+        // (Tùy chọn) Tự động đăng nhập cho người dùng
+        Auth::login($user);
+
+        // Chuyển hướng đến trang chủ với thông báo thành công
+        return redirect()->route('client.home.index')->with('success', 'Email của bạn đã được xác thực thành công!');
+    }
+
+    /**
+     * Gửi lại email xác thực.
+     */
+    public function resendVerificationEmail(Request $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect()->route('client.home.index');
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+
+        return back()->with('success', 'Một liên kết xác minh mới đã được gửi đến địa chỉ email của bạn.');
+    }
     /**
      * Hiển thị form đăng nhập
      */
@@ -106,7 +167,7 @@ class AuthController extends Controller
                     ->with('success', 'Tạo tài khoản và đăng nhập bằng Google thành công!');
             }
         } catch (Exception $e) {
-            return redirect()->route('auth.login')
+            return redirect()->route('login')
                 ->with('error', 'Lỗi đăng nhập Google: ' . $e->getMessage());
         }
     }
@@ -124,6 +185,9 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'phone' => 'nullable|string|max:15',
             'password' => 'required|confirmed|min:8',
+            // THÊM VALIDATION CHO RECAPTCHA
+            'g-recaptcha-response.required' => 'Vui lòng xác minh reCAPTCHA.',
+
         ], [
             'full_name.required' => 'Họ tên không được để trống',
             'email.required' => 'Email không được để trống',
@@ -133,6 +197,24 @@ class AuthController extends Controller
             'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự',
         ]);
 
+        // === 4. XÁC MINH reCAPTCHA BẰTAY ===
+        $recaptchaResponse = $request->input('g-recaptcha-response');
+        $secretKey = config('services.recaptcha.secret_key');
+
+        $verifyResponse = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => $secretKey,
+            'response' => $recaptchaResponse,
+            'remoteip' => $request->ip(),
+        ]);
+
+        $recaptchaData = $verifyResponse->json();
+
+        // Check kết quả
+        if (!$recaptchaData['success']) {
+            return back()
+                ->withInput()
+                ->withErrors(['g-recaptcha-response' => 'Xác minh reCAPTCHA thất bại. Vui lòng thử lại.']);
+        }
         $user = User::create([
             'full_name' => $validated['full_name'],
             'email' => $validated['email'],
@@ -142,10 +224,12 @@ class AuthController extends Controller
             'status' => 'active',
         ]);
 
-        Auth::login($user);
+        // Auth::login($user);
+        $user->sendEmailVerificationNotification();
 
-        return redirect()->route('client.home.index')
-            ->with('success', 'Đăng ký thành công!');
+        // Chuyển hướng đến trang đăng nhập với thông báo
+        return redirect()->route('login')
+            ->with('success', 'Đăng ký thành công! Vui lòng email của bạn để xác thực tài khoản.');
     }
 
     public function logout(Request $request)

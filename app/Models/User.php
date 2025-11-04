@@ -5,11 +5,12 @@
 // ==========================================
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable;
 
@@ -22,6 +23,8 @@ class User extends Authenticatable
         'status',
         'google_id',
         'avatar',
+        'email_verified_at', // Thêm vào fillable
+
     ];
 
     protected $hidden = [
@@ -36,14 +39,14 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function setPasswordAttribute($value)
-    {
-        if ($value) {
-            $this->attributes['password'] = Hash::make($value);
-        } else {
-            $this->attributes['password'] = null; // Cho social login
-        }
-    }
+    // public function setPasswordAttribute($value)
+    // {
+    //     if ($value) {
+    //         $this->attributes['password'] = Hash::make($value);
+    //     } else {
+    //         $this->attributes['password'] = null; // Cho social login
+    //     }
+    // }
     public function scopeByGoogleId($query, $googleId)
     {
         return $query->where('google_id', $googleId);

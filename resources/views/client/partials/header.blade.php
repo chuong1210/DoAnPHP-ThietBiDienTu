@@ -62,7 +62,7 @@
                             </li>
                         @endif
                         <li>
-                            <a class="dropdown-item" href="{{ route('profile.index') }}">
+                            <a class="dropdown-item" href="{{ route('client.profile.index') }}">
                                 <i class="fas fa-user-circle text-info"></i> Hồ Sơ
                             </a>
                         </li>
@@ -86,10 +86,10 @@
                 </div>
             @else
                     <!-- Guest Links -->
-                    <a href="{{ route('auth.login') }}" class="btn btn-outline-primary btn-sm me-1">
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm me-1">
                         <i class="fas fa-sign-in-alt"></i> <span class="d-none d-md-inline">Đăng Nhập</span>
                     </a>
-                    <a href="{{ route('auth.register') }}" class="btn btn-primary btn-sm">
+                    <a href="{{ route('register') }}" class="btn btn-primary btn-sm">
                         <i class="fas fa-user-plus"></i> <span class="d-none d-md-inline">Đăng Ký</span>
                     </a>
                 @endauth

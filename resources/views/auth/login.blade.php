@@ -261,7 +261,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('auth.login.post') }}">
+                <form method="POST" action="{{ route('login') }}">
                     @csrf
 
                     <!-- Email -->
@@ -324,7 +324,7 @@
                     <div class="text-center mt-4">
                         <p class="mb-0" style="color: #64748B;">
                             Chưa có tài khoản?
-                            <a href="{{ route('auth.register') }}">Đăng ký ngay</a>
+                            <a href="{{ route('register') }}">Đăng ký ngay</a>
                         </p>
                     </div>
                 </form>

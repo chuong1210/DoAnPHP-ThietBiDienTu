@@ -74,7 +74,7 @@
                     <div class="tab-content" id="profileTabsContent">
                         <!-- Profile Tab -->
                         <div class="tab-pane fade show active" id="profile" role="tabpanel">
-                            <form action="{{ route('profile.update') }}" method="POST" class="modern-form">
+                            <form action="{{ route('client.profile.update') }}" method="POST" class="modern-form">
                                 @csrf
                                 @method('PUT')
                                 <div class="row">
@@ -134,7 +134,7 @@
 
                         <!-- Password Tab -->
                         <div class="tab-pane fade" id="password" role="tabpanel">
-                            <form action="{{ route('profile.update.password') }}" method="POST" class="modern-form">
+                            <form action="{{ route('client.profile.update.password') }}" method="POST" class="modern-form">
                                 @csrf
                                 <div class="mb-4">
                                     <label for="current_password" class="form-label">
@@ -182,7 +182,7 @@
                                     </div>
                                 </div>
                                 <div class="form-actions">
-                                    <a href="{{ route('profile.index') }}" class="btn btn-secondary">
+                                    <a href="{{ route('client.profile.index') }}" class="btn btn-secondary">
                                         <i class="fas fa-arrow-left me-2"></i> Hủy
                                     </a>
                                     <button type="submit" class="btn btn-primary">
@@ -224,7 +224,7 @@
                                 <h5>Đánh Giá</h5>
                                 <p>Quản lý đánh giá sản phẩm</p>
                             </div>
-                            <a href="{{ route('profile.reviews') }}" class="card-link">
+                            <a href="{{ route('client.profile.reviews') }}" class="card-link">
                                 Xem Ngay <i class="fas fa-arrow-right ms-1"></i>
                             </a>
                         </div>

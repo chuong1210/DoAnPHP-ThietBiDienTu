@@ -10,7 +10,7 @@
         <ol class="breadcrumb modern-breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}"><i class="fas fa-home"></i> Trang chủ</a>
             </li>
-            <li class="breadcrumb-item"><a href="{{ route('profile.index') }}">Hồ sơ</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('client.profile.index') }}">Hồ sơ</a></li>
             <li class="breadcrumb-item active">Đánh Giá Của Tôi</li>
         </ol>
     </nav>
@@ -913,9 +913,9 @@
     <script>
         function filterReviews(status) {
             if (status === 'all') {
-                window.location.href = '{{ route("profile.reviews") }}';
+                window.location.href = '{{ route("client.profile.reviews") }}';
             } else {
-                window.location.href = '{{ route("profile.reviews") }}?status=' + status;
+                window.location.href = '{{ route("client.profile.reviews") }}?status=' + status;
             }
         }
 

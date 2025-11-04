@@ -1,5 +1,6 @@
 <?php
 
+// Import các Controller
 use App\Http\Controllers\Admin\BrandController as AdminBrandController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
@@ -18,23 +19,44 @@ use App\Http\Controllers\Client\ProductController as ClientsProductController;
 use App\Http\Controllers\Client\ReviewController;
 use App\Http\Controllers\Client\SupportController;
 use App\Http\Controllers\Client\VnpayController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/', function () {
-    return view('welcome');
-});
 
 /*
 |--------------------------------------------------------------------------
-| Guest Routes (Người dùng chưa đăng nhập)
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// Ghi chú: Route gốc đang trỏ đến trang login.
+// Nếu muốn trỏ đến trang chủ, hãy thay đổi thành:
+// Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', function () {
+    return redirect()->route('client.home.index'); // Tốt hơn là redirect đến trang chủ
+})->name('root');
+
+// Tạo các route cho xác thực (login, register, forgot password, email verification)
+// Auth::routes(['verify' => true]);
+Route::get('/email/verify', [AuthController::class, 'showVerificationNotice'])
+    ->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware(['signed'])->name('verification.verify'); // <-- Chỉ giữ lại 'signed'
+
+// Route này vẫn cần 'auth' để biết user nào đang yêu cầu gửi lại email
+Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
+    ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+/*
+|--------------------------------------------------------------------------
+| Guest Routes (Chỉ dành cho khách)
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('auth.login');
-    Route::post('/login', [AuthController::class, 'login'])->name('auth.login.post');
-    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('auth.register');
-    Route::post('/register', [AuthController::class, 'register'])->name('auth.register.post');
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login'); // Laravel đã tạo route này, nhưng định nghĩa lại để custom controller
+    Route::post('/login', [AuthController::class, 'login']);
 
+    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
 
     Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
     Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
@@ -42,118 +64,116 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Client Public Routes (Công khai - Không cần đăng nhập)
+| Client Public Routes (Công khai cho mọi người)
 |--------------------------------------------------------------------------
 */
-Route::prefix('client')->name('client.')->group(function () {
+Route::name('client.')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home.index');
-    Route::get('/products-all', [ClientsProductController::class, 'all'])->name('product.all');
-    Route::get('/products', [ClientsProductController::class, 'index'])->name('product.index');
 
-    Route::get('/product/{slug}', [ClientsProductController::class, 'show'])->name('product.show');
+    Route::prefix('products')->name('product.')->group(function () {
+        Route::get('/all', [ClientsProductController::class, 'all'])->name('all');
+        Route::get('/', [ClientsProductController::class, 'index'])->name('index');
+        Route::get('/{slug}', [ClientsProductController::class, 'show'])->name('show');
+    });
+
     Route::get('/search', [ClientsProductController::class, 'search'])->name('search');
     Route::get('/category/{slug}', [ClientsProductController::class, 'category'])->name('product.category.index');
-
-    Route::prefix('brands')->name('brand.')->group(function () {
-        Route::get('{slug}', [ClientBrandController::class, 'index'])->name('index');
-    });
+    Route::get('/brands/{slug}', [ClientBrandController::class, 'index'])->name('brand.index');
 });
+
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::get('/support', [SupportController::class, 'index'])->name('client.support.index');
+Route::post('/support/contact', [SupportController::class, 'contact'])->name('client.support.contact');
+
+// VNPay Routes (Không cần auth, vì VNPay server sẽ gọi vào)
+Route::get('/vnpay/callback', [VnpayController::class, 'callback'])->name('vnpay.callback');
+Route::get('/vnpay/ipn', [VnpayController::class, 'ipn'])->name('vnpay.ipn');
 
 /*
 |--------------------------------------------------------------------------
-| Client Authenticated Routes (Người dùng đã đăng nhập)
+| Client Authenticated Routes (Yêu cầu đăng nhập)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    // Auth actions
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/profile', [AuthController::class, 'profile'])->name('profile.index');
-    Route::put('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
-    Route::post('/profile/update/password', [AuthController::class, 'updatePassword'])->name('profile.update.password');
 
-    // Reviews
-    Route::get('/products/{slug}/review', [ReviewController::class, 'create'])->name('reviews.create');
-    Route::post('/products/{slug}/review', [ReviewController::class, 'store'])->name('reviews.store');
-    Route::get('/profile/reviews', [ReviewController::class, 'userReviews'])->name('profile.reviews');
-
-    // Cart
-    Route::prefix('client/cart')->name('client.cart.')->group(function () {
-        Route::get('/', [CartController::class, 'index'])->name('index');
-        Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
-        Route::put('/update/{item}', [CartController::class, 'update'])->name('update');
-        Route::delete('/remove/{item}', [CartController::class, 'remove'])->name('remove');
+    // === CÁC ROUTE CHỈ CẦN ĐĂNG NHẬP ===
+    Route::prefix('client')->name('client.')->group(function () {
+        // Cart Routes
+        Route::prefix('cart')->name('cart.')->group(function () {
+            Route::get('/', [CartController::class, 'index'])->name('index');
+            Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
+            Route::put('/update/{item}', [CartController::class, 'update'])->name('update');
+            Route::delete('/remove/{item}', [CartController::class, 'remove'])->name('remove');
+        });
     });
 
-    Route::get('/support', [SupportController::class, 'index'])->name('client.support.index');
-    Route::post('/support/contact', [SupportController::class, 'contact'])->name('client.support.contact');
-
-    // Checkout
-    Route::prefix('client/checkout')->name('client.checkout.')->group(function () {
-        Route::get('/', [CheckoutController::class, 'index'])->name('index');
-        Route::post('/apply-coupon', [CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
-        Route::post('/remove-coupon', [CheckoutController::class, 'removeCoupon'])->name('remove-coupon');
-        Route::post('/process', [CheckoutController::class, 'process'])->name('process');
-        Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
-
-        Route::post('/apply-coupon', [CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
-        // routes/web.php
-        Route::post('/remove-coupon', [CheckoutController::class, 'removeCoupon'])
-            ->name('remove-coupon');
+    // Chat Widget Routes
+    Route::prefix('chat')->name('chat.')->group(function () {
+        Route::get('/room', [ClientChatController::class, 'getRoom'])->name('room');
+        Route::get('/unread-count', [ClientChatController::class, 'unreadCount'])->name('unread-count');
+        Route::post('/rooms/{room}/messages', [ClientChatController::class, 'sendMessage'])->name('send');
+        Route::post('/rooms/{room}/read', [ClientChatController::class, 'markAsRead'])->name('mark-read');
     });
 
-    // Orders
-    Route::prefix('client/my-orders')->name('client.my-orders.')->group(function () {
-        Route::get('/', [OrderController::class, 'index'])->name('index');
-        Route::get('/{id}', [OrderController::class, 'show'])->name('show');
-        Route::post('/{id}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+
+    // === CÁC ROUTE YÊU CẦU ĐÃ XÁC THỰC EMAIL (quan trọng) ===
+    Route::middleware('verified')->group(function () {
+        Route::prefix('client')->name('client.')->group(function () {
+            // Profile
+            Route::get('/profile', [AuthController::class, 'profile'])->name('profile.index');
+            Route::put('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
+            Route::post('/profile/update/password', [AuthController::class, 'updatePassword'])->name('profile.update.password');
+
+            // Reviews
+            Route::get('/products/{slug}/review/create', [ReviewController::class, 'create'])->name('reviews.create');
+            Route::post('/products/{slug}/review', [ReviewController::class, 'store'])->name('reviews.store');
+            Route::get('/profile/reviews', [ReviewController::class, 'userReviews'])->name('profile.reviews');
+
+            // Checkout
+            Route::prefix('checkout')->name('checkout.')->group(function () {
+                Route::get('/', [CheckoutController::class, 'index'])->name('index');
+                Route::post('/apply-coupon', [CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
+                Route::post('/remove-coupon', [CheckoutController::class, 'removeCoupon'])->name('remove-coupon');
+                Route::post('/process', [CheckoutController::class, 'process'])->name('process');
+                Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
+            });
+
+            // My Orders
+            Route::prefix('my-orders')->name('my-orders.')->group(function () {
+                Route::get('/', [OrderController::class, 'index'])->name('index');
+                Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+                Route::post('/{id}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+            });
+        });
     });
 });
 
 
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
-    ->name('newsletter.subscribe');
-// CLIENT ROUTES (Widget)
-// ==========================================
-Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
-    Route::get('/room', [ClientChatController::class, 'getRoom'])->name('room');
-    Route::get('/unread-count', [ClientChatController::class, 'unreadCount'])->name('unread-count');
-    Route::post('/rooms/{room}/messages', [ClientChatController::class, 'sendMessage'])->name('send');
-    Route::post('/rooms/{room}/read', [ClientChatController::class, 'markAsRead'])->name('mark-read');
-});
-
-
-
-// Route::get('/api/vnpay/callback', [VnpayController::class, 'callback'])
-//     ->name('vnpay.callback');
-Route::get('/vnpay/ipn', [VnpayController::class, 'ipn'])
-    ->name('vnpay.ipn');
-Route::get('/vnpay/callback', [VnpayController::class, 'callback'])->name('vnpay.callback');
 /*
-
-
 |--------------------------------------------------------------------------
-| Admin Routes (Quản trị viên)
+| Admin Routes (Yêu cầu đăng nhập và là admin)
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'admin'])
+    ->middleware(['auth', 'verified', 'admin']) // Thêm 'verified' cho admin để đảm bảo
     ->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('products', AdminProductController::class);
         Route::resource('categories', AdminCategoryController::class);
         Route::resource('brands', AdminBrandController::class);
+
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+
+        // Admin Chat
+        Route::prefix('chat')->name('chat.')->group(function () {
+            Route::get('/', [AdminChatController::class, 'index'])->name('index');
+            Route::get('/rooms/{room}/messages', [AdminChatController::class, 'getMessages'])->name('messages');
+            Route::post('/rooms/{room}/messages', [AdminChatController::class, 'sendMessage'])->name('send');
+            Route::post('/rooms/{room}/close', [AdminChatController::class, 'closeRoom'])->name('close');
+            Route::post('/rooms/{room}/open', [AdminChatController::class, 'openRoom'])->name('open');
+        });
     });
-
-
-
-Route::middleware(['auth', 'admin'])->prefix('admin/chat')->name('admin.chat.')->group(function () {
-    Route::get('/', [AdminChatController::class, 'index'])->name('index');
-    Route::get('/rooms/{room}/messages', [AdminChatController::class, 'getMessages'])->name('messages');
-    Route::post('/rooms/{room}/messages', [AdminChatController::class, 'sendMessage'])->name('send');
-    Route::post('/rooms/{room}/close', [AdminChatController::class, 'closeRoom'])->name('close');
-    Route::post('/rooms/{room}/open', [AdminChatController::class, 'openRoom'])->name('open');
-});

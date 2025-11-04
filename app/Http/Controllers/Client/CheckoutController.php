@@ -294,10 +294,13 @@ class CheckoutController extends Controller
             'customer_phone'    => 'required|string|max:15',
             'customer_email'    => 'nullable|email',
             'shipping_address'  => 'required|string',
-            'shipping_province' => 'required',
-            'shipping_ward'     => 'required|string',
-            'payment_method'    => 'required|in:cod,bank_transfer,momo,vnpay',
+            // 'shipping_province' => 'required',
+            // 'shipping_ward'     => 'required|string',
+            'shipping_province_name' => 'required|string', // Validate trường tên tỉnh
+            'shipping_ward_name'     => 'required|string', // Validate trường tên phường/xã            'payment_method'    => 'required|in:cod,bank_transfer,momo,vnpay',
             'note'              => 'nullable|string',
+            'payment_method'         => 'required|in:cod,bank_transfer,momo,vnpay',
+
         ]);
 
         DB::beginTransaction();
@@ -340,9 +343,9 @@ class CheckoutController extends Controller
                 'customer_name'    => $validated['customer_name'],
                 'customer_phone'   => $validated['customer_phone'],
                 'customer_email'   => $validated['customer_email'],
-                'shipping_address' => $validated['shipping_address'] . ', ' . $validated['shipping_ward'] . ', ' . $validated['shipping_province'],
-                'shipping_ward'    => $validated['shipping_ward'],
-                'shipping_city'    => $validated['shipping_province'],
+                'shipping_address' => $validated['shipping_address'] . ', ' . $validated['shipping_ward_name'] . ', ' . $validated['shipping_province_name'],
+                // 'shipping_ward'    => $validated['shipping_ward'],
+                // 'shipping_city'    => $validated['shipping_province'],
                 'subtotal'         => $subtotal,
                 'shipping_fee'     => $shippingFee,
                 'discount'         => $discount,

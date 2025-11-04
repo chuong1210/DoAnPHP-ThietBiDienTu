@@ -103,7 +103,7 @@ class ReviewController extends Controller
     public function userReviews()
     {
         if (!Auth::check()) {
-            return redirect()->route('auth.login')->with('error', 'Vui lòng đăng nhập.');
+            return redirect()->route('login')->with('error', 'Vui lòng đăng nhập.');
         }
 
         $reviews = $this->reviewRepository->getReviewsByUser(Auth::id());

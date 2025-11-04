@@ -296,7 +296,7 @@
                         @endphp
                         @if($hasOrdered && !$hasReviewed)
                             <div class="review-action">
-                                <a href="{{ route('reviews.create', $product->slug) }}" class="btn-write-review">
+                                <a href="{{ route('client.reviews.create', $product->slug) }}" class="btn-write-review">
                                     <i class="fas fa-star me-2"></i> Viết Đánh Giá Của Bạn
                                 </a>
                             </div>
@@ -309,7 +309,7 @@
                     @else
                         <div class="review-notice info">
                             <i class="fas fa-sign-in-alt"></i>
-                            <a href="{{ route('auth.login') }}">Đăng nhập</a> để viết đánh giá
+                            <a href="{{ route('login') }}">Đăng nhập</a> để viết đánh giá
                         </div>
                     @endauth
                 </div>
@@ -419,7 +419,7 @@
             image: "{{ asset($product->image) }}",
             price: {{ $product->sale_price ?? $product->price }},
             stock: {{ $product->quantity }}
-                        };
+                                };
 
         let modalQty = 1;
 
