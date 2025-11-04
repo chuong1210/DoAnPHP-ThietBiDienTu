@@ -17,8 +17,7 @@
                 @foreach($banners as $index => $banner)
                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                         <div class="banner-wrapper">
-                            <img src="{{ asset('images/banners/' . $banner->image) }}" class="d-block w-100"
-                                alt="{{ $banner->title }}">
+                            <img src="{{ asset($banner->image) }}" class="d-block w-100" alt="{{ $banner->title }}">
                             <div class="banner-overlay">
                                 <div class="container">
                                     <div class="banner-content">
@@ -816,13 +815,13 @@
                 .then(data => {
                     msg.innerHTML = data.success
                         ? `<div class="alert alert-success alert-dismissible fade show">
-                        <i class="fas fa-check-circle"></i> ${data.message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                       </div>`
+                            <i class="fas fa-check-circle"></i> ${data.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                           </div>`
                         : `<div class="alert alert-danger alert-dismissible fade show">
-                        <i class="fas fa-times-circle"></i> ${data.message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                       </div>`;
+                            <i class="fas fa-times-circle"></i> ${data.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                           </div>`;
 
                     if (data.success) form.reset();
                 })

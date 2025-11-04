@@ -23,7 +23,8 @@ return new class extends Migration
             $table->decimal('shipping_fee', 12, 2)->default(0);
             $table->decimal('discount', 12, 2)->default(0);
             $table->decimal('total', 12, 2);
-            $table->enum('payment_method', ['cod', 'bank_transfer', 'momo'])->default('cod');
+            $table->enum('payment_method', ['cod', 'bank_transfer', 'momo', 'vnpay'])->default('cod');
+
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
             $table->enum('status', ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'])->default('pending');
             $table->text('note')->nullable();

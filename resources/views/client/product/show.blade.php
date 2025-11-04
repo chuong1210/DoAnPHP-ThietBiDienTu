@@ -6,8 +6,11 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb modern-breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}"><i class="fas fa-home"></i> Trang chủ</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('client.product.category.index', $product->category->slug) }}">{{ $product->category->name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}"><i class="fas fa-home"></i> Trang chủ</a>
+            </li>
+            <li class="breadcrumb-item"><a
+                    href="{{ route('client.product.category.index', $product->category->slug) }}">{{ $product->category->name }}</a>
+            </li>
             <li class="breadcrumb-item active">{{ Str::limit($product->name, 50) }}</li>
         </ol>
     </nav>
@@ -18,8 +21,7 @@
             <div class="product-images-section">
                 <div class="main-image-wrapper">
                     @if($product->image)
-                        <img src="{{ asset($product->image) }}" class="main-image"
-                            alt="{{ $product->name }}" id="mainImage">
+                        <img src="{{ asset($product->image) }}" class="main-image" alt="{{ $product->name }}" id="mainImage">
                     @else
                         <div class="image-placeholder">
                             <i class="fas fa-image"></i>
@@ -42,8 +44,7 @@
                         </div>
                         @foreach($product->images as $image)
                             <div class="thumbnail-item">
-                                <img src="{{ asset($image) }}" alt="Gallery"
-                                    onclick="changeMainImage('{{ asset($image) }}', this)">
+                                <img src="{{ asset($image) }}" alt="Gallery" onclick="changeMainImage('{{ asset($image) }}', this)">
                             </div>
                         @endforeach
                     </div>
@@ -128,8 +129,8 @@
                                 <button type="button" class="qty-btn minus" onclick="decreaseQty()">
                                     <i class="fas fa-minus"></i>
                                 </button>
-                                <input type="number" name="quantity" id="quantity" value="1"
-                                    min="1" max="{{ $product->quantity }}" readonly>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1"
+                                    max="{{ $product->quantity }}" readonly>
                                 <button type="button" class="qty-btn plus" onclick="increaseQty()">
                                     <i class="fas fa-plus"></i>
                                 </button>
@@ -140,7 +141,8 @@
                             <button type="submit" class="btn-add-cart">
                                 <i class="fas fa-cart-plus"></i> Thêm Vào Giỏ Hàng
                             </button>
-                            <button type="button" class="btn-buy-now" onclick="buyNow()">
+                            <!-- Thay nút cũ -->
+                            <button type="button" class="btn-buy-now" onclick="openBuyNowModal()">
                                 <i class="fas fa-bolt"></i> Mua Ngay
                             </button>
                         </div>
@@ -354,40 +356,145 @@
             </div>
         </div>
     @endif
-@endsection
 
+    <!-- Buy Now Modal -->
+    <div class="modal fade" id="buyNowModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; overflow: hidden;">
+                <!-- Header -->
+                <div class="modal-header bg-gradient-primary text-white border-0"
+                    style="background: linear-gradient(135deg, #0066FF, #00B4D8); padding: 1.5rem;">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-bolt me-2"></i> Xác nhận mua ngay
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body p-4">
+                    <div class="d-flex gap-3 mb-4">
+                        <img id="modalImage" src="" alt="" class="rounded-3"
+                            style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #e2e8f0;">
+                        <div>
+                            <h6 id="modalName" class="fw-bold text-text mb-1"></h6>
+                            <div id="modalPrice" class="text-primary fw-bold fs-5"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Số lượng:</label>
+                        <div class="quantity-input d-flex align-items-center border rounded-3 overflow-hidden"
+                            style="width: fit-content;">
+                            <button type="button" class="btn qty-btn" onclick="decreaseModalQty()">-</button>
+                            <input type="number" id="modalQuantity" value="1" min="1"
+                                class="form-control text-center border-0" style="width: 60px;" readonly>
+                            <button type="button" class="btn qty-btn" onclick="increaseModalQty()">+</button>
+                        </div>
+                        <small class="text-muted d-block mt-1">
+                            Còn <span id="modalStock"></span> sản phẩm
+                        </small>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-lg btn-primary fw-bold" onclick="confirmBuyNow()">
+                            <i class="fas fa-check me-2"></i> Xác nhận mua ngay
+                        </button>
+                        <button type="button" class="btn btn-lg btn-outline-secondary" data-bs-dismiss="modal">
+                            Hủy
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
 @section('scripts')
     <script>
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN').format(amount);
+        }
+        const buyNowProduct = {
+            id: {{ $product->id }},
+            name: "{{ $product->name }}",
+            image: "{{ asset($product->image) }}",
+            price: {{ $product->sale_price ?? $product->price }},
+            stock: {{ $product->quantity }}
+                        };
+
+        let modalQty = 1;
+
+        function openBuyNowModal() {
+            document.getElementById('modalName').textContent = buyNowProduct.name;
+            document.getElementById('modalImage').src = buyNowProduct.image;
+            document.getElementById('modalPrice').textContent = formatCurrency(buyNowProduct.price) + 'đ';
+            document.getElementById('modalStock').textContent = buyNowProduct.stock;
+            document.getElementById('modalQuantity').value = 1;
+            document.getElementById('modalQuantity').max = buyNowProduct.stock;
+            modalQty = 1;
+            new bootstrap.Modal(document.getElementById('buyNowModal')).show();
+        }
+
+        function increaseModalQty() {
+            if (modalQty < buyNowProduct.stock) {
+                modalQty++;
+                document.getElementById('modalQuantity').value = modalQty;
+            }
+        }
+
+
+        function decreaseModalQty() {
+            if (modalQty > 1) {
+                modalQty--;
+                document.getElementById('modalQuantity').value = modalQty;
+            }
+        }
+
+        function confirmBuyNow() {
+            const form = document.createElement('form');
+            // DÙNG URL TRỰC TIẾP, KHÔNG DÙNG route()
+            form.action = '{{ route("client.cart.add", ":id") }}'.replace(':id', buyNowProduct.id); form.method = 'POST';
+            form.style.display = 'none';
+
+            // CSRF
+            const csrf = document.createElement('input');
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            form.appendChild(csrf);
+
+            // Quantity
+            const qty = document.createElement('input');
+            qty.name = 'quantity';
+            qty.value = modalQty;
+            form.appendChild(qty);
+
+            // Buy now flag
+            const buyNow = document.createElement('input');
+            buyNow.name = 'buy_now';
+            buyNow.value = '1';
+            form.appendChild(buyNow);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Các hàm khác giữ nguyên
         function changeMainImage(src, element) {
             document.getElementById('mainImage').src = src;
-
-            // Update active thumbnail
-            document.querySelectorAll('.thumbnail-item').forEach(item => {
-                item.classList.remove('active');
-            });
+            document.querySelectorAll('.thumbnail-item').forEach(item => item.classList.remove('active'));
             element.closest('.thumbnail-item').classList.add('active');
         }
 
         function increaseQty() {
             const input = document.getElementById('quantity');
             const max = parseInt(input.max);
-            const current = parseInt(input.value);
-            if (current < max) {
-                input.value = current + 1;
-            }
+            const cur = parseInt(input.value);
+            if (cur < max) input.value = cur + 1;
         }
 
         function decreaseQty() {
             const input = document.getElementById('quantity');
-            const current = parseInt(input.value);
-            if (current > 1) {
-                input.value = current - 1;
-            }
-        }
-
-        function buyNow() {
-            document.getElementById('quantity').value = 1;
-            document.querySelector('.cart-form').submit();
+            const cur = parseInt(input.value);
+            if (cur > 1) input.value = cur - 1;
         }
     </script>
 @endsection

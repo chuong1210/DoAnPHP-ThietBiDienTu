@@ -2,18 +2,22 @@
 
 use App\Http\Controllers\Admin\BrandController as AdminBrandController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Client\BrandController as ClientBrandController;
 use App\Http\Controllers\Client\CartController;
+use App\Http\Controllers\Client\ChatController as ClientChatController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\NewsletterController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\ProductController as ClientsProductController;
 use App\Http\Controllers\Client\ReviewController;
 use App\Http\Controllers\Client\SupportController;
+use App\Http\Controllers\Client\VnpayController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -105,11 +109,28 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-use App\Http\Controllers\Client\NewsletterController;
 
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
     ->name('newsletter.subscribe');
+// CLIENT ROUTES (Widget)
+// ==========================================
+Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
+    Route::get('/room', [ClientChatController::class, 'getRoom'])->name('room');
+    Route::get('/unread-count', [ClientChatController::class, 'unreadCount'])->name('unread-count');
+    Route::post('/rooms/{room}/messages', [ClientChatController::class, 'sendMessage'])->name('send');
+    Route::post('/rooms/{room}/read', [ClientChatController::class, 'markAsRead'])->name('mark-read');
+});
+
+
+
+// Route::get('/api/vnpay/callback', [VnpayController::class, 'callback'])
+//     ->name('vnpay.callback');
+Route::get('/vnpay/ipn', [VnpayController::class, 'ipn'])
+    ->name('vnpay.ipn');
+Route::get('/vnpay/callback', [VnpayController::class, 'callback'])->name('vnpay.callback');
 /*
+
+
 |--------------------------------------------------------------------------
 | Admin Routes (Quản trị viên)
 |--------------------------------------------------------------------------
@@ -126,3 +147,13 @@ Route::prefix('admin')
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
     });
+
+
+
+Route::middleware(['auth', 'admin'])->prefix('admin/chat')->name('admin.chat.')->group(function () {
+    Route::get('/', [AdminChatController::class, 'index'])->name('index');
+    Route::get('/rooms/{room}/messages', [AdminChatController::class, 'getMessages'])->name('messages');
+    Route::post('/rooms/{room}/messages', [AdminChatController::class, 'sendMessage'])->name('send');
+    Route::post('/rooms/{room}/close', [AdminChatController::class, 'closeRoom'])->name('close');
+    Route::post('/rooms/{room}/open', [AdminChatController::class, 'openRoom'])->name('open');
+});

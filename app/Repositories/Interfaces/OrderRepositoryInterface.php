@@ -8,6 +8,8 @@ namespace App\Repositories\Interfaces;
  */
 interface OrderRepositoryInterface extends BaseRepositoryInterface
 {
+    public function countUserOrders($userId, $status = null);
+
     public function getOrderByNumber($orderNumber);
     public function updateStatus($id, $status);
     public function updatePaymentStatus($id, $status);

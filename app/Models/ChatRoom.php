@@ -9,6 +9,9 @@ class ChatRoom extends Model
 {
     use HasFactory;
 
+    // QUAN TRỌNG: Không set $table nếu tên table là chat_rooms
+    // protected $table = 'chat_rooms'; // Bỏ dòng này nếu có
+
     protected $fillable = [
         'user_id',
         'admin_id',
@@ -17,13 +20,13 @@ class ChatRoom extends Model
     ];
 
     protected $casts = [
-        'status' => 'string', // open/closed
+        'status' => 'string',
     ];
 
     // Relationships
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function admin()
@@ -33,16 +36,18 @@ class ChatRoom extends Model
 
     public function messages()
     {
-        return $this->hasMany(ChatMessage::class)->orderBy('created_at');
+        // localKey là 'id' của ChatRoom
+        // foreignKey là 'room_id' của ChatMessage
+        return $this->hasMany(ChatMessage::class, 'room_id')->orderBy('created_at');
     }
 
-    // Scope cho open rooms
+    // Scopes
     public function scopeOpen($query)
     {
         return $query->where('status', 'open');
     }
 
-    // Helper: Tạo subject tự động nếu chưa có
+    // Helper
     public function generateSubject()
     {
         if (!$this->subject) {

@@ -31,16 +31,25 @@ class OrderController extends Controller
     public function index(Request $request, CategoryRepository $categoryRepository)
     {
         $status = $request->get('status'); // Filter theo status
-
+        $userId = Auth::id();
         $orders = $this->orderRepository->getUserOrders(
-            Auth::id(),
+            $userId,
             $status,
             10
         );
+        // Đếm số lượng từng trạng thái
+        $statusCounts = [
+            'all'        => $this->orderRepository->countUserOrders($userId),
+            'pending'    => $this->orderRepository->countUserOrders($userId, 'pending'),
+            'confirmed'  => $this->orderRepository->countUserOrders($userId, 'confirmed'),
+            'shipping'   => $this->orderRepository->countUserOrders($userId, 'shipping'),
+            'delivered'  => $this->orderRepository->countUserOrders($userId, 'delivered'),
+            'cancelled'  => $this->orderRepository->countUserOrders($userId, 'cancelled'),
+        ];
         $categories = $categoryRepository->getSidebarCategories(); // Pass categories for layout sidebar
 
 
-        return view('client.orders.index', compact('orders', 'status', 'categories'));
+        return view('client.orders.index', compact('orders', 'status', 'categories', 'statusCounts'));
     }
 
     /**

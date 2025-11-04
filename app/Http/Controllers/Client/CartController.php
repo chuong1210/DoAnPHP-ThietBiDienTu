@@ -12,6 +12,7 @@ use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
 {
@@ -65,25 +66,32 @@ class CartController extends Controller
     {
         $request->validate([
             'quantity' => 'required|integer|min:1',
+            'buy_now'  => 'nullable|in:1',
         ]);
 
         $userId = Auth::id();
-        $quantity = $request->quantity;
+        $quantity = $request->input('quantity', 1);
+        $isBuyNow = $request->has('buy_now');
 
-        // Lấy sản phẩm sử dụng repository
         $product = $this->productRepository->findById($productId);
+        if (!$product) {
+            return back()->with('error', 'Sản phẩm không tồn tại');
+        }
 
-        // Kiểm tra tồn kho
         if ($product->quantity < $quantity) {
-            return back()->with('error', 'Sản phẩm không đủ số lượng trong kho');
+            return back()->with('error', 'Sản phẩm không đủ số lượng (còn ' . $product->quantity . ')');
         }
 
         DB::beginTransaction();
         try {
-            // Lấy hoặc tạo giỏ hàng sử dụng repository
             $cart = $this->cartRepository->createOrGetCart($userId);
 
-            // Thêm hoặc cập nhật item sử dụng repository
+            if ($isBuyNow) {
+                // XÓA SẠCH GIỎ → CHỈ GIỮ 1 SẢN PHẨM
+                $cart->items()->delete();
+            }
+
+            // Thêm hoặc cập nhật item
             $this->cartItemRepository->addOrUpdateItem(
                 $cart->id,
                 $productId,
@@ -93,13 +101,18 @@ class CartController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'Đã thêm sản phẩm vào giỏ hàng');
+            if ($isBuyNow) {
+                return redirect()->route('client.checkout.index')
+                    ->with('success', 'Chuyển đến thanh toán ngay!');
+            }
+
+            return back()->with('success', 'Đã thêm vào giỏ hàng');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+            Log::error('Add to cart error: ' . $e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra, vui lòng thử lại');
         }
     }
-
     /**
      * Cập nhật số lượng
      */

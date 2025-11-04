@@ -125,7 +125,7 @@ CREATE TABLE orders (
     shipping_fee DECIMAL(12,2) DEFAULT 0,
     discount DECIMAL(12,2) DEFAULT 0,
     total DECIMAL(12,2) NOT NULL,
-    payment_method ENUM('cod','bank_transfer','momo') NOT NULL DEFAULT 'cod',
+    payment_method ENUM('cod','bank_transfer','momo','vnpay') NOT NULL DEFAULT 'cod',
     payment_status ENUM('pending','paid','failed') DEFAULT 'pending',
     status ENUM('pending','confirmed','shipping','delivered','cancelled') DEFAULT 'pending',
     note TEXT NULL,

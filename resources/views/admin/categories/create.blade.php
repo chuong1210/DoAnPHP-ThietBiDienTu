@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Thêm Danh Mục</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+@extends('admin.layouts.admin')
+
+@section('title', 'Quản Lý danh mục')
+@section('content')
     <div class="container mt-5">
         <h1>Thêm Danh Mục Mới</h1>
 
@@ -52,5 +48,3 @@
             </div>
         </div>
     </div>
-</body>
-</html>

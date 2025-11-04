@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\client;
 
+use App\Classes\VNPay;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\Controller;
+use App\Mail\OrderSuccessMail;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,10 +13,12 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Coupon;
 use App\Repositories\CategoryRepository;
+use App\Services\VnpayService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 
 /**
@@ -100,10 +104,11 @@ class CheckoutController extends Controller
 
     //     return back()->withErrors(['code' => 'Mã giảm giá không áp dụng được cho đơn hàng này']);
     // }
+    // CheckoutController@removeCoupon
     public function removeCoupon()
     {
         session()->forget('coupon');
-        return back()->with('success', 'Đã xóa mã giảm giá');
+        return response()->json(['success' => true]);
     }
     public function applyCoupon(Request $request)
     {
@@ -143,7 +148,7 @@ class CheckoutController extends Controller
         if ($subtotal < $coupon->min_order) {
             return response()->json([
                 'success' => false,
-                'message' => 'Đơn tối thiểu ' . number_format($coupon->min_order) . 'đ',
+                'message' => 'Đơn tối thiểu ' . number_format((float)$coupon->min_order) . 'đ',
             ], 422);
         }
 
@@ -173,7 +178,116 @@ class CheckoutController extends Controller
     /**
      * Xử lý đặt hàng
      */
-    public function process(Request $request)
+    // public function process(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'customer_name'     => 'required|string|max:100',
+    //         'customer_phone'    => 'required|string|max:15',
+    //         'customer_email'    => 'nullable|email',
+    //         'shipping_address'  => 'required|string',
+    //         'shipping_province' => 'required',
+    //         'shipping_ward'     => 'required|string',
+    //         'payment_method'    => 'required|in:cod,bank_transfer,momo,vnpay',
+    //         'note'              => 'nullable|string',
+    //     ]);
+
+    //     DB::beginTransaction();
+    //     try {
+    //         $cart = Cart::with('items.product')->where('user_id', Auth::id())->firstOrFail();
+    //         if ($cart->items->isEmpty()) {
+    //             return back()->with('error', 'Giỏ hàng trống');
+    //         }
+
+    //         // === KIỂM TRA TỒN KHO ===
+    //         foreach ($cart->items as $item) {
+    //             if ($item->product->quantity < $item->quantity) {
+    //                 DB::rollBack();
+    //                 return back()->with('error', "Sản phẩm {$item->product->name} không đủ hàng");
+    //             }
+    //         }
+
+    //         $subtotal    = $cart->total;
+    //         $shippingFee = 30000;
+    //         $discount    = 0;
+    //         $couponId    = null;
+
+    //         // === ĐỌC COUPON TỪ SESSION ===
+    //         if (session()->has('coupon')) {
+    //             $couponData = session('coupon');
+    //             $coupon = Coupon::find($couponData['id']);
+
+    //             // Kiểm tra lại coupon còn hợp lệ không
+    //             if ($coupon && $coupon->is_active && $subtotal >= $coupon->min_order) {
+    //                 $discount = $couponData['discount'];
+    //                 $couponId = $coupon->id;
+    //             } else {
+    //                 // Coupon không hợp lệ → xóa session
+    //                 session()->forget('coupon');
+    //             }
+    //         }
+
+    //         $total = $subtotal + $shippingFee - $discount;
+
+    //         // === TẠO ORDER ===
+    //         $order = Order::create([
+    //             'order_number'     => 'ORD-' . strtoupper(uniqid()),
+    //             'user_id'          => Auth::id(),
+    //             'coupon_id'        => $couponId,
+    //             'customer_name'    => $validated['customer_name'],
+    //             'customer_phone'   => $validated['customer_phone'],
+    //             'customer_email'   => $validated['customer_email'],
+    //             'shipping_address' => $validated['shipping_address'] . ', ' .
+    //                 $validated['shipping_ward'] . ', ' .
+    //                 $validated['shipping_province'],
+    //             'shipping_ward'    => $validated['shipping_ward'],
+    //             'shipping_city'    => $validated['shipping_province'],
+    //             'subtotal'         => $subtotal,
+    //             'shipping_fee'     => $shippingFee,
+    //             'discount'         => $discount,
+    //             'total'            => $total,
+    //             'payment_method'   => $validated['payment_method'],
+    //             'payment_status'   => 'pending',
+    //             'status'           => 'pending',
+    //             'note'             => $validated['note'] ?? null,
+    //         ]);
+
+    //         // === CHI TIẾT + GIẢM TỒN KHO ===
+    //         foreach ($cart->items as $item) {
+    //             OrderItem::create([
+    //                 'order_id'      => $order->id,
+    //                 'product_id'    => $item->product_id,
+    //                 'product_name'  => $item->product->name,
+    //                 'product_image' => $item->product->image,
+    //                 'price'         => $item->price,
+    //                 'quantity'      => $item->quantity,
+    //                 'subtotal'      => $item->subtotal,
+    //             ]);
+
+    //             $item->product->decrement('quantity', $item->quantity);
+    //             $item->product->increment('sold_count', $item->quantity);
+    //         }
+
+    //         // === TĂNG used_count CHỈ KHI THÀNH CÔNG ===
+    //         if ($couponId) {
+    //             Coupon::where('id', $couponId)->increment('used_count');
+    //         }
+
+    //         // === XÓA SESSION + GIỎ HÀNG ===
+    //         session()->forget('coupon');
+    //         $cart->items()->delete();
+
+    //         DB::commit();
+
+    //         return redirect()->route('client.checkout.success', $order->id)
+    //             ->with('success', 'Đặt hàng thành công!');
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Checkout error: ' . $e->getMessage());
+    //         return back()->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
+    //     }
+    // }
+
+    public function process(Request $request,  VNPay $vnpay)
     {
         $validated = $request->validate([
             'customer_name'     => 'required|string|max:100',
@@ -193,7 +307,6 @@ class CheckoutController extends Controller
                 return back()->with('error', 'Giỏ hàng trống');
             }
 
-            // === KIỂM TRA TỒN KHO ===
             foreach ($cart->items as $item) {
                 if ($item->product->quantity < $item->quantity) {
                     DB::rollBack();
@@ -201,29 +314,25 @@ class CheckoutController extends Controller
                 }
             }
 
-            $subtotal    = $cart->total;
+            $subtotal = $cart->total;
             $shippingFee = 30000;
-            $discount    = 0;
-            $couponId    = null;
+            $discount = 0;
+            $couponId = null;
 
-            // === ĐỌC COUPON TỪ SESSION ===
             if (session()->has('coupon')) {
                 $couponData = session('coupon');
                 $coupon = Coupon::find($couponData['id']);
-
-                // Kiểm tra lại coupon còn hợp lệ không
                 if ($coupon && $coupon->is_active && $subtotal >= $coupon->min_order) {
                     $discount = $couponData['discount'];
                     $couponId = $coupon->id;
                 } else {
-                    // Coupon không hợp lệ → xóa session
                     session()->forget('coupon');
                 }
             }
 
             $total = $subtotal + $shippingFee - $discount;
 
-            // === TẠO ORDER ===
+            // === TẠO ORDER (CHƯA THANH TOÁN) ===
             $order = Order::create([
                 'order_number'     => 'ORD-' . strtoupper(uniqid()),
                 'user_id'          => Auth::id(),
@@ -231,9 +340,7 @@ class CheckoutController extends Controller
                 'customer_name'    => $validated['customer_name'],
                 'customer_phone'   => $validated['customer_phone'],
                 'customer_email'   => $validated['customer_email'],
-                'shipping_address' => $validated['shipping_address'] . ', ' .
-                    $validated['shipping_ward'] . ', ' .
-                    $validated['shipping_province'],
+                'shipping_address' => $validated['shipping_address'] . ', ' . $validated['shipping_ward'] . ', ' . $validated['shipping_province'],
                 'shipping_ward'    => $validated['shipping_ward'],
                 'shipping_city'    => $validated['shipping_province'],
                 'subtotal'         => $subtotal,
@@ -246,7 +353,7 @@ class CheckoutController extends Controller
                 'note'             => $validated['note'] ?? null,
             ]);
 
-            // === CHI TIẾT + GIẢM TỒN KHO ===
+            // === CHI TIẾT ===
             foreach ($cart->items as $item) {
                 OrderItem::create([
                     'order_id'      => $order->id,
@@ -257,31 +364,40 @@ class CheckoutController extends Controller
                     'quantity'      => $item->quantity,
                     'subtotal'      => $item->subtotal,
                 ]);
-
                 $item->product->decrement('quantity', $item->quantity);
                 $item->product->increment('sold_count', $item->quantity);
             }
 
-            // === TĂNG used_count CHỈ KHI THÀNH CÔNG ===
+            // === TĂNG COUPON ===
             if ($couponId) {
                 Coupon::where('id', $couponId)->increment('used_count');
             }
 
-            // === XÓA SESSION + GIỎ HÀNG ===
-            session()->forget('coupon');
+            // === XÓA GIỎ HÀNG + SESSION ===
             $cart->items()->delete();
+            session()->forget('coupon');
 
+            if ($validated['payment_method'] === 'vnpay') {
+                DB::commit();
+
+                $response = $vnpay->payment($total, $order->order_number);
+
+                if ($response['errorCode'] == 0) {
+                    return redirect()->away($response['url']);
+                }
+
+                return back()->with('error', 'Lỗi tạo thanh toán VNPay');
+            }
             DB::commit();
-
+            Mail::to($order->customer_email)->send(new OrderSuccessMail($order));
             return redirect()->route('client.checkout.success', $order->id)
                 ->with('success', 'Đặt hàng thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Checkout error: ' . $e->getMessage());
-            return back()->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
+            return back()->with('error', 'Lỗi hệ thống');
         }
     }
-
     /**
      * Trang đặt hàng thành công
      */

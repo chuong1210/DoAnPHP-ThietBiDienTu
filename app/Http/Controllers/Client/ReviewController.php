@@ -100,14 +100,14 @@ class ReviewController extends Controller
      * Hiển thị danh sách đánh giá của user (profile)
      * GET /profile/reviews
      */
-    // public function userReviews()
-    // {
-    //     if (!Auth::check()) {
-    //         return redirect()->route('client.login')->with('error', 'Vui lòng đăng nhập.');
-    //     }
+    public function userReviews()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('auth.login')->with('error', 'Vui lòng đăng nhập.');
+        }
 
-    //     $reviews = $this->reviewRepository->getReviewsByUser(Auth::id());
+        $reviews = $this->reviewRepository->getReviewsByUser(Auth::id());
 
-    //     return view('client.profile.reviews', compact('reviews'));
-    // }
+        return view('client.profile.review', compact('reviews'));
+    }
 }

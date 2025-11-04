@@ -9,10 +9,14 @@ class ChatMessage extends Model
 {
     use HasFactory;
 
-    public $timestamps = false; // Chỉ dùng created_at
+    // QUAN TRỌNG: Không set $table nếu tên table là chat_messages
+    // protected $table = 'chat_messages'; // Bỏ dòng này nếu có
+
+    public $timestamps = true;
+    const UPDATED_AT = null; // Chỉ dùng created_at
 
     protected $fillable = [
-        'room_id',
+        'room_id',        // PHẢI LÀ 'room_id' KHÔNG PHẢI 'chat_room_id'
         'user_id',
         'message',
         'message_type',
@@ -28,7 +32,8 @@ class ChatMessage extends Model
     // Relationships
     public function room()
     {
-        return $this->belongsTo(ChatRoom::class);
+        // foreignKey phải là 'room_id'
+        return $this->belongsTo(ChatRoom::class, 'room_id');
     }
 
     public function user()
@@ -36,13 +41,12 @@ class ChatMessage extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Scope cho unread messages
+    // Scopes
     public function scopeUnread($query)
     {
         return $query->where('is_read', false);
     }
 
-    // Mark as read
     public function markAsRead()
     {
         $this->update(['is_read' => true]);

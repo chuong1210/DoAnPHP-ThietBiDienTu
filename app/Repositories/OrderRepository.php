@@ -99,6 +99,16 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
         return $query->paginate($perPage);
     }
 
+    public function countUserOrders($userId, $status = null)
+    {
+        $query = Order::where('user_id', $userId);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        return $query->count();
+    }
     /**
      * Hủy đơn hàng (chỉ pending/confirmed)
      */

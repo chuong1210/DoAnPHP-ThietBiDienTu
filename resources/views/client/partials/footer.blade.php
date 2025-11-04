@@ -143,6 +143,8 @@
                 </div>
             </div>
         </div>
+        <div id="footer-map"></div>
+
     </div>
 </footer>
 
@@ -406,6 +408,19 @@
         color: var(--secondary);
     }
 
+    #footer-map {
+        width: 100%;
+        height: 180px;
+        /* Chiều cao tùy chỉnh */
+        margin-top: 1.5rem;
+        /* Tạo khoảng cách với danh sách liên hệ */
+        border-radius: 12px;
+        border: 2px solid #334155;
+        overflow: hidden;
+        /* Đảm bảo các góc bo tròn được áp dụng */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .footer-main {
@@ -421,3 +436,35 @@
         }
     }
 </style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!-- Thêm thư viện VietMap GL JS -->
+<script src="https://unpkg.com/@vietmap/vietmap-gl-js@6.0.0/dist/vietmap-gl.js"></script>
+<link href="https://unpkg.com/@vietmap/vietmap-gl-js@6.0.0/dist/vietmap-gl.css" rel="stylesheet" />
+
+<script>
+    // Mã JavaScript để khởi tạo bản đồ sẽ ở đây
+    document.addEventListener('DOMContentLoaded', function () {
+        const VIETMAP_API_KEY = "ff51b832c09822cd2aa33bae21bdc62dec95ff85be2dc64a"; // <-- THAY KHÓA API CỦA BẠN VÀO ĐÂY
+
+        // Tọa độ ví dụ của shop (Kinh độ, Vĩ độ) - Nên lấy tọa độ chính xác
+        const shopCoordinates = [106.6953, 10.8524]; // Ví dụ: Một địa điểm ở Quận 12
+
+        // Khởi tạo bản đồ trong footer
+        const footerMap = new vietmapgl.Map({
+            container: 'footer-map', // ID của thẻ div chứa bản đồ
+            style: `https://maps.vietmap.vn/maps/styles/tm/style.json?apikey=${VIETMAP_API_KEY}`,
+            center: shopCoordinates, // Lấy tọa độ shop làm trung tâm
+            zoom: 15, // Mức phóng to vừa phải để thấy rõ khu vực
+            interactive: false, // Tắt mọi tương tác (quan trọng!)
+            attributionControl: false // (Tùy chọn) Ẩn dòng chữ bản quyền cho gọn
+        });
+
+        // Thêm Marker (điểm đánh dấu) vào vị trí của shop
+        new vietmapgl.Marker()
+            .setLngLat(shopCoordinates)
+            .addTo(footerMap);
+    });
+</script>

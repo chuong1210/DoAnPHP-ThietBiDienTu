@@ -352,10 +352,10 @@
                                 <div class="payment-method active" onclick="selectPayment(this, 'cod')">
                                     <input type="radio" name="payment_method" value="cod" checked class="d-none">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0 me-3">
+                                        <div class="shrink-0 me-3">
                                             <i class="fas fa-money-bill-wave fa-2x text-success"></i>
                                         </div>
-                                        <div class="flex-grow-1">
+                                        <div class="grow">
                                             <h6 class="mb-1 fw-bold text-text">Thanh toán khi nhận hàng</h6>
                                             <small class="text-muted">Thanh toán bằng tiền mặt khi nhận hàng</small>
                                         </div>
@@ -367,10 +367,10 @@
                                 <div class="payment-method" onclick="selectPayment(this, 'bank_transfer')">
                                     <input type="radio" name="payment_method" value="bank_transfer" class="d-none">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0 me-3">
+                                        <div class="shrink-0 me-3">
                                             <i class="fas fa-university fa-2x text-primary"></i>
                                         </div>
-                                        <div class="flex-grow-1">
+                                        <div class="grow">
                                             <h6 class="mb-1 fw-bold text-text">Chuyển khoản ngân hàng</h6>
                                             <small class="text-muted">Chuyển khoản qua ngân hàng</small>
                                         </div>
@@ -382,10 +382,10 @@
                                 <div class="payment-method" onclick="selectPayment(this, 'momo')">
                                     <input type="radio" name="payment_method" value="momo" class="d-none">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0 me-3">
+                                        <div class="shrink-0 me-3">
                                             <i class="fas fa-mobile-alt fa-2x text-danger"></i>
                                         </div>
-                                        <div class="flex-grow-1">
+                                        <div class="grow">
                                             <h6 class="mb-1 fw-bold text-text">Ví MoMo</h6>
                                             <small class="text-muted">Thanh toán qua ví điện tử MoMo</small>
                                         </div>
@@ -397,10 +397,10 @@
                                 <div class="payment-method" onclick="selectPayment(this, 'vnpay')">
                                     <input type="radio" name="payment_method" value="vnpay" class="d-none">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0 me-3">
+                                        <div class="shrink-0 me-3">
                                             <i class="fas fa-credit-card fa-2x text-info"></i>
                                         </div>
-                                        <div class="flex-grow-1">
+                                        <div class="grow">
                                             <h6 class="mb-1 fw-bold text-text">VNPay</h6>
                                             <small class="text-muted">Thanh toán qua VNPay</small>
                                         </div>
@@ -449,16 +449,12 @@
                                             <br><small
                                                 class="text-success">-{{ number_format(session('coupon.discount')) }}đ</small>
                                         </div>
-                                        <form action="{{ route('client.checkout.remove-coupon') }}" method="POST"
-                                            class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill"
+                                            onclick="removeCoupon()">
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                     </div>
                                 @endif
-
                                 <div class="input-group mb-3">
                                     <input type="text" id="couponCode" class="form-control rounded-end-0"
                                         placeholder="Nhập mã giảm giá">
@@ -491,7 +487,7 @@
                                             <img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}"
                                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;"
                                                 class="me-3">
-                                            <div class="flex-grow-1">
+                                            <div class="grow">
                                                 <h6 class="mb-1 small fw-bold text-text">
                                                     {{ Str::limit($item->product->name, 40) }}
                                                 </h6>
@@ -609,7 +605,7 @@
 @section('scripts')
     <script>
         // ==== API V2 (2025) ====
-        const API_BASE = 'https://provinces.open-api.vn/api/v2/';
+        const API_BASE = 'http://provinces.open-api.vn/api/v2/';
 
         // Load khi trang sẵn sàng
         document.addEventListener('DOMContentLoaded', function () {
@@ -725,6 +721,11 @@
             el.querySelector('input[type="radio"]').checked = true;
         }
 
+        if (document.querySelector('input[name="payment_method"]:checked').value === 'vnpay') {
+            const btn = document.querySelector('button[type="submit"]');
+            btn.innerHTML = '<span class="loading"></span> Đang chuyển đến VNPay...';
+            btn.disabled = true;
+        }
         function applyCoupon() {
             const code = document.getElementById('couponCode').value.trim();
             if (!code) return alert('Vui lòng nhập mã giảm giá');
@@ -758,9 +759,9 @@
                     discountRow.id = 'discount-row';
                     discountRow.className = 'd-flex justify-content-between mb-2 text-success';
                     discountRow.innerHTML = `
-                                <span class="fw-semibold">Giảm giá:</span>
-                                <strong id="discount" class="text-success">-0đ</strong>
-                            `;
+                                                                                                <span class="fw-semibold">Giảm giá:</span>
+                                                                                                <strong id="discount" class="text-success">-0đ</strong>
+                                                                                            `;
                     hr.insertAdjacentElement('afterend', discountRow);
                 }
             }
@@ -778,14 +779,14 @@
                 couponAlert.id = 'applied-coupon-alert';
                 couponAlert.className = 'alert alert-success d-flex justify-content-between align-items-center mb-3 rounded-3 border-0';
                 couponAlert.innerHTML = `
-                            <div>
-                                <strong class="text-text">${code}</strong><br>
-                                <small class="text-success">-${discount}đ</small>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removeCoupon()">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        `;
+                                                                                            <div>
+                                                                                                <strong class="text-text">${code}</strong><br>
+                                                                                                <small class="text-success">-${discount}đ</small>
+                                                                                            </div>
+                                                                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removeCoupon()">
+                                                                                                <i class="fas fa-times"></i>
+                                                                                            </button>
+                                                                                        `;
                 inputGroup.insertAdjacentElement('beforebegin', couponAlert);
             } else {
                 couponAlert.querySelector('strong').textContent = code;
@@ -799,25 +800,40 @@
 
 
         function removeCoupon() {
+            if (!confirm('Bạn có chắc muốn xóa mã giảm giá?')) return;
+
             fetch('{{ route("client.checkout.remove-coupon") }}', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 }
             })
-                .then(() => {
-                    // Xóa alert
-                    const alert = document.querySelector('#applied-coupon-alert');
-                    if (alert) alert.remove();
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) {
+                        // XÓA ALERT
+                        const alert = document.querySelector('.alert.alert-success');
+                        if (alert) alert.remove();
 
-                    // Xóa dòng discount
-                    const row = document.querySelector('#discount-row');
-                    if (row) row.style.display = 'none';
+                        // ẨN DÒNG GIẢM GIÁ
+                        const discountRow = document.getElementById('discount-row');
+                        if (discountRow) discountRow.style.display = 'none';
 
-                    // Reset tổng
-                    const subtotal = {{ $cart->total }};
-                    document.getElementById('total').textContent = number_format(subtotal + 30000) + 'đ';
-                    location.reload(); // Reload để cập nhật tổng
+                        // CẬP NHẬT TỔNG
+                        const subtotal = {{ $cart->total }};
+                        const shipping = 30000;
+                        const total = subtotal + shipping;
+                        document.getElementById('total').textContent = number_format(total) + 'đ';
+
+                        alert('Đã xóa mã giảm giá!');
+                    } else {
+                        alert('Lỗi: ' + (d.message || 'Không thể xóa'));
+                    }
+                })
+                .catch(() => {
+                    alert('Lỗi kết nối, vui lòng thử lại');
                 });
         }
 
