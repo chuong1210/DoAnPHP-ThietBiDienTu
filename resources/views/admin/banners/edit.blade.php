@@ -65,11 +65,18 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="sort_order" class="form-label"
-                            style="color: #1E293B; font-weight: 600; margin-bottom: 8px;">Thứ tự</label>
-                        <input type="number" name="sort_order" id="sort_order" class="form-control"
-                            value="{{ old('sort_order', $banner->sort_order) }}"
-                            style="border-color: #CBD5E1; border-radius: 8px; padding: 10px 12px;" min="0">
+                        <label for="sort_order" class="form-label" style="...">Thứ tự</label>
+                        <select name="sort_order" id="sort_order"
+                            class="form-select @error('sort_order') is-invalid @enderror"
+                            style="border-color: #CBD5E1; border-radius: 8px; padding: 10px 12px;">
+                            {{-- Lặp từ 1 đến số lượng banner đang active --}}
+                            @for ($i = 1; $i <= $activeBannerCount; $i++)
+                                <option value="{{ $i }}" {{ old('sort_order', $banner->sort_order) == $i ? 'selected' : '' }}>
+                                    Vị trí {{ $i }}
+                                </option>
+                            @endfor
+                        </select>
+                        <small class="form-text text-muted">Chọn vị trí hiển thị của banner. Vị trí 1 là đầu tiên.</small>
                         @error('sort_order')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

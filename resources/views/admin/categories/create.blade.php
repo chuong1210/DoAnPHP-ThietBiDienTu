@@ -29,7 +29,7 @@
 
         .btn-save {
             background: var(--primary-gradient);
-            color: white;
+            color: rgb(18, 106, 238);
             border: none;
         }
 
@@ -56,6 +56,31 @@
 
         .image-uploader .placeholder {
             color: var(--text-muted);
+        }
+
+        .form-switch .form-check-input {
+            width: 50px;
+            height: 28px;
+            border-radius: 28px;
+            background-color: rgba(18, 124, 237, 0.785);
+            border: none;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .form-switch .form-check-input:focus {
+            box-shadow: 0 0 0 4px rgba(255, 59, 63, 0.2);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+        }
+
+        .form-switch .form-check-input:checked {
+            background-color: #f0f0f0;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+        }
+
+        .form-switch .form-check-label {
+            padding-left: 1rem;
+            color: #00000;
+            cursor: pointer;
         }
     </style>
 @endsection
@@ -121,10 +146,16 @@
 
 
                         <!-- Trạng Thái -->
-                        <div class="mb-4 form-check form-switch fs-5">
-                            <input class="form-check-input" type="checkbox" role="switch" id="is_active" name="is_active"
-                                value="1" checked>
-                            <label class="form-check-label fw-bold" for="is_active">Kích hoạt hiển thị</label>
+                        <!-- Trạng Thái -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Trạng Thái</label>
+                            <div class="form-check form-switch fs-5">
+                                <input class="form-check-input" type="checkbox" role="switch" id="is_active"
+                                    name="is_active" value="1" {{ old('is_active', 1) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_active">Kích hoạt hiển thị</label>
+                            </div>
+                            <small class="form-text text-muted">Khi được kích hoạt, danh mục này sẽ hiển thị trên trang
+                                web.</small>
                         </div>
 
                         <!-- Action Buttons -->
