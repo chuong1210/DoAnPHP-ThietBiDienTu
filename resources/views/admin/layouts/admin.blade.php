@@ -350,37 +350,21 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Top Bar -->
-        <header class="top-bar">
-            <div class="d-flex align-items-center">
-                <button class="btn-toggle-sidebar me-3">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="page-title">@yield('page-title', 'Dashboard')</h1>
-            </div>
-
-            <div class="topbar-actions">
-                <button class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                    <i class="fas fa-bell"></i>
-                </button>
-                <img src="https://cdn-icons-png.flaticon.com/512/8188/8188362.png" alt="Admin" class="user-avatar">
-            </div>
-        </header>
+        <!-- Top Bar - CHỈ DÙNG HEADER NÀY -->
+        @include('admin.partials.header')
 
         <!-- Content -->
         <div class="content-wrapper">
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show">
-                    <i class="fas fa-check-circle"></i>
-                    {{ session('success') }}
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show">
-                    <i class="fas fa-exclamation-circle"></i>
-                    {{ session('error') }}
+                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
@@ -391,17 +375,16 @@
 
     <!-- Bootstrap JS -->
 
+    <!-- Toggle Sidebar -->
     <script>
-        // Toggle Sidebar on Mobile
-        document.querySelector('.btn-toggle-sidebar').addEventListener('click', function () {
+        document.querySelector('.btn-toggle-sidebar')?.addEventListener('click', function () {
             document.querySelector('.sidebar').classList.toggle('show');
         });
 
-        // Close sidebar when clicking outside
         document.addEventListener('click', function (e) {
             const sidebar = document.querySelector('.sidebar');
             const toggleBtn = document.querySelector('.btn-toggle-sidebar');
-            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && window.innerWidth <= 992) {
+            if (sidebar && toggleBtn && !sidebar.contains(e.target) && !toggleBtn.contains(e.target) && window.innerWidth <= 992) {
                 sidebar.classList.remove('show');
             }
         });
