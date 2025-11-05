@@ -2,7 +2,8 @@
 
 @extends('admin.layouts.admin')
 
-@section('title', 'Quản Lý Chat')
+@section('title', 'Quản Lý Đơn Hàng')
+@section('page-title', 'Hỗ Trợ Khách Hàng')
 
 @section('styles')
     <style>

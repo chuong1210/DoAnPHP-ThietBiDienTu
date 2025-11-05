@@ -17,13 +17,14 @@
             --background: #F8FAFC;
             --text: #1E293B;
             --neutral: #CBD5E1;
+            --danger: #EF4444;
         }
 
         body {
             background: linear-gradient(135deg, var(--background) 0%, #E0F2FE 100%);
             min-height: 100vh;
             padding: 2rem 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         .register-container {
@@ -34,7 +35,7 @@
         .brand-logo {
             text-align: center;
             margin-bottom: 2rem;
-            animation: fadeInDown 0.6s ease;
+            animation: fadeInDown 0.6s ease-out;
         }
 
         .brand-logo i {
@@ -63,7 +64,7 @@
             box-shadow: 0 20px 60px rgba(0, 102, 255, 0.1);
             border: 1px solid var(--neutral);
             padding: 2.5rem;
-            animation: fadeInUp 0.6s ease;
+            animation: fadeInUp 0.6s ease-out;
         }
 
         .form-label {
@@ -196,47 +197,34 @@
             position: relative;
         }
 
-        .input-icon i {
+        .input-icon .form-icon {
             position: absolute;
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
             color: #94A3B8;
+            pointer-events: none;
         }
 
         .input-icon .form-control {
             padding-left: 2.75rem;
         }
 
-        .progress-indicator {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            position: relative;
+        /* CSS cho nút toggle mật khẩu */
+        .password-toggle-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            padding: 5px;
+            /* Tăng vùng click */
         }
 
-        .progress-step {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--neutral);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.85rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .progress-step.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
-        }
-
-        .text-danger {
-            color: #EF4444 !important;
+        .password-toggle-icon:hover {
+            color: var(--primary);
         }
     </style>
 </head>
@@ -270,119 +258,131 @@
                     @csrf
 
                     <!-- Họ tên -->
+                    <!-- Họ tên -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            <i class="fas fa-user me-1"></i> Họ và tên <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label"><i class="fas fa-user me-1"></i> Họ và tên <span
+                                class="text-danger">*</span></label>
                         <div class="input-icon">
-                            <i class="fas fa-id-card"></i>
+                            <i class="fas fa-id-card form-icon"></i>
                             <input type="text" name="full_name"
                                 class="form-control @error('full_name') is-invalid @enderror"
                                 value="{{ old('full_name') }}" placeholder="Nguyễn Văn A" required>
                         </div>
-                        @error('full_name')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                        @enderror
+                        @error('full_name')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
 
                     <!-- Email -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            <i class="fas fa-envelope me-1"></i> Email <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label"><i class="fas fa-envelope me-1"></i> Email <span
+                                class="text-danger">*</span></label>
                         <div class="input-icon">
-                            <i class="fas fa-at"></i>
+                            <i class="fas fa-at form-icon"></i>
                             <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
                                 value="{{ old('email') }}" placeholder="your.email@example.com" required>
                         </div>
-                        @error('email')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                        @enderror
+                        @error('email')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
 
                     <!-- Số điện thoại -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            <i class="fas fa-phone me-1"></i> Số điện thoại
-                        </label>
+                        <label class="form-label"><i class="fas fa-phone me-1"></i> Số điện thoại <span
+                                class="text-danger">*</span></label>
                         <div class="input-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                            <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
-                                value="{{ old('phone') }}" placeholder="0912345678">
+                            <i class="fas fa-mobile-alt form-icon"></i>
+                            <input type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror"
+                                value="{{ old('phone') }}" placeholder="0912345678" required>
                         </div>
-                        @error('phone')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                        @enderror
+                        @error('phone')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
 
                     <!-- Mật khẩu -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            <i class="fas fa-lock me-1"></i> Mật khẩu <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label"><i class="fas fa-lock me-1"></i> Mật khẩu <span
+                                class="text-danger">*</span></label>
                         <div class="input-icon">
-                            <i class="fas fa-key"></i>
-                            <input type="password" name="password"
+                            <i class="fas fa-key form-icon"></i>
+                            <input type="password" name="password" id="password"
                                 class="form-control @error('password') is-invalid @enderror"
-                                placeholder="Ít nhất 8 ký tự" required>
+                                placeholder="Tối thiểu 8 ký tự, gồm chữ hoa, số, ký tự đặc biệt" required>
+                            <i class="fas fa-eye password-toggle-icon" data-target="password"></i>
                         </div>
-                        @error('password')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                        @enderror
+                        @error('password')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
 
                     <!-- Xác nhận mật khẩu -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            <i class="fas fa-shield-alt me-1"></i> Xác nhận mật khẩu <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label"><i class="fas fa-shield-alt me-1"></i> Xác nhận mật khẩu <span
+                                class="text-danger">*</span></label>
                         <div class="input-icon">
-                            <i class="fas fa-check-circle"></i>
-                            <input type="password" name="password_confirmation" class="form-control"
-                                placeholder="Nhập lại mật khẩu" required>
+                            <i class="fas fa-check-circle form-icon"></i>
+                            <input type="password" name="password_confirmation" id="password_confirmation"
+                                class="form-control" placeholder="Nhập lại mật khẩu" required>
+                            <i class="fas fa-eye password-toggle-icon" data-target="password_confirmation"></i>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
-                        @if($errors->has('g-recaptcha-response'))
-                            <div class="server-error">{{ $errors->first('g-recaptcha-response') }}</div>
-                        @endif
-                    </div>
 
-                    <!-- Điều khoản -->
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="terms" required>
-                        <label class="form-check-label" for="terms" style="font-weight: 500;">
-                            Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a>
-                        </label>
-                    </div>
+                    <div class="mb-3 ">
+                        <div class="mb-3">
+                            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                            @if($errors->has('g-recaptcha-response'))
+                                <div class="server-error">{{ $errors->first('g-recaptcha-response') }}</div>
+                            @endif
+                        </div>
 
-                    <!-- Submit -->
-                    <button type="submit" class="btn btn-primary w-100 mb-3">
-                        <i class="fas fa-user-plus me-2"></i> Đăng Ký
-                    </button>
+                        <!-- Điều khoản -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms" style="font-weight: 500;">
+                                Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a>
+                            </label>
+                        </div>
 
-                    <!-- Divider -->
-                    <div class="divider">
-                        <span>hoặc đăng ký với</span>
-                    </div>
+                        <!-- Submit -->
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            <i class="fas fa-user-plus me-2"></i> Đăng Ký
+                        </button>
 
-                    <!-- Google Register -->
-                    <a href="{{ route('auth.google') }}" class="btn btn-google w-100">
-                        <i class="fab fa-google me-2"></i> Đăng Ký Với Google
-                    </a>
+                        <!-- Divider -->
+                        <div class="divider">
+                            <span>hoặc đăng ký với</span>
+                        </div>
 
-                    <!-- Links -->
-                    <div class="text-center mt-4">
-                        <p class="mb-0" style="color: #64748B;">
-                            Đã có tài khoản?
-                            <a href="{{ route('login') }}">Đăng nhập ngay</a>
-                        </p>
-                    </div>
+                        <!-- Google Register -->
+                        <a href="{{ route('auth.google') }}" class="btn btn-google w-100">
+                            <i class="fab fa-google me-2"></i> Đăng Ký Với Google
+                        </a>
+
+                        <!-- Links -->
+                        <div class="text-center mt-4">
+                            <p class="mb-0" style="color: #64748B;">
+                                Đã có tài khoản?
+                                <a href="{{ route('login') }}">Đăng nhập ngay</a>
+                            </p>
+                        </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleIcons = document.querySelectorAll('.password-toggle-icon');
+
+            toggleIcons.forEach(icon => {
+                icon.addEventListener('click', function () {
+                    const targetInputId = this.getAttribute('data-target');
+                    const targetInput = document.getElementById(targetInputId);
+
+                    if (targetInput) {
+                        const type = targetInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                        targetInput.setAttribute('type', type);
+                        this.classList.toggle('fa-eye');
+                        this.classList.toggle('fa-eye-slash');
+                    }
+                });
+            });
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

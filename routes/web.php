@@ -28,6 +28,8 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\FaqController;
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -113,6 +115,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/remove/{item}', [CartController::class, 'remove'])->name('remove');
         });
     });
+
 
     // Chat Widget Routes
     Route::prefix('chat')->name('chat.')->group(function () {

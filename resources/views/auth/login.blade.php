@@ -200,6 +200,7 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -211,6 +212,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -221,16 +223,35 @@
             position: relative;
         }
 
-        .input-icon i {
+        .input-icon .form-icon {
+            /* Đổi tên từ i thành .form-icon để không bị xung đột */
             position: absolute;
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
             color: #94A3B8;
+            pointer-events: none;
+            /* Icon không thể click */
         }
 
         .input-icon .form-control {
             padding-left: 2.75rem;
+        }
+
+
+        /* === CSS CHO NÚT TOGGLE MẬT KHẨU === */
+        .password-toggle-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle-icon:hover {
+            color: var(--primary);
         }
     </style>
 </head>
@@ -266,37 +287,37 @@
 
                     <!-- Email -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            <i class="fas fa-envelope me-1"></i> Email
-                        </label>
+                        <label class="form-label"><i class="fas fa-envelope me-1"></i> Email</label>
                         <div class="input-icon">
-                            <i class="fas fa-at"></i>
-                            <input type="email" name="email"
-                                class="form-control @error('email') is-invalid @enderror"
-                                value="{{ old('email') }}"
-                                placeholder="your.email@example.com" required>
+                            <i class="fas fa-at form-icon"></i>
+                            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                                value="{{ old('email') }}" placeholder="your.email@example.com" required>
                         </div>
                         @error('email')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
+                            {{-- Chỉ hiển thị lỗi của password để tránh lặp lại --}}
+                            @if($errors->has('password'))
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @endif
                         @enderror
                     </div>
 
+
                     <!-- Password -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            <i class="fas fa-lock me-1"></i> Mật khẩu
-                        </label>
+                        <label class="form-label"><i class="fas fa-lock me-1"></i> Mật khẩu</label>
                         <div class="input-icon">
-                            <i class="fas fa-key"></i>
-                            <input type="password" name="password"
-                                class="form-control @error('password') is-invalid @enderror"
-                                placeholder="••••••••" required>
+                            <i class="fas fa-key form-icon"></i>
+                            <input type="password" name="password" id="password-input" {{-- Thêm id --}}
+                                class="form-control @error('password') is-invalid @enderror" placeholder="••••••••"
+                                required>
+
+                            {{-- THÊM ICON MẮT VÀO ĐÂY --}}
+                            <i class="fas fa-eye password-toggle-icon" id="password-toggle"></i>
                         </div>
                         @error('password')
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <!-- Remember Me -->
                     <div class="mb-3 form-check">
                         <input type="checkbox" name="remember" class="form-check-input" id="remember">
@@ -344,6 +365,24 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const passwordInput = document.getElementById('password-input');
+            const passwordToggle = document.getElementById('password-toggle');
+
+            if (passwordInput && passwordToggle) {
+                passwordToggle.addEventListener('click', function () {
+                    // Lấy ra type hiện tại của input
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+
+                    // Thay đổi icon mắt
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

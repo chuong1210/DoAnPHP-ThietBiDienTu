@@ -181,20 +181,46 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'full_name' => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'nullable|string|max:15',
-            'password' => 'required|confirmed|min:8',
+            'full_name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-]+$/u'],
+
+            // Email phải đúng định dạng, domain tồn tại, duy nhất và không phải email rác
+            'email'     => ['required', 'email:rfc,dns', 'max:100', 'unique:users,email'],
+
+            // SĐT phải đúng chuẩn SĐT Việt Nam và là duy nhất
+            'phone'     => ['required', 'string', 'unique:users,phone', 'regex:/^(0[3|5|7|8|9])+([0-9]{8})$/'],
+
+            // Mật khẩu mạnh mẽ hơn
+            'password'  => [
+                'required',
+                'confirmed',
+                Password::min(8)
+                    ->mixedCase()  // Yêu cầu cả chữ hoa và chữ thường
+                    ->numbers()    // Yêu cầu cả số
+                    ->symbols()    // Yêu cầu cả ký tự đặc biệt
+            ],
             // THÊM VALIDATION CHO RECAPTCHA
             'g-recaptcha-response.required' => 'Vui lòng xác minh reCAPTCHA.',
 
+
         ], [
-            'full_name.required' => 'Họ tên không được để trống',
-            'email.required' => 'Email không được để trống',
-            'email.unique' => 'Email đã được sử dụng',
-            'password.required' => 'Mật khẩu không được để trống',
-            'password.confirmed' => 'Xác nhận mật khẩu không khớp',
-            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự',
+            // Thông báo lỗi tùy chỉnh
+            'full_name.required' => 'Họ và tên không được để trống.',
+            'full_name.regex'    => 'Họ và tên chỉ được chứa chữ cái và khoảng trắng.',
+
+            'email.required'     => 'Email không được để trống.',
+            'email.email'        => 'Email không đúng định dạng.',
+            'email.unique'       => 'Email này đã được sử dụng.',
+
+            'phone.required'     => 'Số điện thoại không được để trống.',
+            'phone.unique'       => 'Số điện thoại này đã được sử dụng.',
+            'phone.regex'        => 'Số điện thoại không hợp lệ. (VD: 0912345678)',
+
+            'password.required'  => 'Mật khẩu không được để trống.',
+            'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
+            'password.min'       => 'Mật khẩu phải có ít nhất 8 ký tự.',
+            'password'           => 'Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt.',
+            'g-recaptcha-response.required' => 'Vui lòng xác minh bạn không phải là robot.',
+            'g-recaptcha-response.captcha'  => 'Xác minh reCAPTCHA không thành công.',
         ]);
 
         // === 4. XÁC MINH reCAPTCHA BẰTAY ===

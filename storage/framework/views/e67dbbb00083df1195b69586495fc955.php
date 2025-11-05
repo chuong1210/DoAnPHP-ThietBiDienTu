@@ -200,6 +200,7 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -211,6 +212,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -221,16 +223,35 @@
             position: relative;
         }
 
-        .input-icon i {
+        .input-icon .form-icon {
+            /* Đổi tên từ i thành .form-icon để không bị xung đột */
             position: absolute;
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
             color: #94A3B8;
+            pointer-events: none;
+            /* Icon không thể click */
         }
 
         .input-icon .form-control {
             padding-left: 2.75rem;
+        }
+
+
+        /* === CSS CHO NÚT TOGGLE MẬT KHẨU === */
+        .password-toggle-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle-icon:hover {
+            color: var(--primary);
         }
     </style>
 </head>
@@ -268,13 +289,10 @@
 
                     <!-- Email -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            <i class="fas fa-envelope me-1"></i> Email
-                        </label>
+                        <label class="form-label"><i class="fas fa-envelope me-1"></i> Email</label>
                         <div class="input-icon">
-                            <i class="fas fa-at"></i>
-                            <input type="email" name="email"
-                                class="form-control <?php $__errorArgs = ['email'];
+                            <i class="fas fa-at form-icon"></i>
+                            <input type="email" name="email" class="form-control <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -282,29 +300,30 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                value="<?php echo e(old('email')); ?>"
-                                placeholder="your.email@example.com" required>
+                                value="<?php echo e(old('email')); ?>" placeholder="your.email@example.com" required>
                         </div>
                         <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                            <div class="text-danger small mt-1"><?php echo e($message); ?></div>
+                            
+                            <?php if($errors->has('password')): ?>
+                                <div class="text-danger small mt-1"><?php echo e($message); ?></div>
+                            <?php endif; ?>
                         <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                     </div>
 
+
                     <!-- Password -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            <i class="fas fa-lock me-1"></i> Mật khẩu
-                        </label>
+                        <label class="form-label"><i class="fas fa-lock me-1"></i> Mật khẩu</label>
                         <div class="input-icon">
-                            <i class="fas fa-key"></i>
-                            <input type="password" name="password"
+                            <i class="fas fa-key form-icon"></i>
+                            <input type="password" name="password" id="password-input" 
                                 class="form-control <?php $__errorArgs = ['password'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -312,8 +331,11 @@ if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>"
-                                placeholder="••••••••" required>
+unset($__errorArgs, $__bag); ?>" placeholder="••••••••"
+                                required>
+
+                            
+                            <i class="fas fa-eye password-toggle-icon" id="password-toggle"></i>
                         </div>
                         <?php $__errorArgs = ['password'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -326,7 +348,6 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                     </div>
-
                     <!-- Remember Me -->
                     <div class="mb-3 form-check">
                         <input type="checkbox" name="remember" class="form-check-input" id="remember">
@@ -374,7 +395,24 @@ unset($__errorArgs, $__bag); ?>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const passwordInput = document.getElementById('password-input');
+            const passwordToggle = document.getElementById('password-toggle');
+
+            if (passwordInput && passwordToggle) {
+                passwordToggle.addEventListener('click', function () {
+                    // Lấy ra type hiện tại của input
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+
+                    // Thay đổi icon mắt
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                });
+            }
+        });
+    </script>
 </body>
 
-</html>
-<?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/auth/login.blade.php ENDPATH**/ ?>
+</html><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/auth/login.blade.php ENDPATH**/ ?>
