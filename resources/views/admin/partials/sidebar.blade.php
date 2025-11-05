@@ -53,13 +53,11 @@
         <a href="{{ route('admin.orders.index') }}"
             class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
             <i class="fas fa-shopping-cart"></i>
-            {{-- <span>Quản Lý Đơn Hàng</span>
-            @php
-            $pendingOrders = \App\Models\Order::where('status', 'pending')->count();
-            @endphp
-            @if($pendingOrders > 0)
-            <span class="nav-badge">{{ $pendingOrders }}</span>
-            @endif --}}
+            <span>Quản Lý Đơn Hàng</span>
+            {{-- Sử dụng biến đã được View Composer chia sẻ --}}
+            @if(isset($pendingOrdersCount) && $pendingOrdersCount > 0)
+                <span class="nav-badge">{{ $pendingOrdersCount }}</span>
+            @endif
         </a>
 
         <!-- Communication Section -->

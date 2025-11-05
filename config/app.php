@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Laravel\ServiceProvider;
+
 return [
 
     /*
@@ -27,7 +29,15 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+    // 'providers' => ServiceProvider::defaultProviders()->merge([
+    //     // ...
+    //     App\Providers\AppServiceProvider::class,
+    //     App\Providers\AuthServiceProvider::class,
+    //     // App\Providers\BroadcastServiceProvider::class,
 
+    //     App\Providers\ViewServiceProvider::class, // <-- THÊM DÒNG NÀY VÀO
+
+    // ])->toArray(),
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
