@@ -3,93 +3,6 @@
     $hideSidebar = true;
 ?>
 
-<?php $__env->startSection('styles'); ?>
-    
-    <style>
-        /* Sử dụng biến màu "Tech Blue Pro" */
-        :root {
-            --primary: #0066FF;
-            --secondary: #00B4D8;
-            --text: #1E293B;
-            --neutral: #CBD5E1;
-        }
-
-        /* === BREADCRUMB STYLE (FRAMELESS) === */
-        .breadcrumb-frameless {
-            background-color: transparent;
-            border: none;
-            box-shadow: none;
-            padding: 0;
-            list-style: none;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 0;
-            font-size: 0.95rem;
-        }
-
-        .breadcrumb-frameless .breadcrumb-item a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .breadcrumb-frameless .breadcrumb-item a:hover {
-            color: var(--secondary);
-            text-decoration: underline;
-        }
-
-        .breadcrumb-frameless .breadcrumb-item a i {
-            margin-right: 0.4rem;
-            font-size: 1rem;
-        }
-
-        .breadcrumb-frameless .breadcrumb-item.active {
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        .breadcrumb-frameless .breadcrumb-item+.breadcrumb-item::before {
-            color: var(--neutral);
-            font-weight: 400;
-            padding-right: 0.75rem;
-            padding-left: 0.75rem;
-            content: '/';
-        }
-    </style>
-
-    
-    <style>
-        :root {
-            /* Bạn có thể xóa khối này nếu đã có ở trên */
-            --primary: #0066FF;
-            --secondary: #00B4D8;
-            --background: #F8FAFC;
-            --text: #1E293B;
-            --neutral: #CBD5E1;
-        }
-
-        /* XÓA KHỐI NÀY ĐI */
-        /* .modern-breadcrumb {
-                background: white;
-                padding: 1rem 1.5rem;
-                border-radius: 12px;
-                border: 2px solid var(--neutral);
-            }
-            .modern-breadcrumb a { ... }
-            .modern-breadcrumb .active { ... } */
-
-        /* Profile Header */
-        .profile-header {
-            /* ... style còn lại giữ nguyên ... */
-        }
-
-        /* ... các style khác của bạn ... */
-    </style>
-<?php $__env->stopSection(); ?>
 
 
 <?php $__env->startSection('content'); ?>
@@ -139,13 +52,17 @@
                                 <span>Thông Tin Cá Nhân</span>
                             </button>
                         </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password"
-                                type="button" role="tab">
-                                <i class="fas fa-lock"></i>
-                                <span>Đổi Mật Khẩu</span>
-                            </button>
-                        </li>
+                        <?php if(!Auth::user()->is_social): ?>
+
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password"
+                                    type="button" role="tab">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Đổi Mật Khẩu</span>
+                                </button>
+                            </li>
+                        <?php endif; ?>
+
                     </ul>
 
                     <!-- Tab Content -->
@@ -253,106 +170,114 @@ unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <!-- Password Tab -->
-                        <div class="tab-pane fade" id="password" role="tabpanel">
-                            <form action="<?php echo e(route('client.profile.update.password')); ?>" method="POST" class="modern-form">
-                                <?php echo csrf_field(); ?>
-                                <div class="mb-4">
-                                    <label for="current_password" class="form-label">
-                                        <i class="fas fa-key me-1"></i> Mật Khẩu Hiện Tại <span class="text-danger">*</span>
-                                    </label>
-                                    <div class="input-wrapper">
-                                        <input type="password"
-                                            class="form-control <?php $__errorArgs = ['current_password'];
+             
+
+<!-- Password Tab -->
+<?php if(!Auth::user()->is_social): ?>
+<div class="tab-pane fade" id="password" role="tabpanel">
+    
+    <?php if(session('password_success')): ?>
+        <div class="alert alert-success d-flex align-items-center gap-2">
+            <i class="fas fa-check-circle"></i> <?php echo e(session('password_success')); ?>
+
+        </div>
+    <?php endif; ?>
+    <?php if(session('password_error')): ?>
+         <div class="alert alert-danger d-flex align-items-center gap-2">
+            <i class="fas fa-exclamation-triangle"></i> <?php echo e(session('password_error')); ?>
+
+        </div>
+    <?php endif; ?>
+
+    <form action="<?php echo e(route('client.profile.update.password')); ?>" method="POST" class="modern-form">
+        <?php echo csrf_field(); ?>
+        
+        <div class="mb-4">
+            <label for="current_password" class="form-label">
+                <i class="fas fa-key me-1"></i> Mật Khẩu Hiện Tại <span class="text-danger">*</span>
+            </label>
+            <div class="input-wrapper">
+                <input type="password" id="current_password" name="current_password"
+                    class="form-control <?php $__errorArgs = ['current_password', 'updatePassword'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>"
-                                            id="current_password" name="current_password" required>
-                                        <?php $__errorArgs = ['current_password'];
+unset($__errorArgs, $__bag); ?>" required>
+                <i class="fas fa-eye password-toggle-icon" data-target="current_password"></i>
+          <?php $__errorArgs = ['current_password', 'updatePassword'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                                            <div class="invalid-feedback"><?php echo e($message); ?></div>
-                                        <?php unset($message);
+    <div class="invalid-feedback"><?php echo e($message); ?></div>
+<?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <label for="password" class="form-label">
-                                            <i class="fas fa-lock me-1"></i> Mật Khẩu Mới <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="input-wrapper">
-                                            <input type="password"
-                                                class="form-control <?php $__errorArgs = ['password'];
+            </div>
+        </div>
+
+        
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <label for="new_password" class="form-label">
+                    <i class="fas fa-lock me-1"></i> Mật Khẩu Mới <span class="text-danger">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <input type="password" id="new_password" name="new_password"
+                        class="form-control <?php $__errorArgs = ['new_password', 'updatePassword'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" id="password"
-                                                name="password" required minlength="8">
-                                            <div class="input-note">
-                                                <i class="fas fa-info-circle"></i> Tối thiểu 8 ký tự
-                                            </div>
-                                            <?php $__errorArgs = ['password'];
+unset($__errorArgs, $__bag); ?>" required minlength="8">
+                    <i class="fas fa-eye password-toggle-icon" data-target="new_password"></i>
+
+              <?php $__errorArgs = ['new_password', 'updatePassword'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                                                <div class="invalid-feedback"><?php echo e($message); ?></div>
-                                            <?php unset($message);
+    <div class="invalid-feedback"><?php echo e($message); ?></div>
+<?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4">
-                                        <label for="password_confirmation" class="form-label">
-                                            <i class="fas fa-shield-alt me-1"></i> Xác Nhận Mật Khẩu Mới <span
-                                                class="text-danger">*</span>
-                                        </label>
-                                        <div class="input-wrapper">
-                                            <input type="password"
-                                                class="form-control <?php $__errorArgs = ['password_confirmation'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>"
-                                                id="password_confirmation" name="password_confirmation" required>
-                                            <?php $__errorArgs = ['password_confirmation'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                                <div class="invalid-feedback"><?php echo e($message); ?></div>
-                                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-actions">
-                                    <a href="<?php echo e(route('client.profile.index')); ?>" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left me-2"></i> Hủy
-                                    </a>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-key me-2"></i> Đổi Mật Khẩu
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                </div>
+                        <div class="input-note">
+                        <i class="fas fa-info-circle"></i> Tối thiểu 8 ký tự, gồm chữ hoa, số, ký tự đặc biệt
+                    </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <label for="new_password_confirmation" class="form-label">
+                    <i class="fas fa-shield-alt me-1"></i> Xác Nhận Mật Khẩu Mới <span class="text-danger">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <input type="password" id="new_password_confirmation" name="new_password_confirmation"
+                        class="form-control" required>
+                    <i class="fas fa-eye password-toggle-icon" data-target="new_password_confirmation"></i>
+                    
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="form-actions">
+            <a href="<?php echo e(route('client.profile.index')); ?>" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Hủy
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-key me-2"></i> Đổi Mật Khẩu
+            </button>
+        </div>
+    </form>
+</div>
+<?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -836,6 +761,40 @@ unset($__errorArgs, $__bag); ?>
         transform: translateX(4px);
     }
 
+
+    /* ... */
+    /* === CĂN CHỈNH ICON MẮT HOÀN HẢO === */
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper .form-control {
+        padding-right: 3.5rem !important;
+        /* Đẩy chữ ra để chừa chỗ cho icon */
+        height: 58px;
+        /* Đồng bộ chiều cao */
+        font-size: 1rem;
+    }
+
+    .password-toggle-icon {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94A3B8;
+        cursor: pointer;
+        font-size: 1.1rem;
+        z-index: 10;
+        transition: color 0.2s ease;
+        padding: 4px;
+        border-radius: 50%;
+    }
+
+    .password-toggle-icon:hover {
+        color: var(--primary);
+        background-color: rgba(0, 102, 255, 0.1);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .profile-header {
@@ -874,4 +833,44 @@ unset($__errorArgs, $__bag); ?>
         }
     }
 </style>
+
+<?php $__env->startSection('scripts'); ?>
+<script>
+ document.addEventListener('DOMContentLoaded', function() {
+        // --- LOGIC TOGGLE MẬT KHẨU ---
+        const toggleIcons = document.querySelectorAll('.password-toggle-icon');
+        toggleIcons.forEach(icon => {
+            icon.addEventListener('click', function() {
+                const targetInputId = this.getAttribute('data-target');
+                const targetInput = document.getElementById(targetInputId);
+                if (targetInput) {
+                    const type = targetInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    targetInput.setAttribute('type', type);
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                }
+            });
+        });
+
+        // --- LOGIC XÓA LỖI KHI NHẬP ---
+        // Lấy tất cả các input có class is-invalid trong form đổi mật khẩu
+        const invalidInputs = document.querySelectorAll('#password .is-invalid');
+
+        invalidInputs.forEach(input => {
+            // Lắng nghe sự kiện 'input' (khi người dùng gõ)
+            input.addEventListener('input', function() {
+                // Xóa class is-invalid khỏi chính nó
+                this.classList.remove('is-invalid');
+
+                // Tìm và xóa thẻ div.invalid-feedback ngay sau nó
+                const errorFeedback = this.nextElementSibling;
+                if (errorFeedback && errorFeedback.classList.contains('invalid-feedback')) {
+                    errorFeedback.style.display = 'none'; // Hoặc có thể xóa hẳn: errorFeedback.remove();
+                }
+            }, { once: true }); // { once: true } để sự kiện chỉ chạy 1 lần duy nhất
+        });
+    });
+</script>
+<?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('client.layouts.client', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/client/profile/index.blade.php ENDPATH**/ ?>

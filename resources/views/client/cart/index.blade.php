@@ -1,7 +1,9 @@
 @extends('client.layouts.client')
 
 @section('title', 'Giỏ Hàng')
-
+@php
+    $hideSidebar = true;
+@endphp
 @section('content')
     <style>
         :root {

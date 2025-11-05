@@ -11,6 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ... Toàn bộ CSS của bạn giữ nguyên ... */
         :root {
             --primary: #0066FF;
             --secondary: #00B4D8;
@@ -210,7 +211,6 @@
             padding-left: 2.75rem;
         }
 
-        /* CSS cho nút toggle mật khẩu */
         .password-toggle-icon {
             position: absolute;
             right: 1rem;
@@ -220,7 +220,6 @@
             cursor: pointer;
             transition: color 0.2s ease;
             padding: 5px;
-            /* Tăng vùng click */
         }
 
         .password-toggle-icon:hover {
@@ -243,22 +242,16 @@
             <div class="register-card">
                 <h4 class="text-center mb-4" style="color: var(--text); font-weight: 700;">Đăng Ký Tài Khoản</h4>
 
-                {{-- @if($errors->any())
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <ul class="mb-0 ps-3">
-                        @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif --}}
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Vui lòng kiểm tra lại các thông tin bên dưới.
+                    </div>
+                @endif
 
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
-
-                    <!-- Họ tên -->
-                    <!-- Họ tên -->
+                    <!-- ... Các trường input của bạn ... -->
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-user me-1"></i> Họ và tên <span
                                 class="text-danger">*</span></label>
@@ -270,8 +263,6 @@
                         </div>
                         @error('full_name')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
-
-                    <!-- Email -->
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-envelope me-1"></i> Email <span
                                 class="text-danger">*</span></label>
@@ -282,8 +273,6 @@
                         </div>
                         @error('email')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
-
-                    <!-- Số điện thoại -->
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-phone me-1"></i> Số điện thoại <span
                                 class="text-danger">*</span></label>
@@ -294,8 +283,6 @@
                         </div>
                         @error('phone')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
-
-                    <!-- Mật khẩu -->
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-lock me-1"></i> Mật khẩu <span
                                 class="text-danger">*</span></label>
@@ -303,13 +290,11 @@
                             <i class="fas fa-key form-icon"></i>
                             <input type="password" name="password" id="password"
                                 class="form-control @error('password') is-invalid @enderror"
-                                placeholder="Tối thiểu 8 ký tự, gồm chữ hoa, số, ký tự đặc biệt" required>
+                                placeholder="Tối thiểu 8 ký tự..." required>
                             <i class="fas fa-eye password-toggle-icon" data-target="password"></i>
                         </div>
                         @error('password')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
-
-                    <!-- Xác nhận mật khẩu -->
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-shield-alt me-1"></i> Xác nhận mật khẩu <span
                                 class="text-danger">*</span></label>
@@ -320,59 +305,42 @@
                             <i class="fas fa-eye password-toggle-icon" data-target="password_confirmation"></i>
                         </div>
                     </div>
-
-                    <div class="mb-3 ">
-                        <div class="mb-3">
-                            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
-                            @if($errors->has('g-recaptcha-response'))
-                                <div class="server-error">{{ $errors->first('g-recaptcha-response') }}</div>
-                            @endif
-                        </div>
-
-                        <!-- Điều khoản -->
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="terms" required>
-                            <label class="form-check-label" for="terms" style="font-weight: 500;">
-                                Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a>
-                            </label>
-                        </div>
-
-                        <!-- Submit -->
-                        <button type="submit" class="btn btn-primary w-100 mb-3">
-                            <i class="fas fa-user-plus me-2"></i> Đăng Ký
-                        </button>
-
-                        <!-- Divider -->
-                        <div class="divider">
-                            <span>hoặc đăng ký với</span>
-                        </div>
-
-                        <!-- Google Register -->
-                        <a href="{{ route('auth.google') }}" class="btn btn-google w-100">
-                            <i class="fab fa-google me-2"></i> Đăng Ký Với Google
-                        </a>
-
-                        <!-- Links -->
-                        <div class="text-center mt-4">
-                            <p class="mb-0" style="color: #64748B;">
-                                Đã có tài khoản?
-                                <a href="{{ route('login') }}">Đăng nhập ngay</a>
-                            </p>
-                        </div>
+                    <div class="mb-3">
+                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                        @if($errors->has('g-recaptcha-response'))
+                            <div class="server-error">{{ $errors->first('g-recaptcha-response') }}</div>
+                        @endif
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="terms" required>
+                        <label class="form-check-label" for="terms" style="font-weight: 500;">Tôi đồng ý với <a
+                                href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mb-3"><i class="fas fa-user-plus me-2"></i> Đăng
+                        Ký</button>
+                    <div class="divider"><span>hoặc đăng ký với</span></div>
+                    <a href="{{ route('auth.google') }}" class="btn btn-google w-100"><i class="fab fa-google me-2"></i>
+                        Đăng Ký Với Google</a>
+                    <div class="text-center mt-4">
+                        <p class="mb-0" style="color: #64748B;">Đã có tài khoản? <a href="{{ route('login') }}">Đăng
+                                nhập ngay</a></p>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // --- LOGIC TOGGLE MẬT KHẨU ---
             const toggleIcons = document.querySelectorAll('.password-toggle-icon');
-
             toggleIcons.forEach(icon => {
                 icon.addEventListener('click', function () {
                     const targetInputId = this.getAttribute('data-target');
                     const targetInput = document.getElementById(targetInputId);
-
                     if (targetInput) {
                         const type = targetInput.getAttribute('type') === 'password' ? 'text' : 'password';
                         targetInput.setAttribute('type', type);
@@ -381,10 +349,59 @@
                     }
                 });
             });
-        });
-    </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            // === THÊM LOGIC MỚI: XÓA LỖI KHI NHẬP LẠI ===
+            const invalidInputs = document.querySelectorAll('.is-invalid');
+
+            invalidInputs.forEach(input => {
+                input.addEventListener('input', function () {
+                    // Xóa class is-invalid khỏi chính nó
+                    this.classList.remove('is-invalid');
+
+                    // Tìm đến div.input-icon hoặc div.mb-3 cha
+                    const parentWrapper = this.closest('.input-icon') || this.parentElement;
+
+                    // Tìm và xóa thẻ div.text-danger ngay bên trong wrapper đó
+                    const errorFeedback = parentWrapper.parentElement.querySelector('.text-danger.small');
+                    if (errorFeedback) {
+                        errorFeedback.style.display = 'none'; // Hoặc có thể xóa hẳn: errorFeedback.remove();
+                    }
+                }, { once: true }); // { once: true } để sự kiện chỉ chạy 1 lần duy nhất
+            });
+            // ===============================================
+        });
+
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                // Kiểm tra validity
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                // QUAN TRỌNG: CHỈ thêm class sau khi submit
+                form.classList.add('was-validated');
+
+                // Vô hiệu hóa nút submit nếu form hợp lệ
+                if (form.checkValidity()) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang gửi...';
+                }
+            }, false);
+        }
+
+        // === RESET reCAPTCHA NẾU CÓ LỖI ===
+        @if($errors->has('g-recaptcha-response'))
+            setTimeout(function () {
+                if (typeof grecaptcha !== 'undefined') {
+                    grecaptcha.reset();
+                }
+            }, 500);
+        @endif
+
+
+
+    </script>
 </body>
 
 </html>

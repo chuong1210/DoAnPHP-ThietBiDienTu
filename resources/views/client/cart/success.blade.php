@@ -1,5 +1,8 @@
 @extends('client.layouts.client')
 @section('content')
+    @php
+        $hideSidebar = true;
+    @endphp
     <div class="cart-success">
         <div class="panel-head">
             <h2 class="cart-heading">

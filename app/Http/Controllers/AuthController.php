@@ -13,6 +13,7 @@ use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -290,16 +291,13 @@ class AuthController extends Controller
             'full_name' => 'required|string|max:100',
             'phone' => 'nullable|string|max:15',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'current_password' => 'nullable|required_with:new_password',
-            'new_password' => 'nullable|min:8|confirmed',
+
         ], [
             'full_name.required' => 'Họ tên không được để trống',
             'email.required' => 'Email không được để trống',
             'email.email' => 'Email không đúng định dạng',
             'email.unique' => 'Email đã được sử dụng',
-            'current_password.required_with' => 'Vui lòng nhập mật khẩu hiện tại',
-            'new_password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự',
-            'new_password.confirmed' => 'Xác nhận mật khẩu mới không khớp',
+
         ]);
 
         // Cập nhật thông tin cơ bản
@@ -329,30 +327,58 @@ class AuthController extends Controller
      */
     public function updatePassword(Request $request)
     {
-        $request->validate([
-            'current_password' => 'required',
-            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-        ], [
-            'current_password.required' => 'Mật khẩu hiện tại không được để trống',
-            'password.required' => 'Mật khẩu mới không được để trống',
-            'password.confirmed' => 'Xác nhận mật khẩu mới không khớp',
-            'password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự',
-            'password.mixed' => 'Mật khẩu mới phải có ít nhất 1 chữ hoa và 1 chữ thường',
-            'password.numbers' => 'Mật khẩu mới phải có ít nhất 1 số',
-        ]);
-
         $user = Auth::user();
-        // Kiểm tra mật khẩu hiện tại
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác']);
+
+        // 1. Lớp bảo mật: Chặn tài khoản mạng xã hội
+        if ($user->is_social) {
+            return redirect()->route('client.profile.index')
+                ->with('password_error', 'Tài khoản đăng nhập bằng mạng xã hội không thể đổi mật khẩu.');
         }
 
-        // Gán password mới (mutator sẽ hash)
-        $user->fill(['password' => $request->password]);
-        // $user->setPasswordAttribute($request->password);
+        // 2. Tạo Validator thủ công để có thể tùy chỉnh Error Bag
+        $validator = Validator::make($request->all(), [
+            'current_password' => ['required', 'current_password'],
+            'new_password'     => [
+                'required',
+                'confirmed',
+                Password::min(8)
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(), // (Tùy chọn) Kiểm tra xem mật khẩu có bị rò rỉ không
+            ],
+        ], [
+            // Thông báo lỗi tùy chỉnh
+            'current_password.required'   => 'Vui lòng nhập mật khẩu hiện tại của bạn.',
+            'current_password.current_password' => 'Mật khẩu hiện tại không chính xác.',
+            'new_password.required'     => 'Vui lòng nhập mật khẩu mới.',
+            'new_password.confirmed'    => 'Xác nhận mật khẩu mới không khớp.',
+            'new_password.min'          => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+            'new_password'              => 'Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt.',
+            'new_password.uncompromised' => 'Mật khẩu này đã xuất hiện trong một vụ rò rỉ dữ liệu. Vui lòng chọn một mật khẩu khác an toàn hơn.',
+        ]);
 
-        $user->save();
+        // 3. Xử lý nếu validation thất bại
+        if ($validator->fails()) {
+            return redirect(route('client.profile.index') . '#password') // Chuyển hướng về tab mật khẩu
+                ->withErrors($validator, 'updatePassword') // Gửi lỗi vào Error Bag 'updatePassword'
+                ->withInput();
+        }
 
-        return back()->with('success', 'Đổi mật khẩu thành công!');
+        // 4. Nếu validation thành công, cập nhật mật khẩu
+        try {
+            $user->update([
+                'password' => $request->new_password
+            ]);
+        } catch (\Exception $e) {
+            // Ghi log lỗi nếu cần
+            // Log::error('Lỗi khi cập nhật mật khẩu: ' . $e->getMessage());
+            return redirect(route('client.profile.index') . '#password')
+                ->with('password_error', 'Đã có lỗi xảy ra, không thể cập nhật mật khẩu.');
+        }
+
+        // 5. Chuyển hướng với thông báo thành công
+        return redirect(route('client.profile.index') . '#password')
+            ->with('password_success', 'Đổi mật khẩu thành công!');
     }
 }
