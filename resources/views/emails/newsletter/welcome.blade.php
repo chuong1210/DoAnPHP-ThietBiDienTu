@@ -189,7 +189,7 @@
             </div>
 
             <!-- CTA -->
-            <a href="{{ url('/client/products-all') }}" class="cta-button">
+            <a href="{{ url('/products/all') }}" class="cta-button">
                 Khám Phá Sản Phẩm Ngay
             </a>
         </div>

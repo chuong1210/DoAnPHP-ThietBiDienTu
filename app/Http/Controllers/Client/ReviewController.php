@@ -31,8 +31,8 @@ class ReviewController extends Controller
     {
         $product = $this->productRepository->getProductBySlug($slug);
 
-        // Kiểm tra user đã mua chưa (sử dụng logic từ repository)
         try {
+            // Kiểm tra user đã mua sản phẩm chưa
             $hasOrdered = DB::table('order_items')
                 ->join('orders', 'order_items.order_id', '=', 'orders.id')
                 ->where('orders.user_id', Auth::id())
@@ -45,7 +45,7 @@ class ReviewController extends Controller
                     ->with('error', 'Bạn chưa mua sản phẩm này để có thể đánh giá.');
             }
 
-            // Kiểm tra đã review chưa
+            // Kiểm tra đã đánh giá chưa
             $existingReview = $this->reviewRepository->findByCondition(
                 [['product_id', '=', $product->id], ['user_id', '=', Auth::id()]],
                 false
@@ -73,32 +73,35 @@ class ReviewController extends Controller
     {
         $product = $this->productRepository->getProductBySlug($slug);
 
+        // ✅ Đảm bảo dùng đúng trường 'comment' (trùng với model Review)
         $validated = $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
+            'rating'  => 'required|integer|min:1|max:5',
+            'content' => 'required|string|max:1000',
         ], [
             'rating.required' => 'Vui lòng chọn điểm đánh giá.',
-            'rating.integer' => 'Điểm đánh giá phải là số nguyên từ 1-5.',
-            'comment.max' => 'Nhận xét không được vượt quá 1000 ký tự.',
+            'rating.integer'  => 'Điểm đánh giá phải là số nguyên từ 1-5.',
+            'content.required' => 'Vui lòng nhập nội dung đánh giá.',
+            'content.max'     => 'Nhận xét không được vượt quá 1000 ký tự.',
         ]);
 
+        // Gán thêm dữ liệu cần thiết
         $validated['product_id'] = $product->id;
-        $validated['user_id'] = Auth::id();
-        $validated['status'] = 'pending'; // Chờ admin duyệt
+        $validated['user_id']    = Auth::id();
+        $validated['status']     = 'pending'; // Chờ duyệt
 
         try {
+            // Gọi Repository để lưu
             $this->reviewRepository->createReview($validated);
 
             return redirect()->route('client.product.show', $slug)
                 ->with('success', 'Đánh giá của bạn đã được gửi và đang chờ duyệt!');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage())->withInput();
+            return redirect()->back()->with('error', 'Lỗi khi lưu đánh giá: ' . $e->getMessage())->withInput();
         }
     }
 
     /**
-     * Hiển thị danh sách đánh giá của user (profile)
-     * GET /profile/reviews
+     * (Tuỳ chọn) Hiển thị danh sách đánh giá của user
      */
     public function userReviews()
     {

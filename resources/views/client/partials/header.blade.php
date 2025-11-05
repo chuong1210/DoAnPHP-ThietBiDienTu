@@ -130,12 +130,7 @@
                                 <span>Sản Phẩm</span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link modern-nav-link" href="#">
-                                <i class="fas fa-fire"></i>
-                                <span>Khuyến Mãi</span>
-                            </a>
-                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link modern-nav-link {{ request()->routeIs('client.support.index') ? 'active' : '' }}"
                                 href="{{ route('client.support.index') }}"> <i class="fas fa-headset"></i>
@@ -368,13 +363,21 @@
     }
 
     .modern-nav-link.active {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: white;
-        box-shadow: 0 3px 10px rgba(0, 102, 255, 0.25);
+        /* background: linear-gradient(135deg, var(--primary), var(--secondary)); */
+        color: rgb(62, 132, 244);
+        /* box-shadow: 0 3px 10px rgba(0, 102, 255, 0.25); */
     }
 
     .modern-nav-link.active i {
         animation: pulse 1.8s infinite;
+        color: rgb(62, 132, 244);
+
+    }
+
+    .modern-nav-link.active span {
+        animation: pulse 1.8s infinite;
+        color: rgb(62, 132, 244);
+
     }
 
     @keyframes pulse {

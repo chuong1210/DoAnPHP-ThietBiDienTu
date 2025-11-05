@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\client;
 
-use App\Classes\VNPay;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\Controller;
 use App\Mail\OrderSuccessMail;
 use App\Models\Cart;
+use App\Services\VnpayService;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Coupon;
 use App\Repositories\CategoryRepository;
-use App\Services\VnpayService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -287,7 +286,7 @@ class CheckoutController extends Controller
     //     }
     // }
 
-    public function process(Request $request,  VNPay $vnpay)
+    public function process(Request $request, VnpayService $vnpayService)
     {
         $validated = $request->validate([
             'customer_name'     => 'required|string|max:100',
@@ -383,14 +382,23 @@ class CheckoutController extends Controller
             if ($validated['payment_method'] === 'vnpay') {
                 DB::commit();
 
-                $response = $vnpay->payment($total, $order->order_number);
-
-                if ($response['errorCode'] == 0) {
-                    return redirect()->away($response['url']);
+                // Tạo URL thanh toán
+                $amount = (float) $order->total;
+                if ($amount <= 0) {
+                    // đảm bảo không truyền giá trị null/âm; có thể điều chỉnh theo yêu cầu nghiệp vụ
+                    $amount = 0.0;
                 }
+                $paymentUrl = $vnpayService->createPaymentUrl(
+                    $amount,
+                    $order->order_number,
+                    'Thanh toan don hang ' . $order->order_number,
+                    $request->ip()
+                );
 
-                return back()->with('error', 'Lỗi tạo thanh toán VNPay');
+                // Chuyển hướng người dùng đến cổng VNPAY
+                return redirect()->away($paymentUrl);
             }
+
             DB::commit();
             Mail::to($order->customer_email)->send(new OrderSuccessMail($order));
             return redirect()->route('client.checkout.success', $order->id)

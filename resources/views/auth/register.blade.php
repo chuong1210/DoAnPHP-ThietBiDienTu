@@ -255,16 +255,16 @@
             <div class="register-card">
                 <h4 class="text-center mb-4" style="color: var(--text); font-weight: 700;">Đăng Ký Tài Khoản</h4>
 
-                @if($errors->any())
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <ul class="mb-0 ps-3">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+                {{-- @if($errors->any())
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <ul class="mb-0 ps-3">
+                        @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif --}}
 
                 <form method="POST" action="{{ route('register') }}">
                     @csrf

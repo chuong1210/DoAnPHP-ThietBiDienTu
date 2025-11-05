@@ -53,13 +53,13 @@
         <a href="{{ route('admin.orders.index') }}"
             class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
             <i class="fas fa-shopping-cart"></i>
-            <span>Quản Lý Đơn Hàng</span>
+            {{-- <span>Quản Lý Đơn Hàng</span>
             @php
-                $pendingOrders = \App\Models\Order::where('status', 'pending')->count();
+            $pendingOrders = \App\Models\Order::where('status', 'pending')->count();
             @endphp
             @if($pendingOrders > 0)
-                <span class="nav-badge">{{ $pendingOrders }}</span>
-            @endif
+            <span class="nav-badge">{{ $pendingOrders }}</span>
+            @endif --}}
         </a>
 
         <!-- Communication Section -->
@@ -97,6 +97,24 @@
         <div class="nav-section-title">
             <i class="fas fa-cog me-1"></i> Hệ Thống
         </div>
+        <a href="{{ route('admin.banners.index') }}"
+            class="nav-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+            <i class="fas fa-image"></i> Quản Lý Banner
+        </a>
+        <a href="{{ route('admin.reviews.index') }}"
+            class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+            <i class="fas fa-image"></i> Quản Lý Reviews
+        </a>
+
+        <a href="{{ route('admin.contact.index') }}"
+            class="nav-link {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}">
+            <i class="fas fa-headset"></i> Quản Lý Liên Hệ
+        </a>
+        <a href="{{ route('admin.faqs.index') }}"
+            class="nav-link {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}">
+            <i class="fas fa-question-circle"></i> Quản Lý Câu Hỏi Thường Gặp
+        </a>
+        <hr class="bg-secondary">
 
         <a href="{{ route('client.home.index') }}" class="nav-link" target="_blank">
             <i class="fas fa-globe"></i>
@@ -110,3 +128,42 @@
         </a>
     </nav>
 </div>
+
+
+{{--
+
+<body>
+    <!-- Sidebar -->
+    @include('admin.partials.sidebar')
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        @include('admin.partials.header')
+
+        <!-- Content -->
+        <div class="content-wrapper">
+            @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
+
+            @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
+
+            @yield('content')
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @yield('scripts')
+</body>
+
+</html> --}}

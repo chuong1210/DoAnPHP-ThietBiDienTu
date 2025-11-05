@@ -8,6 +8,7 @@ use App\Repositories\CategoryRepository;
 use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -52,18 +53,15 @@ class ProductController extends Controller
         }
 
         // Phân trang sử dụng repository
-        $products = $this->productRepository->pagination(
-            ['*'],
-            $conditions,
-            20,
-            [],
-            ['category', 'brand'],
-            ['id', 'DESC']
+        $products = $this->productRepository->searchAndPaginateProduct(
+            $request,
+            20, // Số sản phẩm mỗi trang
+            ['category', 'brand'] // Các relationship cần load
         );
 
         // Lấy danh sách categories và brands cho bộ lọc sử dụng repository
-        $categories = $this->categoryRepository->getActiveCategories();
-        $brands = $this->brandRepository->getActiveBrands();
+        $categories = $this->categoryRepository->getActiveCategories_2();
+        $brands = $this->brandRepository->getActiveBrands_2();
 
         return view('admin.products.index', compact('products', 'categories', 'brands'));
     }
@@ -75,8 +73,8 @@ class ProductController extends Controller
     public function create()
     {
         // Lấy danh sách categories và brands cho form sử dụng repository
-        $categories = $this->categoryRepository->getActiveCategories();
-        $brands = $this->brandRepository->getActiveBrands();
+        $categories = $this->categoryRepository->getActiveCategories_2();
+        $brands = $this->brandRepository->getActiveBrands_2();
 
         return view('admin.products.create', compact('categories', 'brands'));
     }
@@ -87,77 +85,57 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate dữ liệu
         $validated = $request->validate([
-            'name' => 'required|max:255',
+            'name'        => 'required|max:255',
             'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'required|exists:brands,id',
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0|lt:price',
-            'quantity' => 'required|integer|min:0',
+            'brand_id'    => 'required|exists:brands,id',
+            'price'       => 'required|numeric|min:0',
+            'sale_price'  => 'nullable|numeric|min:0|lt:price',
+            'quantity'    => 'required|integer|min:0',
             'description' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:active,inactive',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images'      => 'nullable|array', // Validate images là một mảng
+            'images.*'    => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Validate từng file trong mảng
+            'status'      => 'required|in:active,inactive',
             'is_featured' => 'nullable|boolean',
-        ], [
-            'name.required' => 'Tên sản phẩm không được để trống',
-            'name.max' => 'Tên sản phẩm không được vượt quá 255 ký tự',
-            'category_id.required' => 'Vui lòng chọn danh mục',
-            'category_id.exists' => 'Danh mục không tồn tại',
-            'brand_id.required' => 'Vui lòng chọn thương hiệu',
-            'brand_id.exists' => 'Thương hiệu không tồn tại',
-            'price.required' => 'Giá sản phẩm không được để trống',
-            'price.numeric' => 'Giá phải là số',
-            'price.min' => 'Giá phải lớn hơn hoặc bằng 0',
-            'sale_price.numeric' => 'Giá khuyến mãi phải là số',
-            'sale_price.lt' => 'Giá khuyến mãi phải nhỏ hơn giá gốc',
-            'quantity.required' => 'Số lượng không được để trống',
-            'quantity.integer' => 'Số lượng phải là số nguyên',
-            'quantity.min' => 'Số lượng phải lớn hơn hoặc bằng 0',
-            'image.image' => 'File phải là ảnh',
-            'image.mimes' => 'Ảnh phải có định dạng: jpeg, png, jpg, gif',
-            'image.max' => 'Ảnh không được vượt quá 2MB',
         ]);
 
         DB::beginTransaction();
         try {
-            // Tạo slug từ tên
-            $validated['slug'] = str()->slug($validated['name']);
+            $data = $validated;
+            $data['slug'] = Str::slug($data['name']);
+            $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
             // Xử lý upload ảnh đại diện
             if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageName = time() . '_' . str()->random(10) . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images/'), $imageName);
-                $validated['image'] = 'images/' . $imageName; // ✔ lưu kèm thư mục
-
+                $file = $request->file('image');
+                $fileName = 'product_main_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('images'), $fileName);
+                $data['image'] = 'images/' . $fileName;
             }
 
-            // Xử lý upload nhiều ảnh
+            // Xử lý upload nhiều ảnh bổ sung
             if ($request->hasFile('images')) {
                 $uploadedImages = [];
-                foreach ($request->file('images') as $image) {
-                    $imageName = time() . '_' . str()->random(10) . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('images/'), $imageName);
-                    $uploadedImages[] = 'images/' . $imageName; // ✔ Lưu kèm folder
+                foreach ($request->file('images') as $imageFile) {
+                    $imageName = 'product_extra_' . time() . '_' . Str::random(4) . '.' . $imageFile->getClientOriginalExtension();
+                    $imageFile->move(public_path('images'), $imageName);
+                    $uploadedImages[] = 'images/' . $imageName;
                 }
-                $validated['images'] = json_encode($uploadedImages);
+                // GÁN TRỰC TIẾP MẢNG, KHÔNG CẦN json_encode
+                $data['images'] = $uploadedImages;
+            } else {
+                // Nếu không upload ảnh mới, đảm bảo nó là một mảng rỗng
+                $data['images'] = [];
             }
 
-            // Xử lý checkbox is_featured
-            $validated['is_featured'] = $request->has('is_featured') ? 1 : 0;
-
-            // Tạo sản phẩm sử dụng repository
-            $this->productRepository->create($validated);
-
+            $this->productRepository->create($data);
             DB::commit();
 
             return redirect()->route('admin.products.index')
                 ->with('success', 'Thêm sản phẩm thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
-
             return redirect()->back()
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage())
                 ->withInput();
@@ -184,8 +162,8 @@ class ProductController extends Controller
         $product = $this->productRepository->findById($id);
 
         // Lấy danh sách categories và brands cho form sử dụng repository
-        $categories = $this->categoryRepository->getActiveCategories();
-        $brands = $this->brandRepository->getActiveBrands();
+        $categories = $this->categoryRepository->getActiveCategories_2();
+        $brands = $this->brandRepository->getActiveBrands_2();
 
         return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
@@ -198,65 +176,85 @@ class ProductController extends Controller
     {
         $product = $this->productRepository->findById($id);
 
-        // Validate dữ liệu
         $validated = $request->validate([
-            'name' => 'required|max:255',
+            'name'        => 'required|max:255',
             'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'required|exists:brands,id',
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0|lt:price',
-            'quantity' => 'required|integer|min:0',
-            'description' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:active,inactive',
+            'brand_id'    => 'required|exists:brands,id',
+            // ... các validation khác tương tự store()
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images'      => 'nullable|array',
+            'images.*'    => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'status'      => 'required|in:active,inactive',
             'is_featured' => 'nullable|boolean',
-        ], [
-            'name.required' => 'Tên sản phẩm không được để trống',
-            'category_id.required' => 'Vui lòng chọn danh mục',
-            'brand_id.required' => 'Vui lòng chọn thương hiệu',
-            'price.required' => 'Giá sản phẩm không được để trống',
-            'sale_price.lt' => 'Giá khuyến mãi phải nhỏ hơn giá gốc',
-            'quantity.required' => 'Số lượng không được để trống',
         ]);
 
         DB::beginTransaction();
         try {
-            // Cập nhật slug nếu đổi tên
-            $validated['slug'] = str()->slug($validated['name']);
+            $data = $validated;
+            $data['slug'] = STR::slug($data['name']);
+            $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
-            // Xử lý upload ảnh mới
+            // Xử lý upload ảnh đại diện mới
             if ($request->hasFile('image')) {
                 // Xóa ảnh cũ
                 if ($product->image && file_exists(public_path($product->image))) {
                     unlink(public_path($product->image));
                 }
-
                 // Upload ảnh mới
-                $image = $request->file('image');
-                $imageName = time() . '_' . str()->random(10) . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images/'), $imageName);
-                $validated['image'] = 'images/' . $imageName; // ✔ lưu kèm thư mục
-
+                $file = $request->file('image');
+                $fileName = 'product_main_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('images'), $fileName);
+                $data['image'] = 'images/' . $fileName;
             }
 
-            // Xử lý checkbox is_featured
-            $validated['is_featured'] = $request->has('is_featured') ? 1 : 0;
+            // --- LOGIC XỬ LÝ NHIỀU ẢNH KHI UPDATE ---
 
-            // Cập nhật sản phẩm sử dụng repository
-            $this->productRepository->update($id, $validated);
+            // 1. Lấy danh sách ảnh cũ còn lại (sau khi người dùng có thể đã xóa)
+            $remainingOldImages = $request->input('old_images', []);
 
+            // 2. Xác định các ảnh cũ bị xóa và xóa file trên server
+            $currentImages = $product->images ? (is_array($product->images) ? $product->images : json_decode($product->images, true)) : [];
+            $deletedImages = array_diff($currentImages, $remainingOldImages);
+
+            foreach ($deletedImages as $deletedImage) {
+                if (file_exists(public_path($deletedImage))) {
+                    unlink(public_path($deletedImage));
+                }
+            }
+
+            // 3. Upload các ảnh mới (nếu có)
+            $newUploadedImages = [];
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $imageFile) {
+                    $imageName = 'product_extra_' . time() . '_' . Str::random(4) . '.' . $imageFile->getClientOriginalExtension();
+                    $imageFile->move(public_path('images'), $imageName);
+                    $newUploadedImages[] = 'images/' . $imageName;
+                }
+            }
+
+            // 4. Hợp nhất ảnh cũ còn lại và ảnh mới upload
+            $finalImages = array_merge($remainingOldImages, $newUploadedImages);
+
+            // 5. Chuyển thành JSON để lưu
+            // $data['images'] = json_encode($finalImages);
+            $data['images'] = $finalImages;
+
+
+            // ------------------------------------------
+
+            $this->productRepository->update($id, $data);
             DB::commit();
 
             return redirect()->route('admin.products.index')
                 ->with('success', 'Cập nhật sản phẩm thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
-
             return redirect()->back()
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage())
                 ->withInput();
         }
     }
+
 
     /**
      * Xóa sản phẩm

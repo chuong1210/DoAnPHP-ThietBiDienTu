@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Models\Coupon;
 use App\Repositories\BrandRepository;
 use App\Repositories\CartRepository;
@@ -47,13 +48,21 @@ class CartController extends Controller
     public function index()
     {
         $userId = Auth::id();
+        // $cart = $this->cartRepository->findByCondition(
+        //     [['user_id', '=', $userId]],
+        //     false,
+        //     ['items.product.brand']
+        // );
         $cart = $this->cartRepository->findByCondition(
             [['user_id', '=', $userId]],
-            false,
+            true, // <-- ĐỔI THÀNH TRUE
             ['items.product.brand']
         );
+
         $categories = $this->categoryRepository->getCategoriesWithChildren();
-        $brands = $this->brandRepository->getActiveBrands();
+        // $brands = $this->brandRepository->getActiveBrands();
+        $brands = Brand::where('is_active', 1)->orderBy('name')->get();
+
         $coupons = Coupon::active()->get(); // Load active coupons
 
         return view('client.cart.index', compact('cart', 'categories', 'brands', 'coupons'));

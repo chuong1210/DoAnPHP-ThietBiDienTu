@@ -3,200 +3,752 @@
 @section('title', 'Giỏ Hàng')
 
 @section('content')
+    <style>
+        :root {
+            --primary: #0066FF;
+            --secondary: #00B4D8;
+            --background: #F8FAFC;
+            --text: #1E293B;
+            --neutral: #CBD5E1;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        /* Page Header */
+        .cart-header {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 2px solid var(--neutral);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .cart-header-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0, 102, 255, 0.3);
+        }
+
+        .cart-header-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .cart-header h3 {
+            color: var(--text);
+            font-weight: 800;
+            margin: 0;
+        }
+
+        /* Alert */
+        .alert {
+            border-radius: 16px;
+            border: none;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            color: #065F46;
+        }
+
+        /* Cart Card */
+        .cart-card {
+            background: white;
+            border-radius: 20px;
+            border: 2px solid var(--neutral);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .cart-card .card-body {
+            padding: 2rem;
+        }
+
+        /* Table Styles */
+        .table {
+            margin: 0;
+        }
+
+        .table thead th {
+            background: var(--background);
+            color: var(--text);
+            font-weight: 700;
+            border: none;
+            padding: 1.25rem 1rem;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody td {
+            padding: 1.5rem 1rem;
+            vertical-align: middle;
+            border-bottom: 2px solid var(--background);
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background: var(--background);
+        }
+
+        /* Product Image */
+        .product-image-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--neutral);
+            flex-shrink: 0;
+        }
+
+        .product-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info h6 {
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .product-info h6 a {
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .product-info h6 a:hover {
+            color: var(--primary);
+        }
+
+        .product-info small {
+            color: #64748B;
+            font-weight: 600;
+        }
+
+        /* Quantity Input */
+        .input-group-sm {
+            width: 130px;
+        }
+
+        .input-group-sm .btn {
+            border: 2px solid var(--neutral);
+            background: white;
+            color: var(--text);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .input-group-sm .btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .input-group-sm .form-control {
+            border: 2px solid var(--neutral);
+            border-left: none;
+            border-right: none;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .input-group-sm .form-control:focus {
+            box-shadow: none;
+            border-color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn-outline-danger {
+            border: 2px solid var(--danger);
+            color: var(--danger);
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .btn-outline-danger:hover {
+            background: var(--danger);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+            padding: 0.85rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background: white;
+            border-radius: 20px;
+            border: 2px solid var(--neutral);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: sticky;
+            top: 120px;
+        }
+
+        .summary-card .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border: none;
+        }
+
+        .summary-card .card-header h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .summary-card .card-body {
+            padding: 2rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            color: #64748B;
+            font-size: 1rem;
+        }
+
+        .summary-row strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .summary-row.discount strong {
+            color: var(--success);
+        }
+
+        .summary-divider {
+            height: 2px;
+            background: var(--neutral);
+            margin: 1.5rem 0;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .summary-total h5 {
+            color: var(--text);
+            font-weight: 800;
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .summary-total .total-amount {
+            color: var(--danger);
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .btn-checkout {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 102, 255, 0.3);
+            color: white;
+        }
+
+        .btn-checkout:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.4);
+            color: white;
+        }
+
+        .btn-coupon {
+            background: white;
+            border: 2px solid var(--neutral);
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            color: var(--text);
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-coupon:hover {
+            border-color: var(--warning);
+            background: var(--background);
+            color: var(--warning);
+        }
+
+        /* Payment Methods */
+        .payment-methods {
+            background: var(--background);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-top: 1.5rem;
+        }
+
+        .payment-methods h6 {
+            color: var(--text);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .payment-icons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .payment-icon {
+            width: 60px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border: 2px solid var(--neutral);
+            transition: all 0.3s ease;
+        }
+
+        .payment-icon:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
+        }
+
+        .payment-icon img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Security Card */
+        .security-card {
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            border: 2px solid #10B981;
+            margin-top: 2rem;
+        }
+
+        .security-card i {
+            font-size: 3rem;
+            color: #065F46;
+            margin-bottom: 1rem;
+        }
+
+        .security-card h6 {
+            color: #065F46;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .security-card p {
+            color: #047857;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Empty Cart */
+        .empty-cart {
+            background: white;
+            border-radius: 24px;
+            padding: 5rem 2rem;
+            text-align: center;
+            border: 2px solid var(--neutral);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-cart i {
+            font-size: 6rem;
+            color: var(--neutral);
+            margin-bottom: 2rem;
+            opacity: 0.5;
+        }
+
+        .empty-cart h4 {
+            color: var(--text);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .empty-cart .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            box-shadow: 0 6px 20px rgba(0, 102, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .empty-cart .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.4);
+        }
+
+        /* Modal */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 2rem;
+            border: none;
+        }
+
+        .modal-header .modal-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-body .form-label {
+            color: var(--text);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .modal-body .input-group .form-control {
+            border: 2px solid var(--neutral);
+            border-right: none;
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px 0 0 12px;
+        }
+
+        .modal-body .input-group .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: none;
+        }
+
+        .modal-body .input-group .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 0 12px 12px 0;
+            font-weight: 700;
+        }
+
+        .list-group-item {
+            border: 2px solid var(--neutral);
+            border-radius: 12px !important;
+            margin-bottom: 0.75rem;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.1);
+        }
+
+        .list-group-item strong {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .list-group-item .btn-outline-primary {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cart-header {
+                padding: 1.5rem;
+            }
+
+            .cart-card .card-body {
+                padding: 1rem;
+            }
+
+            .summary-card {
+                position: static;
+                margin-top: 2rem;
+            }
+
+            .table-responsive {
+                border-radius: 12px;
+            }
+
+            .product-image-wrapper {
+                width: 60px;
+                height: 60px;
+            }
+
+            .input-group-sm {
+                width: 100px;
+            }
+        }
+    </style>
+
     <div class="row">
         <div class="col-12">
-            <h3 class="mb-4">
-                <i class="fas fa-shopping-cart"></i> Giỏ Hàng Của Bạn
-            </h3>
+            <div class="cart-header">
+                <div class="cart-header-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div>
+                    <h3>Giỏ Hàng Của Bạn</h3>
+                    <p class="text-muted mb-0">Quản lý sản phẩm bạn muốn mua</p>
+                </div>
+            </div>
 
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show">
-                    {{ session('success') }}
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ session('success') }}</span>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
             @if($cart && $cart->items->count() > 0)
-                    <div class="row">
-                        <!-- Cart Items -->
-                        <div class="col-md-8">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table align-middle">
-                                            <thead>
+                <div class="row">
+                    <!-- Cart Items -->
+                    <div class="col-lg-8">
+                        <div class="cart-card card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Sản Phẩm</th>
+                                                <th>Đơn Giá</th>
+                                                <th style="width: 150px;">Số Lượng</th>
+                                                <th>Thành Tiền</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($cart->items as $item)
                                                 <tr>
-                                                    <th>Sản Phẩm</th>
-                                                    <th>Đơn Giá</th>
-                                                    <th style="width: 150px;">Số Lượng</th>
-                                                    <th>Thành Tiền</th>
-                                                    <th></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($cart->items as $item)
-                                                    <tr>
-                                                        <td>
-                                                            <div class="d-flex align-items-center">
-                                                                @if($item->product->image)
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-3">
+                                                            @if($item->product->image)
+                                                                <div class="product-image-wrapper">
                                                                     <img src="{{ asset($item->product->image) }}"
-                                                                        alt="{{ $item->product->name }}"
-                                                                        style="width: 80px; height: 80px; object-fit: cover;"
-                                                                        class="rounded me-3">
-                                                                @endif
-                                                                <div>
-                                                                    <h6 class="mb-1">
-                                                                        <a href="{{ route('client.product.show', $item->product->slug) }}"
-                                                                            class="text-decoration-none text-dark">
-                                                                            {{ $item->product->name }}
-                                                                        </a>
-                                                                    </h6>
-                                                                    <small class="text-muted">{{ $item->product->brand->name }}</small>
+                                                                        alt="{{ $item->product->name }}">
                                                                 </div>
+                                                            @endif
+                                                            <div class="product-info">
+                                                                <h6>
+                                                                    <a
+                                                                        href="{{ route('client.product.show', $item->product->slug) }}">
+                                                                        {{ $item->product->name }}
+                                                                    </a>
+                                                                </h6>
+                                                                <small>{{ $item->product->brand->name }}</small>
                                                             </div>
-                                                        </td>
-                                                        <td>
-                                                            <strong>{{ number_format($item->price) }}đ</strong>
-                                                        </td>
-                                                        <td>
-                                                            <form action="{{ route('client.cart.update', $item->id) }}" method="POST"
-                                                                class="d-inline">
-                                                                @csrf
-                                                                @method('PUT')
-                                                                <div class="input-group input-group-sm">
-                                                                    <button type="button" class="btn btn-outline-secondary"
-                                                                        onclick="updateQty({{ $item->id }}, -1, {{ $item->product->quantity }})">
-                                                                        <i class="fas fa-minus"></i>
-                                                                    </button>
-                                                                    <input type="number" name="quantity" id="qty{{ $item->id }}"
-                                                                        class="form-control text-center" value="{{ $item->quantity }}"
-                                                                        min="1" max="{{ $item->product->quantity }}"
-                                                                        onchange="this.form.submit()">
-                                                                    <button type="button" class="btn btn-outline-secondary"
-                                                                        onclick="updateQty({{ $item->id }}, 1, {{ $item->product->quantity }})">
-                                                                        <i class="fas fa-plus"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </form>
-                                                        </td>
-                                                        <td>
-                                                            <strong class="text-danger">
-                                                                {{ number_format($item->subtotal) }}đ
-                                                            </strong>
-                                                        </td>
-                                                        <td>
-                                                            <form action="{{ route('client.cart.remove', $item->id) }}" method="POST"
-                                                                onsubmit="return confirm('Xóa sản phẩm này khỏi giỏ hàng?')">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                                    <i class="fas fa-trash"></i>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <strong style="color: var(--text); font-size: 1.1rem;">
+                                                            {{ number_format($item->price) }}đ
+                                                        </strong>
+                                                    </td>
+                                                    <td>
+                                                        <form action="{{ route('client.cart.update', $item->id) }}" method="POST"
+                                                            class="d-inline">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="input-group input-group-sm">
+                                                                <button type="button" class="btn btn-outline-secondary"
+                                                                    onclick="updateQty({{ $item->id }}, -1, {{ $item->product->quantity }})">
+                                                                    <i class="fas fa-minus"></i>
                                                                 </button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                                <input type="number" name="quantity" id="qty{{ $item->id }}"
+                                                                    class="form-control text-center" value="{{ $item->quantity }}"
+                                                                    min="1" max="{{ $item->product->quantity }}"
+                                                                    onchange="this.form.submit()">
+                                                                <button type="button" class="btn btn-outline-secondary"
+                                                                    onclick="updateQty({{ $item->id }}, 1, {{ $item->product->quantity }})">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </td>
+                                                    <td>
+                                                        <strong style="color: var(--danger); font-size: 1.25rem; font-weight: 800;">
+                                                            {{ number_format($item->subtotal) }}đ
+                                                        </strong>
+                                                    </td>
+                                                    <td>
+                                                        <form action="{{ route('client.cart.remove', $item->id) }}" method="POST"
+                                                            onsubmit="return confirm('Xóa sản phẩm này khỏi giỏ hàng?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <a href="{{ route('client.product.index') }}" class="btn btn-outline-primary">
-                                    <i class="fas fa-arrow-left"></i> Tiếp Tục Mua Sắm
-                                </a>
                             </div>
                         </div>
 
-                        <!-- Cart Summary -->
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0">Thông Tin Đơn Hàng</h5>
+                        <div class="mt-3">
+                            <a href="{{ route('client.product.index') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i> Tiếp Tục Mua Sắm
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Cart Summary -->
+                    <div class="col-lg-4">
+                        <div class="summary-card card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-receipt me-2"></i>Thông Tin Đơn Hàng</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="summary-row">
+                                    <span>Tạm tính:</span>
+                                    <strong>{{ number_format($cart->total) }}đ</strong>
                                 </div>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between mb-3">
-                                        <span>Tạm tính:</span>
-                                        <strong>{{ number_format($cart->total) }}đ</strong>
+
+                                <div class="summary-row">
+                                    <span>Phí vận chuyển:</span>
+                                    <strong>30,000đ</strong>
+                                </div>
+
+                                @if(session('coupon'))
+                                    <div class="summary-row discount">
+                                        <span>Mã giảm giá ({{ session('coupon.code') }}):</span>
+                                        <strong>-{{ number_format(session('coupon.discount')) }}đ</strong>
                                     </div>
+                                @endif
 
-                                    <div class="d-flex justify-content-between mb-3">
-                                        <span>Phí vận chuyển:</span>
-                                        <strong>30,000đ</strong>
+                                <div class="summary-divider"></div>
+
+                                <div class="summary-total">
+                                    <h5>Tổng cộng:</h5>
+                                    <div class="total-amount">
+                                        {{ number_format($cart->total + 30000 - (session('coupon.discount') ?? 0)) }}đ
                                     </div>
+                                </div>
 
-                                    @if(session('coupon'))
-                                        <div class="d-flex justify-content-between mb-3">
-                                            <span>Mã giảm giá ({{ session('coupon.code') }}):</span>
-                                            <strong class="text-success">-{{ number_format(session('coupon.discount')) }}đ</strong>
-                                        </div>
-                                    @endif
+                                <div class="d-grid gap-2">
+                                    <a href="{{ route('client.checkout.index') }}" class="btn btn-checkout">
+                                        <i class="fas fa-credit-card me-2"></i> Thanh Toán
+                                    </a>
+                                    <button type="button" class="btn btn-coupon" data-bs-toggle="modal"
+                                        data-bs-target="#couponModal">
+                                        <i class="fas fa-tag me-2"></i> Nhập Mã Giảm Giá
+                                    </button>
+                                </div>
 
-                                    <hr>
-
-                                    <div class="d-flex justify-content-between mb-4">
-                                        <h5>Tổng cộng:</h5>
-                                        <h5 class="text-danger">
-                                            {{ number_format($cart->total + 30000 - (session('coupon.discount') ?? 0)) }}đ
-                                        </h5>
-                                    </div>
-
-                                    <div class="d-grid gap-2">
-                                        <a href="{{ route('client.checkout.index') }}" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-credit-card"></i> Thanh Toán
-                                        </a>
-                                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal"
-                                            data-bs-target="#couponModal">
-                                            <i class="fas fa-tag"></i> Nhập Mã Giảm Giá
-                                        </button>
-                                    </div>
-
-                                    <!-- Payment Methods -->
-                                    <div class="mt-4 pt-3 border-top text-center">
-                                        <h6 class="mb-3">Phương thức thanh toán</h6>
-                                        <div class="d-flex gap-3 justify-content-center">
+                                <!-- Payment Methods -->
+                                <div class="payment-methods">
+                                    <h6>Phương thức thanh toán</h6>
+                                    <div class="payment-icons">
+                                        <div class="payment-icon">
                                             <img src="https://static.vecteezy.com/system/resources/previews/019/053/701/original/money-symbol-icon-png.png"
-                                                alt="COD" style="height: 35px; object-fit: contain;">
+                                                alt="COD">
+                                        </div>
+                                        <div class="payment-icon">
                                             <img src="https://developers.momo.vn/v3/assets/images/icon-52bd5808cecdb1970e1aeec3c31a3ee1.png"
-                                                alt="Momo" style="height: 35px; object-fit: contain;">
+                                                alt="Momo">
+                                        </div>
+                                        <div class="payment-icon">
                                             <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg"
-                                                alt="VNPay" style="height: 35px; object-fit: contain;">
+                                                alt="VNPay">
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
 
                         <!-- Security -->
-                        <div class="card mt-3">
-                            <div class="card-body text-center">
-                                <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
-                                <h6>Mua Hàng An Toàn</h6>
-                                <p class="small text-muted mb-0">
-                                    Thanh toán được mã hóa SSL<br>
-                                    Bảo vệ thông tin khách hàng
-                                </p>
-                            </div>
+                        <div class="security-card">
+                            <i class="fas fa-shield-alt"></i>
+                            <h6>Mua Hàng An Toàn</h6>
+                            <p>
+                                Thanh toán được mã hóa SSL<br>
+                                Bảo vệ thông tin khách hàng
+                            </p>
                         </div>
                     </div>
                 </div>
 
             @else
-            <!-- Empty Cart -->
-            <div class="card">
-                <div class="card-body text-center py-5">
-                    <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
-                    <h4>Giỏ Hàng Trống</h4>
-                    <p class="text-muted mb-4">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
-                    <a href="{{ route('client.product.index') }}" class="btn btn-primary">
-                        <i class="fas fa-shopping-bag"></i> Mua Sắm Ngay
-                    </a>
+                <!-- Empty Cart -->
+                <div class="empty-cart card">
+                    <div class="card-body">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h4>Giỏ Hàng Trống</h4>
+                        <p class="text-muted mb-4">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+                        <a href="{{ route('client.product.index') }}" class="btn btn-primary">
+                            <i class="fas fa-shopping-bag me-2"></i> Mua Sắm Ngay
+                        </a>
+                    </div>
                 </div>
-            </div>
-        @endif
-    </div>
+            @endif
+        </div>
     </div>
 
     <!-- Coupon Modal -->
@@ -204,8 +756,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Nhập Mã Giảm Giá</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title"><i class="fas fa-tag me-2"></i>Nhập Mã Giảm Giá</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="couponForm" action="{{ route('client.checkout.apply-coupon') }}" method="POST">
@@ -226,14 +778,14 @@
                     <hr>
 
                     <div class="mt-4">
-                        <h6>Mã giảm giá có sẵn:</h6>
+                        <h6 style="color: var(--text); font-weight: 700; margin-bottom: 1rem;">Mã giảm giá có sẵn:</h6>
                         @if($coupons->count() > 0)
                             <div class="list-group">
                                 @foreach($coupons as $coupon)
                                     <div class="list-group-item">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <strong class="text-primary">{{ $coupon->code }}</strong>
+                                                <strong>{{ $coupon->code }}</strong>
                                                 <br>
                                                 <small class="text-muted">
                                                     @if($coupon->type === 'percent')
@@ -312,16 +864,14 @@
         }
 
         // Optional: Close modal after successful apply (listen to form submit)
-        // document.getElementById('couponForm').addEventListener('submit', function (e) {
-        //     const code = document.getElementById('couponCode').value.trim();
-        //     if (!code) {
-        //         e.preventDefault();
-        //         alert('Vui lòng nhập mã giảm giá');
-        //         return;
-        //     }
-        // });
-
-
+        document.getElementById('couponForm').addEventListener('submit', function (e) {
+            const code = document.getElementById('couponCode').value.trim();
+            if (!code) {
+                e.preventDefault();
+                alert('Vui lòng nhập mã giảm giá');
+                return;
+            }
+        });
 
         // AJAX apply coupon
         document.getElementById('couponForm').addEventListener('submit', function (e) {

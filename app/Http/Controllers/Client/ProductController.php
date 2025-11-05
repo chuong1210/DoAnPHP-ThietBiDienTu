@@ -45,7 +45,9 @@ class ProductController extends Controller
         // Lấy categories cho sidebar
         $categories = $this->categoryRepository->getCategoriesWithChildren();
 
-        $brands = $this->brandRepository->getActiveBrands();
+        // $brands = $this->brandRepository->getActiveBrands();
+        $brands = Brand::where('is_active', 1)->orderBy('name')->get();
+
 
         // Xử lý category_id để bao gồm cả subcategories
         $categoryId = $request->get('category_id');
@@ -187,7 +189,9 @@ class ProductController extends Controller
         $categories = $this->categoryRepository->getCategoriesWithChildren();
 
         // Lấy brands cho filter
-        $brands = $this->brandRepository->getActiveBrands();
+        // $brands = $this->brandRepository->getActiveBrands();
+        $brands = Brand::where('is_active', 1)->orderBy('name')->get();
+
 
         // Xử lý sort và order
         $sort = $request->get('sort', 'created_at');
@@ -231,6 +235,8 @@ class ProductController extends Controller
             $request->get('keyword'),  // Cho phép keyword nếu có
             $filters
         );
+
+        $brands = Brand::where('is_active', 1)->orderBy('name')->get();
 
         return view('client.product.all', compact(
             'products',

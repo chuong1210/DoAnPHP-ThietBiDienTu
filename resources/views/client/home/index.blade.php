@@ -1,7 +1,9 @@
 @extends('client.layouts.client')
 
 @section('title', 'Trang Chủ - Tech Shop')
-
+@php
+    $hideSidebar = true;
+@endphp
 @section('content')
     <!-- Hero Banner Slider -->
     @if($banners->count() > 0)
@@ -815,13 +817,13 @@
                 .then(data => {
                     msg.innerHTML = data.success
                         ? `<div class="alert alert-success alert-dismissible fade show">
-                            <i class="fas fa-check-circle"></i> ${data.message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                           </div>`
+                                <i class="fas fa-check-circle"></i> ${data.message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                               </div>`
                         : `<div class="alert alert-danger alert-dismissible fade show">
-                            <i class="fas fa-times-circle"></i> ${data.message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                           </div>`;
+                                <i class="fas fa-times-circle"></i> ${data.message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                               </div>`;
 
                     if (data.success) form.reset();
                 })

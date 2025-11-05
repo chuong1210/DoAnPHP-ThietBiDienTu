@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Repositories\BannerRepository;
 use App\Repositories\BrandRepository;
 use App\Repositories\CategoryRepository;
@@ -43,8 +44,8 @@ class HomeController extends Controller
         $newProducts = $this->productRepository->getNewProducts(12);
 
         // Brands sử dụng repository
-        $brands = $this->brandRepository->getActiveBrands();
 
+        $brands = Brand::where('is_active', 1)->orderBy('name')->get();
         return view('client.home.index', compact(
             'categories',
             'banners',

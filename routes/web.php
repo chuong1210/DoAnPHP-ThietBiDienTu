@@ -4,9 +4,11 @@
 use App\Http\Controllers\Admin\BrandController as AdminBrandController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
+use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Client\BrandController as ClientBrandController;
 use App\Http\Controllers\Client\CartController;
@@ -21,6 +23,9 @@ use App\Http\Controllers\Client\SupportController;
 use App\Http\Controllers\Client\VnpayController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\FaqController;
 
 /*
 |--------------------------------------------------------------------------
@@ -155,20 +160,55 @@ Route::middleware('auth')->group(function () {
 | Admin Routes (Yêu cầu đăng nhập và là admin)
 |--------------------------------------------------------------------------
 */
+/*
+|--------------------------------------------------------------------------
+| Admin Routes (Quản trị viên)
+|--------------------------------------------------------------------------
+|
+| Các route này yêu cầu người dùng phải đăng nhập, đã xác thực email,
+| và có vai trò là 'admin'.
+|
+*/
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'verified', 'admin']) // Thêm 'verified' cho admin để đảm bảo
+    ->middleware(['auth', 'admin'])
     ->group(function () {
+        // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+        // --- Quản lý tài nguyên (Resource Controllers) ---
         Route::resource('products', AdminProductController::class);
         Route::resource('categories', AdminCategoryController::class);
         Route::resource('brands', AdminBrandController::class);
+        Route::resource('banners', BannerController::class);
+        Route::resource('reviews', AdminReviewController::class)->only(['index', 'destroy', 'show']);
 
+        // Quản lý đơn hàng (Orders)
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
 
-        // Admin Chat
+        // --- Các Nhóm Route Chức Năng Riêng ---
+
+        // Quản lý liên hệ (Contact)
+        Route::prefix('contact')->name('contact.')->group(function () {
+            Route::get('/', [ContactController::class, 'index'])->name('index');
+            Route::get('/{id}', [ContactController::class, 'show'])->name('show');
+            Route::post('/{id}/send', [ContactController::class, 'sendEmail'])->name('send');
+        });
+
+        // Quản lý câu hỏi thường gặp (FAQ)
+        Route::prefix('faqs')->name('faqs.')->group(function () {
+            Route::get('/', [FaqController::class, 'index'])->name('index');
+            Route::get('/create', [FaqController::class, 'create'])->name('create');
+            Route::post('/', [FaqController::class, 'store'])->name('store');
+            Route::get('/{faq}', [FaqController::class, 'show'])->name('show');
+            Route::get('/{faq}/edit', [FaqController::class, 'edit'])->name('edit');
+            Route::put('/{faq}', [FaqController::class, 'update'])->name('update');
+            Route::delete('/{faq}', [FaqController::class, 'destroy'])->name('destroy');
+            Route::get('/category/{category}', [FaqController::class, 'showByCategory'])->name('category');
+        });
+
+        // Quản lý Chat
         Route::prefix('chat')->name('chat.')->group(function () {
             Route::get('/', [AdminChatController::class, 'index'])->name('index');
             Route::get('/rooms/{room}/messages', [AdminChatController::class, 'getMessages'])->name('messages');

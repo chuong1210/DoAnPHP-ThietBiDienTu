@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
-
+use App\Repositories\Interfaces\ContactRepositoryInterface;
+use App\Repositories\ContactRepository;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -24,7 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(CartRepositoryInterface::class, CartRepository::class);
+         $this->app->bind(CartRepositoryInterface::class, CartRepository::class);
+        $this->app->bind(ContactRepositoryInterface::class, ContactRepository::class);
+        
     }
 
     /**

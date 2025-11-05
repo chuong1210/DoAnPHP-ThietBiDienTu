@@ -4,10 +4,101 @@
 @php
     $hideSidebar = true;
 @endphp
+
+@section('styles')
+    {{-- THÊM CSS CHO BREADCRUMB FRAMELESS VÀO ĐÂY --}}
+    <style>
+        /* Sử dụng biến màu "Tech Blue Pro" */
+        :root {
+            --primary: #0066FF;
+            --secondary: #00B4D8;
+            --text: #1E293B;
+            --neutral: #CBD5E1;
+        }
+
+        /* === BREADCRUMB STYLE (FRAMELESS) === */
+        .breadcrumb-frameless {
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+            font-size: 0.95rem;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item a i {
+            margin-right: 0.4rem;
+            font-size: 1rem;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item.active {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item+.breadcrumb-item::before {
+            color: var(--neutral);
+            font-weight: 400;
+            padding-right: 0.75rem;
+            padding-left: 0.75rem;
+            content: '/';
+        }
+    </style>
+
+    {{-- Dán code CSS khổng lồ của bạn vào đây, nhưng XÓA ĐI KHỐI .modern-breadcrumb --}}
+    <style>
+        :root {
+            /* Bạn có thể xóa khối này nếu đã có ở trên */
+            --primary: #0066FF;
+            --secondary: #00B4D8;
+            --background: #F8FAFC;
+            --text: #1E293B;
+            --neutral: #CBD5E1;
+        }
+
+        /* XÓA KHỐI NÀY ĐI */
+        /* .modern-breadcrumb {
+                background: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                border: 2px solid var(--neutral);
+            }
+            .modern-breadcrumb a { ... }
+            .modern-breadcrumb .active { ... } */
+
+        /* Profile Header */
+        .profile-header {
+            /* ... style còn lại giữ nguyên ... */
+        }
+
+        /* ... các style khác của bạn ... */
+    </style>
+@endsection
+
+
 @section('content')
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb modern-breadcrumb">
+        {{-- SỬA CLASS Ở ĐÂY --}}
+        <ol class="breadcrumb breadcrumb-frameless">
             <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}"><i class="fas fa-home"></i> Trang chủ</a>
             </li>
             <li class="breadcrumb-item active">Hồ Sơ Cá Nhân</li>
@@ -16,15 +107,13 @@
 
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            <!-- Profile Header -->
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <div class="avatar-circle">
-                        {{ substr(Auth::user()->full_name, 0, 2) }}
-                    </div>
-                </div>
-                <div class="profile-info">
-                    <h2>{{ Auth::user()->full_name }}</h2>
+
+
+            <!-- Main Card -->
+            <div class="profile-card">
+                <div class="card-header">
+
+                    <h2>Xin chào, {{ Auth::user()->full_name }}</h2>
                     <p>{{ Auth::user()->email }}</p>
                     <div class="profile-badges">
                         @if(Auth::user()->role === 'admin')
@@ -40,16 +129,7 @@
                             <i class="fas fa-check-circle"></i> Đã xác thực
                         </span>
                     </div>
-                </div>
-            </div>
 
-            <!-- Main Card -->
-            <div class="profile-card">
-                <div class="card-header">
-                    <h4>
-                        <i class="fas fa-user-circle me-2"></i>
-                        Quản Lý Tài Khoản
-                    </h4>
                 </div>
                 <div class="card-body">
                     <!-- Tabs Nav -->

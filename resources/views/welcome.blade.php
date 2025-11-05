@@ -518,13 +518,14 @@
                 embed,
                 object {
                     vertical-align: middle;
-                    display: block
+                     display: flex;
+                     align-items: center; 
                 }
 
                 img,
                 video {
                     max-width: 100%;
-                    height: auto
+                    height: auto-
                 }
 
                 button,

@@ -8,14 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-    protected $fillable = [
-        'product_id',
-        'user_id',
-        'order_id',
-        'rating',
-        'comment',
-        'status',
-    ];
+     protected $fillable = ['comment','user_id','user_name','product_id','rating','is_active','status'];
+
+
 
     protected $casts = [
         'rating' => 'integer',

@@ -1,17 +1,99 @@
 @extends('client.layouts.client')
 
 @section('title', $product->name)
+@php
+    $hideSidebar = true;
+@endphp
+
+@section('styles')
+    {{-- Thêm CSS cho breadcrumb không khung --}}
+    <style>
+        /* Sử dụng biến màu "Tech Blue Pro" */
+        :root {
+            --primary: #0066FF;
+            --secondary: #00B4D8;
+            --text: #1E293B;
+            --neutral: #CBD5E1;
+        }
+
+        /* === BREADCRUMB STYLE (FRAMELESS) === */
+        .breadcrumb-frameless {
+            /* Xóa bỏ các thuộc tính tạo khung */
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            /* Bỏ padding của container */
+
+            /* Giữ lại các style cơ bản */
+            list-style: none;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            /* Hơi nhỏ hơn một chút cho tinh tế */
+        }
+
+        /* Style cho các link (Trang chủ, Danh mục) */
+        .breadcrumb-frameless .breadcrumb-item a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+            /* Thêm gạch chân khi hover */
+        }
+
+        .breadcrumb-frameless .breadcrumb-item a i {
+            margin-right: 0.4rem;
+            font-size: 1rem;
+        }
+
+        /* Style cho item hiện tại (trang cuối cùng) */
+        .breadcrumb-frameless .breadcrumb-item.active {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* Style cho dấu gạch chéo "/" phân cách */
+        .breadcrumb-frameless .breadcrumb-item+.breadcrumb-item::before {
+            color: var(--neutral);
+            font-weight: 400;
+            padding-right: 0.75rem;
+            padding-left: 0.75rem;
+            content: '/';
+            /* Đảm bảo dấu / luôn hiển thị */
+        }
+    </style>
+
+    {{-- Các style khác của trang --}}
+@endsection
 
 @section('content')
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb modern-breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}"><i class="fas fa-home"></i> Trang chủ</a>
+        {{-- Sửa class ở đây thành "breadcrumb-frameless" --}}
+        <ol class="breadcrumb breadcrumb-frameless">
+            <li class="breadcrumb-item">
+                <a href="{{ route('client.home.index') }}">
+                    <i class="fas fa-home"></i> Trang chủ
+                </a>
             </li>
-            <li class="breadcrumb-item"><a
-                    href="{{ route('client.product.category.index', $product->category->slug) }}">{{ $product->category->name }}</a>
+            <li class="breadcrumb-item">
+                <a href="{{ route('client.product.category.index', $product->category->slug) }}">
+                    {{ $product->category->name }}
+                </a>
             </li>
-            <li class="breadcrumb-item active">{{ Str::limit($product->name, 50) }}</li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {{ Str::limit($product->name, 50) }}
+            </li>
         </ol>
     </nav>
 
@@ -419,7 +501,7 @@
             image: "{{ asset($product->image) }}",
             price: {{ $product->sale_price ?? $product->price }},
             stock: {{ $product->quantity }}
-                                };
+                                            };
 
         let modalQty = 1;
 

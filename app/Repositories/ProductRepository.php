@@ -8,6 +8,7 @@ namespace App\Repositories;
 use App\Models\Category;
 use App\Models\Product;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use Illuminate\Http\Request;
 
 class ProductRepository extends BaseRepository implements ProductRepositoryInterface
 {
@@ -189,7 +190,41 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->firstOrFail();
     }
 
+    public function searchAndPaginateProduct(Request $request, $perPage = 20, $relations = [])
+    {
+        // Bắt đầu câu truy vấn
+        $query = $this->model->with($relations);
 
+        // 1. Tìm kiếm theo từ khóa
+        if ($request->filled('keyword')) {
+            $keyword = $request->input('keyword');
+            // Tìm kiếm trên nhiều cột
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'LIKE', "%{$keyword}%")
+                    ->orWhere('description', 'LIKE', "%{$keyword}%");
+            });
+        }
+
+        // 2. Lọc theo danh mục
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->input('category_id'));
+        }
+
+        // 3. Lọc theo thương hiệu
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->input('brand_id'));
+        }
+
+        // 4. Lọc theo trạng thái
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        // Sắp xếp và phân trang
+        return $query->orderBy('id', 'DESC')
+            ->paginate($perPage)
+            ->withQueryString(); // withQueryString() tự động nối các param của request vào link phân trang
+    }
     public function getProductsByCategorySlug($slug, $perPage = 20)
     {
         $category = Category::where('slug', $slug)->firstOrFail();

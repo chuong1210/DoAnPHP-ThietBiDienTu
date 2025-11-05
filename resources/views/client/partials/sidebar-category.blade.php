@@ -72,7 +72,7 @@
             </div>
 
             <!-- Brand Filter -->
-            @if(isset($brands) && $brands->count() > 0)
+            @if(isset($brands) && $brands !== false && $brands->count() > 0)
                 <div class="filter-box">
                     <h6 class="filter-title">
                         <i class="fas fa-tags"></i> Thương Hiệu
@@ -81,6 +81,7 @@
                         @foreach($brands as $brand)
                             <div class="brand-item">
                                 <input class="form-check-input" type="checkbox" id="brand{{ $brand->id }}"
+                                    {{ in_array($brand->id, request('brand', [])) ? 'checked' : '' }}
                                     onchange="filterByBrand({{ $brand->id }})">
                                 <label class="form-check-label" for="brand{{ $brand->id }}">
                                     {{ $brand->name }}
@@ -193,26 +194,18 @@
         background: var(--primary);
     }
 
-    /* Category Item */
+    /* Category Item - COMPACT SPACING */
     .category-item {
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem; /* Giảm từ 0.5rem xuống 0.35rem */
         animation: fadeInLeft 0.5s ease forwards;
         opacity: 0;
     }
 
-    @for ($i = 1; $i <= 20; $i++)
-        .category-item:nth-child({{ $i }}) {
-            animation-delay:
-                {{ $i * 0.05 }}
-                s;
-        }
-
-    @endfor @keyframes fadeInLeft {
+    @keyframes fadeInLeft {
         from {
             opacity: 0;
             transform: translateX(-20px);
         }
-
         to {
             opacity: 1;
             transform: translateX(0);
@@ -222,7 +215,7 @@
     .category-link {
         display: flex;
         align-items: center;
-        padding: 0.85rem 1rem;
+        padding: 0.7rem 0.85rem; /* Giảm từ 0.85rem 1rem xuống 0.7rem 0.85rem */
         color: var(--text);
         text-decoration: none;
         border-radius: 12px;
@@ -267,15 +260,16 @@
     }
 
     .category-icon {
-        width: 35px;
-        height: 35px;
+        width: 32px; /* Giảm từ 35px xuống 32px */
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
         background: var(--background);
         border-radius: 10px;
-        margin-right: 0.75rem;
+        margin-right: 0.65rem; /* Giảm từ 0.75rem xuống 0.65rem */
         transition: all 0.3s ease;
+        font-size: 0.95rem;
     }
 
     .category-link:hover .category-icon {
@@ -290,11 +284,12 @@
 
     .category-name {
         flex: 1;
+        font-size: 0.95rem;
     }
 
     .toggle-icon {
         margin-left: auto;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         transition: transform 0.3s ease;
     }
 
@@ -302,35 +297,36 @@
         transform: rotate(180deg);
     }
 
-    /* Subcategories */
+    /* Subcategories - COMPACT SPACING */
     .subcategory-list {
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.4s ease;
-        padding-left: 3rem;
+        padding-left: 2.75rem; /* Giảm từ 3rem xuống 2.75rem */
     }
 
     .category-item.open .subcategory-list {
         max-height: 500px;
-        padding-top: 0.5rem;
+        padding-top: 0.35rem; /* Giảm từ 0.5rem xuống 0.35rem */
     }
 
     .subcategory-link {
         display: flex;
         align-items: center;
-        padding: 0.65rem 1rem;
+        padding: 0.55rem 0.85rem; /* Giảm từ 0.65rem 1rem xuống 0.55rem 0.85rem */
         color: #64748B;
         text-decoration: none;
         border-radius: 8px;
         transition: all 0.3s ease;
-        margin-bottom: 0.25rem;
-        font-size: 0.9rem;
+        margin-bottom: 0.2rem; /* Giảm từ 0.25rem xuống 0.2rem */
+        font-size: 0.88rem; /* Giảm từ 0.9rem xuống 0.88rem */
     }
 
     .subcategory-link i {
-        margin-right: 0.5rem;
+        margin-right: 0.45rem; /* Giảm từ 0.5rem xuống 0.45rem */
         color: var(--primary);
         transition: all 0.3s ease;
+        font-size: 0.85rem;
     }
 
     .subcategory-link:hover {
@@ -352,8 +348,8 @@
 
     /* Filter Box */
     .filter-box {
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
+        margin-top: 1.25rem; /* Giảm từ 1.5rem xuống 1.25rem */
+        padding-top: 1.25rem;
         border-top: 2px solid var(--background);
     }
 
@@ -361,7 +357,7 @@
         color: var(--text);
         font-weight: 700;
         font-size: 0.95rem;
-        margin-bottom: 1rem;
+        margin-bottom: 0.85rem; /* Giảm từ 1rem xuống 0.85rem */
         display: flex;
         align-items: center;
         gap: 0.5rem;
@@ -374,8 +370,8 @@
     .price-inputs {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
+        gap: 0.65rem; /* Giảm từ 0.75rem xuống 0.65rem */
+        margin-bottom: 0.85rem; /* Giảm từ 1rem xuống 0.85rem */
     }
 
     .price-input-group {
@@ -383,7 +379,7 @@
     }
 
     .price-input-group label {
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         color: #64748B;
         margin-bottom: 0.25rem;
         display: block;
@@ -392,7 +388,7 @@
     .price-input-group .form-control {
         border: 2px solid var(--neutral);
         border-radius: 8px;
-        padding: 0.5rem;
+        padding: 0.45rem; /* Giảm từ 0.5rem xuống 0.45rem */
         font-size: 0.85rem;
         transition: all 0.3s ease;
     }
@@ -414,7 +410,7 @@
         color: white;
         border: none;
         border-radius: 10px;
-        padding: 0.75rem;
+        padding: 0.7rem; /* Giảm từ 0.75rem xuống 0.7rem */
         font-weight: 600;
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
@@ -425,17 +421,17 @@
         box-shadow: 0 6px 16px rgba(0, 102, 255, 0.3);
     }
 
-    /* Brand List */
+    /* Brand List - COMPACT SPACING */
     .brand-list {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.4rem; /* Giảm từ 0.5rem xuống 0.4rem */
     }
 
     .brand-item {
         display: flex;
         align-items: center;
-        padding: 0.65rem 1rem;
+        padding: 0.55rem 0.85rem; /* Giảm từ 0.65rem 1rem xuống 0.55rem 0.85rem */
         border-radius: 8px;
         transition: all 0.3s ease;
         cursor: pointer;
@@ -446,11 +442,11 @@
     }
 
     .brand-item .form-check-input {
-        margin-right: 0.75rem;
+        margin-right: 0.65rem; /* Giảm từ 0.75rem xuống 0.65rem */
         cursor: pointer;
         border: 2px solid var(--neutral);
-        width: 20px;
-        height: 20px;
+        width: 18px; /* Giảm từ 20px xuống 18px */
+        height: 18px;
     }
 
     .brand-item .form-check-input:checked {
@@ -460,33 +456,34 @@
 
     .brand-item .form-check-label {
         cursor: pointer;
-        font-size: 0.9rem;
+        font-size: 0.88rem; /* Giảm từ 0.9rem xuống 0.88rem */
         color: var(--text);
         margin-bottom: 0;
     }
 
-    /* Quick Links */
+    /* Quick Links - COMPACT SPACING */
     .quick-links {
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
+        margin-top: 1.25rem; /* Giảm từ 1.5rem xuống 1.25rem */
+        padding-top: 1.25rem;
         border-top: 2px solid var(--background);
     }
 
     .quick-link {
         display: flex;
         align-items: center;
-        padding: 0.75rem 1rem;
+        padding: 0.65rem 0.85rem; /* Giảm từ 0.75rem 1rem xuống 0.65rem 0.85rem */
         color: var(--text);
         text-decoration: none;
         border-radius: 10px;
         transition: all 0.3s ease;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.4rem; /* Giảm từ 0.5rem xuống 0.4rem */
         border: 2px solid transparent;
+        font-size: 0.9rem;
     }
 
     .quick-link i {
-        margin-right: 0.75rem;
-        width: 20px;
+        margin-right: 0.65rem; /* Giảm từ 0.75rem xuống 0.65rem */
+        width: 18px;
         text-align: center;
         color: var(--primary);
     }

@@ -9,82 +9,89 @@ use Illuminate\Support\Facades\Log;
 
 class VnpayController extends Controller
 {
-    // app/Http/Controllers/Client/VnpayController.php
-
     public function callback(Request $request)
     {
-        $vnp_HashSecret = config('vnpay.vnp_HashSecret');
-        $inputData = [];
-        foreach ($request->all() as $key => $value) {
-            if (substr($key, 0, 4) == "vnp_") {
-                $inputData[$key] = $value;
+        // Lấy tất cả tham số VNPAY trả về
+        $vnp_Params = $request->all();
+
+        // Lấy hash secret từ config
+        $vnp_HashSecret = config('services.vnpay.hash_secret');
+
+        // Lấy vnp_SecureHash từ URL
+        $vnp_SecureHash = $vnp_Params['vnp_SecureHash'];
+
+        // Loại bỏ vnp_SecureHash và vnp_SecureHashType khỏi mảng dữ liệu
+        unset($vnp_Params['vnp_SecureHashType']);
+        unset($vnp_Params['vnp_SecureHash']);
+
+        // Sắp xếp dữ liệu theo key
+        ksort($vnp_Params);
+
+        // Tạo chuỗi hash
+        $hashData = "";
+        $i = 0;
+        foreach ($vnp_Params as $key => $value) {
+            if ($i == 1) {
+                $hashData = $hashData . '&' . urlencode($key) . "=" . urlencode($value);
+            } else {
+                $hashData = $hashData . urlencode($key) . "=" . urlencode($value);
+                $i = 1;
             }
         }
 
-        $vnp_SecureHash = $inputData['vnp_SecureHash'] ?? '';
-        unset($inputData['vnp_SecureHash']);
-
-        ksort($inputData);
-        $hashData = "";
-        $first = true;
-        foreach ($inputData as $key => $value) {
-            $encodedKey = rawurlencode($key);
-            $encodedValue = rawurlencode($value);
-            $hashValue = str_replace('%20', '+', $encodedValue);
-
-            if (!$first) $hashData .= '&';
-            $hashData .= $encodedKey . "=" . $hashValue;
-            $first = false;
-        }
-
+        // Tạo chữ ký bảo mật mới
         $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
 
-        Log::info('VNPay Return Hash', [
-            'received' => $vnp_SecureHash,
-            'calculated' => $secureHash,
-            'match' => $secureHash === $vnp_SecureHash,
-            'hashData' => $hashData
-        ]);
+        // Lấy mã đơn hàng
+        $orderId = $vnp_Params['vnp_TxnRef'];
 
-        if ($secureHash === $vnp_SecureHash && $inputData['vnp_ResponseCode'] == '00') {
-            return redirect()->route('client.checkout.success')
-                ->with('success', 'Thanh toán VNPay thành công!');
+        try {
+            // So sánh chữ ký để đảm bảo dữ liệu không bị thay đổi
+            if ($secureHash == $vnp_SecureHash) {
+                // Tìm đơn hàng trong DB
+                $order = Order::where('order_number', $orderId)->first();
+
+                if ($order) {
+                    // Kiểm tra xem đơn hàng đã được xử lý chưa
+                    if ($order->payment_status == 'pending') {
+                        // Kiểm tra mã phản hồi từ VNPAY
+                        if ($vnp_Params['vnp_ResponseCode'] == '00' && $vnp_Params['vnp_TransactionStatus'] == '00') {
+                            // THANH TOÁN THÀNH CÔNG
+                            $order->payment_status = 'paid'; // Cập nhật trạng thái thanh toán
+                            $order->status = 'confirmed';   // Cập nhật trạng thái đơn hàng
+                            $order->save();
+
+                            // (Tùy chọn) Gửi email xác nhận thanh toán thành công
+                            // Mail::to($order->customer_email)->send(new PaymentSuccessMail($order));
+
+                            // Chuyển hướng đến trang thành công
+                            return redirect()->route('client.checkout.success', $order->id)
+                                ->with('success', 'Thanh toán đơn hàng thành công!');
+                        } else {
+                            // THANH TOÁN THẤT BẠI
+                            $order->status = 'cancelled';
+                            $order->payment_status = 'failed';
+                            $order->save();
+
+                            // (Tùy chọn) Khôi phục lại số lượng sản phẩm
+                            // ...
+
+                            return redirect()->route('client.checkout.index')
+                                ->with('error', 'Thanh toán không thành công. Vui lòng thử lại.');
+                        }
+                    }
+                    // Nếu đơn hàng đã được xử lý (paid), chuyển hướng đến trang thành công
+                    return redirect()->route('client.checkout.success', $order->id);
+                } else {
+                    return redirect()->route('client.home.index')->with('error', 'Không tìm thấy đơn hàng.');
+                }
+            } else {
+                Log::error('VNPAY Callback: Invalid signature.');
+                return redirect()->route('client.home.index')->with('error', 'Chữ ký không hợp lệ.');
+            }
+        } catch (\Exception $e) {
+            Log::error('VNPAY Callback Error: ' . $e->getMessage());
+            return redirect()->route('client.home.index')->with('error', 'Đã có lỗi xảy ra trong quá trình xử lý.');
         }
-
-        return redirect()->route('client.cart.index')
-            ->with('error', 'Thanh toán thất bại hoặc chữ ký không hợp lệ');
     }
-
-    // Helper: Dịch mã lỗi VNPay
-    private function getVnpayErrorMessage($code)
-    {
-        $messages = [
-            '07' => 'Giao dịch bị nghi ngờ gian lận',
-            '09' => 'Thẻ/tài khoản chưa đăng ký Internet Banking',
-            '10' => 'Xác thực sai quá 3 lần',
-            '11' => 'Hết hạn thanh toán',
-            '12' => 'Thẻ/tài khoản bị khóa',
-            '13' => 'Sai OTP',
-            '24' => 'Khách hàng hủy giao dịch',
-            '51' => 'Tài khoản không đủ tiền',
-            '65' => 'Vượt hạn mức giao dịch',
-            '75' => 'Ngân hàng đang bảo trì',
-            '79' => 'Nhập sai mật khẩu quá số lần',
-            '99' => 'Lỗi không xác định',
-            '00' => 'Thành công',
-            '01' => 'Giao dịch đã tồn tại',
-            '02' => 'Merchant không hợp lệ',
-            '03' => 'Dữ liệu gửi sang không đúng định dạng',
-            '04' => 'Khởi tạo giao dịch không thành công do thẻ/tài khoản bị khóa',
-            '05' => 'Giao dịch không thành công do: Tài khoản không tồn tại',
-            '06' => 'Giao dịch không thành công do: Tài khoản không đủ số dư',
-
-
-        ];
-
-        return $messages[$code] ?? "Mã lỗi: $code";
-    }
-    /**
-     * Lấy thông báo lỗi VNPay
-     */
 }
