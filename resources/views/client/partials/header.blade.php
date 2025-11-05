@@ -124,7 +124,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link modern-nav-link {{ request()->routeIs('client.products.*') ? 'active' : '' }}"
+                            <a class="nav-link modern-nav-link {{ request()->routeIs('client.product.*') ? 'active' : '' }}"
                                 href="{{ route('client.product.index') }}">
                                 <i class="fas fa-box-open"></i>
                                 <span>Sản Phẩm</span>

@@ -1,9 +1,7 @@
-@extends('admin.layouts.admin')
+<?php $__env->startSection('title', 'Thêm Mới Thương Hiệu'); ?>
+<?php $__env->startSection('page-title', 'Thêm Mới Thương Hiệu'); ?>
 
-@section('title', 'Thêm Mới Thương Hiệu')
-@section('page-title', 'Thêm Mới Thương Hiệu')
-
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         /* === SWITCH NHỎ GỌN, ĐẸP, RÕ BẬT/TẮT === */
         .form-switch {
@@ -89,9 +87,9 @@
             border: none;
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
@@ -99,18 +97,32 @@
                     <h5 class="mb-0">Thông Tin Thương Hiệu</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.brands.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
+                    <form action="<?php echo e(route('admin.brands.store')); ?>" method="POST" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
 
                         <!-- Tên Thương Hiệu -->
                         <div class="mb-4">
                             <label for="name" class="form-label fw-bold">Tên Thương Hiệu <span
                                     class="text-danger">*</span></label>
                             <input type="text" id="name" name="name"
-                                class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                                class="form-control <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" value="<?php echo e(old('name')); ?>" required>
+                            <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <!-- Logo -->
@@ -123,19 +135,33 @@
                                     <p>Nhấn để tải lên</p>
                                 </div>
                             </div>
-                            <input type="file" id="logo" name="logo" class="d-none @error('logo') is-invalid @enderror"
+                            <input type="file" id="logo" name="logo" class="d-none <?php $__errorArgs = ['logo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                 accept="image/*">
                             <small class="form-text text-muted">Đề xuất: PNG, JPG, SVG,... dưới 2MB</small>
-                            @error('logo')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['logo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <!-- Trạng Thái -->
                         <div class="mb-4">
                             <div class="form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" id="is_active"
-                                    name="is_active" value="1" {{ old('is_active', 1) ? 'checked' : '' }}>
+                                    name="is_active" value="1" <?php echo e(old('is_active', 1) ? 'checked' : ''); ?>>
                                 <label class="form-check-label" for="is_active">
                                     <span class="status-text">Bật</span>
                                     Kích hoạt
@@ -145,7 +171,7 @@
 
                         <!-- Action Buttons -->
                         <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('admin.brands.index') }}" class="btn btn-cancel">Hủy</a>
+                            <a href="<?php echo e(route('admin.brands.index')); ?>" class="btn btn-cancel">Hủy</a>
                             <button type="submit" class="btn btn-save">
                                 <i class="fas fa-save me-2"></i> Lưu
                             </button>
@@ -155,9 +181,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         // === PREVIEW ẢNH ===
         document.getElementById('logo').addEventListener('change', function (event) {
@@ -185,4 +211,5 @@
             statusText.style.color = this.checked ? '#28a745' : '#dc3545';
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/admin/brands/create.blade.php ENDPATH**/ ?>

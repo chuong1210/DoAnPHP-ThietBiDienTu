@@ -39,7 +39,6 @@ class ReviewController extends Controller
                 ->where('order_items.product_id', $product->id)
                 ->where('orders.status', 'delivered')
                 ->exists();
-
             if (!$hasOrdered) {
                 return redirect()->route('client.product.show', $slug)
                     ->with('error', 'Bạn chưa mua sản phẩm này để có thể đánh giá.');
@@ -48,7 +47,7 @@ class ReviewController extends Controller
             // Kiểm tra đã đánh giá chưa
             $existingReview = $this->reviewRepository->findByCondition(
                 [['product_id', '=', $product->id], ['user_id', '=', Auth::id()]],
-                false
+                true
             );
 
             if ($existingReview) {
@@ -64,7 +63,7 @@ class ReviewController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
-    
+
     /**
      * Lưu đánh giá mới
      * POST /products/{slug}/review
@@ -76,12 +75,12 @@ class ReviewController extends Controller
         // ✅ Đảm bảo dùng đúng trường 'comment' (trùng với model Review)
         $validated = $request->validate([
             'rating'  => 'required|integer|min:1|max:5',
-            'content' => 'required|string|max:1000',
+            'comment' => 'required|string|max:1000',
         ], [
             'rating.required' => 'Vui lòng chọn điểm đánh giá.',
             'rating.integer'  => 'Điểm đánh giá phải là số nguyên từ 1-5.',
-            'content.required' => 'Vui lòng nhập nội dung đánh giá.',
-            'content.max'     => 'Nhận xét không được vượt quá 1000 ký tự.',
+            'comment.required' => 'Vui lòng nhập nội dung đánh giá.',
+            'comment.max'     => 'Nhận xét không được vượt quá 1000 ký tự.', // Đổi ở đây
         ]);
 
         // Gán thêm dữ liệu cần thiết
@@ -91,7 +90,9 @@ class ReviewController extends Controller
 
         try {
             // Gọi Repository để lưu
-            $this->reviewRepository->createReview($validated);
+            // $this->reviewRepository->createReview($validated);
+            $this->reviewRepository->create($validated);
+
 
             return redirect()->route('client.product.show', $slug)
                 ->with('success', 'Đánh giá của bạn đã được gửi và đang chờ duyệt!');

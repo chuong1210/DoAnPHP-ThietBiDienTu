@@ -1,10 +1,9 @@
-@extends('client.layouts.client')
-@section('title', 'Hỗ Trợ Khách Hàng')
-@php
+<?php $__env->startSection('title', 'Hỗ Trợ Khách Hàng'); ?>
+<?php
     $hideSidebar = true;
-@endphp
+?>
 
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         :root {
             --primary: #0066FF;
@@ -262,9 +261,9 @@
             }
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Hero Section -->
     <section class="support-hero text-center position-relative">
         <div class="container position-relative">
@@ -355,7 +354,7 @@
                     <!-- FAQ -->
                     <div class="tab-pane fade show active" id="faq">
                         <div id="faqList">
-                            @php
+                            <?php
                                 $groups = [
                                     'order' => ['Đặt hàng', 'fas fa-shopping-bag'],
                                     'payment' => ['Thanh toán', 'fas fa-credit-card'],
@@ -363,33 +362,36 @@
                                     'warranty' => ['Bảo hành', 'fas fa-shield-alt'],
                                     'return' => ['Đổi trả', 'fas fa-sync-alt'],
                                 ];
-                            @endphp
+                            ?>
 
-                            @forelse($groups as $key => [$title, $icon])
-                                @if(isset($faqs[$key]) && $faqs[$key]->count() > 0)
+                            <?php $__empty_1 = true; $__currentLoopData = $groups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => [$title, $icon]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                <?php if(isset($faqs[$key]) && $faqs[$key]->count() > 0): ?>
                                     <div class="mb-5">
                                         <h5 class="mb-3 fw-bold text-primary d-flex align-items-center">
-                                            <i class="{{ $icon }} me-2"></i> {{ $title }}
+                                            <i class="<?php echo e($icon); ?> me-2"></i> <?php echo e($title); ?>
+
                                         </h5>
-                                        @foreach($faqs[$key] as $faq)
+                                        <?php $__currentLoopData = $faqs[$key]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <div class="faq-item">
                                                 <div class="faq-question" onclick="toggleFAQ(this)">
-                                                    {{ $faq->question }}
+                                                    <?php echo e($faq->question); ?>
+
                                                     <i class="fas fa-chevron-down"></i>
                                                 </div>
                                                 <div class="faq-answer">
-                                                    {!! nl2br($faq->answer) !!}
+                                                    <?php echo nl2br($faq->answer); ?>
+
                                                 </div>
                                             </div>
-                                        @endforeach
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </div>
-                                @endif
-                            @empty
+                                <?php endif; ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <div class="text-center py-5 text-muted">
                                     <i class="fas fa-info-circle fa-2x mb-3"></i>
                                     <p>Chưa có câu hỏi thường gặp nào.</p>
                                 </div>
-                            @endforelse
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -429,106 +431,108 @@
 
                     <!-- Form liên hệ -->
                     <div class="tab-pane fade" id="contact">
-                        @if(session('success'))
+                        <?php if(session('success')): ?>
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                 <i class="fas fa-check-circle me-2"></i>
-                                {{ session('success') }}
+                                <?php echo e(session('success')); ?>
+
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
-                        @if(session('error'))
+                        <?php if(session('error')): ?>
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <i class="fas fa-exclamation-circle me-2"></i>
-                                {{ session('error') }}
+                                <?php echo e(session('error')); ?>
+
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
-                        <form action="{{ route('client.support.contact') }}" method="POST" id="contactForm" novalidate>
-                            @csrf
+                        <form action="<?php echo e(route('client.support.contact')); ?>" method="POST" id="contactForm" novalidate>
+                            <?php echo csrf_field(); ?>
 
                             <div class="mb-3">
                                 <label class="form-label">Họ tên <span class="text-danger">*</span></label>
                                 <input type="text" name="name"
-                                    class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}"
-                                    value="{{ old('name') }}" required minlength="2" maxlength="60"
+                                    class="form-control <?php echo e($errors->has('name') ? 'is-invalid' : ''); ?>"
+                                    value="<?php echo e(old('name')); ?>" required minlength="2" maxlength="60"
                                     placeholder="Nguyễn Văn A">
                                 <div class="invalid-feedback">
-                                    @if($errors->has('name'))
-                                        <span class="server-error">{{ $errors->first('name') }}</span>
-                                    @else
+                                    <?php if($errors->has('name')): ?>
+                                        <span class="server-error"><?php echo e($errors->first('name')); ?></span>
+                                    <?php else: ?>
                                         Vui lòng nhập họ tên hợp lệ (2-60 ký tự).
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Email <span class="text-danger">*</span></label>
                                 <input type="email" name="email"
-                                    class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-                                    value="{{ old('email') }}" required maxlength="100" placeholder="you@example.com">
+                                    class="form-control <?php echo e($errors->has('email') ? 'is-invalid' : ''); ?>"
+                                    value="<?php echo e(old('email')); ?>" required maxlength="100" placeholder="you@example.com">
                                 <div class="invalid-feedback">
-                                    @if($errors->has('email'))
-                                        <span class="server-error">{{ $errors->first('email') }}</span>
-                                    @else
+                                    <?php if($errors->has('email')): ?>
+                                        <span class="server-error"><?php echo e($errors->first('email')); ?></span>
+                                    <?php else: ?>
                                         Vui lòng nhập email hợp lệ.
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Số điện thoại</label>
                                 <input type="text" name="phone"
-                                    class="form-control {{ $errors->has('phone') ? 'is-invalid' : '' }}"
-                                    value="{{ old('phone') }}" maxlength="10" minlength="10" pattern="0[0-9]{9}"
+                                    class="form-control <?php echo e($errors->has('phone') ? 'is-invalid' : ''); ?>"
+                                    value="<?php echo e(old('phone')); ?>" maxlength="10" minlength="10" pattern="0[0-9]{9}"
                                     placeholder="0784393356">
                                 <div class="invalid-feedback">
-                                    @if($errors->has('phone'))
-                                        <span class="server-error">{{ $errors->first('phone') }}</span>
-                                    @else
+                                    <?php if($errors->has('phone')): ?>
+                                        <span class="server-error"><?php echo e($errors->first('phone')); ?></span>
+                                    <?php else: ?>
                                         Số điện thoại phải có 10 chữ số, bắt đầu bằng 0.
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Tiêu đề <span class="text-danger">*</span></label>
                                 <input type="text" name="subject"
-                                    class="form-control {{ $errors->has('subject') ? 'is-invalid' : '' }}"
-                                    value="{{ old('subject') }}" required minlength="10" maxlength="120"
+                                    class="form-control <?php echo e($errors->has('subject') ? 'is-invalid' : ''); ?>"
+                                    value="<?php echo e(old('subject')); ?>" required minlength="10" maxlength="120"
                                     placeholder="Vấn đề về đơn hàng #12345">
                                 <div class="invalid-feedback">
-                                    @if($errors->has('subject'))
-                                        <span class="server-error">{{ $errors->first('subject') }}</span>
-                                    @else
+                                    <?php if($errors->has('subject')): ?>
+                                        <span class="server-error"><?php echo e($errors->first('subject')); ?></span>
+                                    <?php else: ?>
                                         Tiêu đề phải từ 10-120 ký tự.
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Nội dung <span class="text-danger">*</span></label>
                                 <textarea name="message"
-                                    class="form-control {{ $errors->has('message') ? 'is-invalid' : '' }}" rows="5" required
+                                    class="form-control <?php echo e($errors->has('message') ? 'is-invalid' : ''); ?>" rows="5" required
                                     minlength="20" maxlength="2000"
-                                    placeholder="Mô tả chi tiết vấn đề của bạn...">{{ old('message') }}</textarea>
+                                    placeholder="Mô tả chi tiết vấn đề của bạn..."><?php echo e(old('message')); ?></textarea>
                                 <small class="text-muted float-end" id="charCount">0/2000</small>
                                 <div class="invalid-feedback">
-                                    @if($errors->has('message'))
-                                        <span class="server-error">{{ $errors->first('message') }}</span>
-                                    @else
+                                    <?php if($errors->has('message')): ?>
+                                        <span class="server-error"><?php echo e($errors->first('message')); ?></span>
+                                    <?php else: ?>
                                         Nội dung phải từ 20-2000 ký tự.
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
                             <!-- reCAPTCHA v2 -->
                             <div class="mb-3">
-                                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
-                                @if($errors->has('g-recaptcha-response'))
-                                    <div class="server-error">{{ $errors->first('g-recaptcha-response') }}</div>
-                                @endif
+                                <div class="g-recaptcha" data-sitekey="<?php echo e(config('services.recaptcha.site_key')); ?>"></div>
+                                <?php if($errors->has('g-recaptcha-response')): ?>
+                                    <div class="server-error"><?php echo e($errors->first('g-recaptcha-response')); ?></div>
+                                <?php endif; ?>
                             </div>
 
                             <!-- Honeypot -->
@@ -551,9 +555,9 @@
         <i class="fas fa-phone fa-lg"></i>
         <small>GỌI NGAY</small>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <!-- TẢI reCAPTCHA v2 API -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
@@ -627,16 +631,16 @@
             }
 
             // === RESET reCAPTCHA NẾU CÓ LỖI ===
-            @if($errors->has('g-recaptcha-response'))
+            <?php if($errors->has('g-recaptcha-response')): ?>
                 setTimeout(function () {
                     if (typeof grecaptcha !== 'undefined') {
                         grecaptcha.reset();
                     }
                 }, 500);
-            @endif
+            <?php endif; ?>
 
                 // === TỰ ĐỘNG FOCUS VÀO FIELD LỖI ĐẦU TIÊN (nếu có lỗi từ server) ===
-                @if($errors->any())
+                <?php if($errors->any()): ?>
                     const firstError = document.querySelector('.is-invalid');
                     if (firstError) {
                         // Chuyển sang tab Contact nếu có lỗi
@@ -651,7 +655,8 @@
                             firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }, 300);
                     }
-                @endif
+                <?php endif; ?>
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('client.layouts.client', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/client/support/index.blade.php ENDPATH**/ ?>

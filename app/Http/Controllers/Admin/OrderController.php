@@ -87,52 +87,57 @@ class OrderController extends Controller
      * Cập nhật trạng thái của một đơn hàng.
      * Đây là phương thức tùy chỉnh, được gọi từ form trong trang show.
      */
+    // app/Http/Controllers/Admin/OrderController.php
+
     public function updateStatus(Request $request, string $id)
     {
-        // 1. Validate dữ liệu đầu vào
+        // 1. Validate dữ liệu đầu vào (giữ nguyên)
         $validated = $request->validate([
             'status' => 'required|in:pending,confirmed,shipping,delivered,cancelled',
-        ], [
-            'status.required' => 'Vui lòng chọn một trạng thái.',
-            'status.in'       => 'Trạng thái được chọn không hợp lệ.',
         ]);
 
         // 2. Tìm đơn hàng
         $order = Order::findOrFail($id);
 
-        // (Tùy chọn) Logic kiểm tra chuyển đổi trạng thái hợp lệ
-        // Ví dụ: Không cho phép chuyển từ 'delivered' về 'pending'
-        // if ($order->status === 'delivered' && $validated['status'] === 'pending') {
-        //     return back()->with('error', 'Không thể chuyển trạng thái từ "Đã giao" về "Chờ xử lý".');
-        // }
+        // === THÊM LỚP BẢO MẬT VÀO ĐÂY ===
+        if ($order->status === 'delivered' || $order->status === 'cancelled') {
+            return back()->with('error', 'Không thể cập nhật trạng thái cho đơn hàng đã hoàn thành hoặc đã bị hủy.');
+        }
+        // ===================================
 
-        // 3. Cập nhật trạng thái
+        // (Tùy chọn) Logic kiểm tra chuyển đổi trạng thái hợp lệ
+        // Ví dụ: Không cho phép chuyển từ 'shipping' về 'pending'
+        $allowedTransitions = [
+            'pending' => ['confirmed', 'cancelled'],
+            'confirmed' => ['shipping', 'cancelled'],
+            'shipping' => ['delivered', 'cancelled'],
+        ];
+
+        if (isset($allowedTransitions[$order->status]) && !in_array($validated['status'], $allowedTransitions[$order->status])) {
+            return back()->with('error', "Không thể chuyển từ trạng thái '{$order->status}' sang '{$validated['status']}'.");
+        }
+
+
+        // 3. Cập nhật trạng thái (giữ nguyên)
         $order->status = $validated['status'];
 
-        // Tự động cập nhật trạng thái thanh toán nếu đơn hàng được giao thành công và là COD
+        // ... logic cập nhật payment_status và hoàn kho giữ nguyên ...
         if ($validated['status'] === 'delivered' && $order->payment_method === 'cod') {
             $order->payment_status = 'paid';
         }
-
-        // (Tùy chọn) Xử lý hoàn lại số lượng sản phẩm nếu đơn hàng bị hủy
         if ($validated['status'] === 'cancelled') {
-            $order->payment_status = 'failed'; // Hoặc 'refunded' nếu đã thanh toán
+            $order->payment_status = 'failed';
             foreach ($order->items as $item) {
-                $item->product()->increment('quantity', $item->quantity);
+                // Chỉ hoàn kho nếu sản phẩm còn tồn tại
+                if ($item->product) {
+                    $item->product->increment('quantity', $item->quantity);
+                }
             }
         }
 
         $order->save();
 
-        // (Tùy chọn) Gửi email thông báo cho khách hàng về việc cập nhật trạng thái
-        // try {
-        //     Mail::to($order->customer_email)->send(new OrderStatusUpdatedMail($order));
-        // } catch (\Exception $e) {
-        //     // Ghi log nếu gửi mail lỗi nhưng không làm gián đoạn quy trình
-        //     Log::error("Failed to send order status update email for order {$order->id}: " . $e->getMessage());
-        // }
-
-        // 4. Chuyển hướng về trang chi tiết với thông báo thành công
+        // ...
         return redirect()->route('admin.orders.show', $order->id)
             ->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
     }

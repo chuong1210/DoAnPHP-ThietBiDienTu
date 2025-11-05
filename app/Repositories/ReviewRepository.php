@@ -17,6 +17,15 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
         parent::__construct($this->model);
     }
 
+    public function hasUserReviewedProduct(int $productId, int $userId): bool
+    {
+        // exists() là phương thức cực kỳ tối ưu, nó chỉ kiểm tra sự tồn tại
+        // và trả về true/false, nhanh hơn nhiều so với get() hoặc first().
+        return $this->model
+            ->where('product_id', $productId)
+            ->where('user_id', $userId)
+            ->exists();
+    }
     /**
      * Lấy đánh giá đã duyệt của sản phẩm (paginated)
      */
@@ -110,7 +119,7 @@ class ReviewRepository extends BaseRepository implements ReviewRepositoryInterfa
     /**
      * Từ chối review
      */
-    public function rejectReview($id,$reason = null)
+    public function rejectReview($id, $reason = null)
     {
         return $this->update($id, ['status' => 'rejected']);
     }

@@ -12,6 +12,8 @@ use App\Repositories\ProductRepository;
 use App\Repositories\ReviewRepository;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -127,13 +129,36 @@ class ProductController extends Controller
         // Categories cho sidebar
         $categories = $this->categoryRepository->getCategoriesWithChildren();
 
+        // === PHẦN THÊM MỚI QUAN TRỌNG ===
+        $userHasReviewed = false;
+        $canUserReview = false;
+
+
+        if (Auth::check()) {
+            // Kiểm tra xem user đã từng review sản phẩm này chưa (bất kể status)
+            $userHasReviewed = $this->reviewRepository->hasUserReviewedProduct($product->id, Auth::id());
+
+            // Kiểm tra xem user có đủ điều kiện để viết review mới không
+            // (đã mua, đã giao hàng, và chưa review)
+            if (!$userHasReviewed) {
+                $canUserReview = DB::table('order_items')
+                    ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                    ->where('orders.user_id', Auth::id())
+                    ->where('order_items.product_id', $product->id)
+                    ->where('orders.status', 'delivered')
+                    ->exists();
+            }
+        }
+
         return view('client.product.show', compact(
             'product',
             'relatedProducts',
             'categories',
             'reviews',
             'averageRating',
-            'discountPercent'
+            'discountPercent',
+            'userHasReviewed', // <-- Biến mới
+            'canUserReview'    // <-- Biến mới
         ));
     }
 

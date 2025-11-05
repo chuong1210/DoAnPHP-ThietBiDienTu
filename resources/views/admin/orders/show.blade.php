@@ -216,39 +216,53 @@
                 </div>
 
                 <!-- Cập nhật trạng thái -->
+                <!-- Cập nhật trạng thái -->
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0">Cập Nhật Trạng Thái</h5>
+                        <h5 class="mb-0">Trạng Thái Đơn Hàng</h5>
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
-                            <span class="fw-bold me-2">Trạng thái hiện tại:</span>
-                            <span class="status-badge status-badge-{{ $order->status }}">{{ $order->status }}</span>
+                        <div class="mb-3 text-center">
+                            <h6 class="text-muted">Trạng thái hiện tại</h6>
+                            <span class="status-badge status-badge-{{ $order->status }} fs-5">{{ $order->status }}</span>
                         </div>
-                        <form action="{{ route('admin.orders.update-status', $order->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Thay đổi trạng thái:</label>
-                                <select name="status" class="form-select">
-                                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Chờ xử lý
-                                    </option>
-                                    <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Đã xác
-                                        nhận</option>
-                                    <option value="shipping" {{ $order->status == 'shipping' ? 'selected' : '' }}>Đang giao
-                                        hàng</option>
-                                    <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Đã giao
-                                        thành công</option>
-                                    <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Hủy đơn
-                                        hàng</option>
-                                </select>
+
+                        {{-- CHỈ HIỂN THỊ FORM KHI ĐƠN HÀNG CÓ THỂ THAY ĐỔI TRẠNG THÁI --}}
+                        @if ($order->status !== 'delivered' && $order->status !== 'cancelled')
+                            <hr>
+                            <form action="{{ route('admin.orders.update-status', $order->id) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Thay đổi trạng thái:</label>
+                                    <select name="status" class="form-select">
+                                        {{-- Chỉ hiển thị các trạng thái hợp lệ tiếp theo --}}
+                                        <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Chờ xử lý
+                                        </option>
+                                        <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Đã xác
+                                            nhận</option>
+                                        <option value="shipping" {{ $order->status == 'shipping' ? 'selected' : '' }}>Đang giao
+                                            hàng</option>
+                                        <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Đã giao
+                                            thành công</option>
+                                        <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Hủy đơn
+                                            hàng</option>
+                                    </select>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i> Cập Nhật
+                                    </button>
+                                </div>
+                            </form>
+                        @else
+                            {{-- Hiển thị thông báo khi đơn hàng đã ở trạng thái cuối cùng --}}
+                            <div class="alert alert-info text-center mt-3"
+                                style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Đơn hàng đã hoàn thành hoặc đã bị hủy. Không thể thay đổi trạng thái.
                             </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i> Cập Nhật
-                                </button>
-                            </div>
-                        </form>
+                        @endif
                     </div>
                 </div>
             </div>

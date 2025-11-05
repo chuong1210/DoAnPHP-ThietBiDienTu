@@ -1,8 +1,6 @@
-@extends('client.layouts.client')
+<?php $__env->startSection('title', 'Đánh giá sản phẩm - ' . $product->name); ?>
 
-@section('title', 'Đánh giá sản phẩm - ' . $product->name)
-
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         /* Sử dụng biến màu "Tech Blue Pro" */
         :root {
@@ -207,16 +205,16 @@
             font-weight: 600;
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="review-container">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('client.home.index') }}">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="<?php echo e(route('client.home.index')); ?>">Trang chủ</a></li>
                 <li class="breadcrumb-item"><a
-                        href="{{ route('client.product.show', $product->slug) }}">{{ Str::limit($product->name, 30) }}</a>
+                        href="<?php echo e(route('client.product.show', $product->slug)); ?>"><?php echo e(Str::limit($product->name, 30)); ?></a>
                 </li>
                 <li class="breadcrumb-item active">Viết đánh giá</li>
             </ol>
@@ -232,17 +230,17 @@
             <div class="review-card-body">
                 <!-- Product Preview -->
                 <div class="product-preview">
-                    <img src="{{ asset($product->image ?? 'placeholder.jpg') }}" class="product-preview-image"
-                        alt="{{ $product->name }}">
+                    <img src="<?php echo e(asset($product->image ?? 'placeholder.jpg')); ?>" class="product-preview-image"
+                        alt="<?php echo e($product->name); ?>">
                     <div class="product-preview-info">
-                        <h5 class="mb-1">{{ $product->name }}</h5>
-                        <p class="text-muted">{{ $product->brand->name ?? 'Thương hiệu chưa xác định' }}</p>
+                        <h5 class="mb-1"><?php echo e($product->name); ?></h5>
+                        <p class="text-muted"><?php echo e($product->brand->name ?? 'Thương hiệu chưa xác định'); ?></p>
                     </div>
                 </div>
 
                 <!-- Review Form -->
-                <form action="{{ route('client.reviews.store', $product->slug) }}" method="POST" id="reviewForm">
-                    @csrf
+                <form action="<?php echo e(route('client.reviews.store', $product->slug)); ?>" method="POST" id="reviewForm">
+                    <?php echo csrf_field(); ?>
                     <!-- Rating Stars -->
                     <div class="rating-stars-wrapper">
                         <label class="form-label">Bạn đánh giá sản phẩm này thế nào? <span
@@ -257,26 +255,47 @@
                             </div>
                             <span id="rating-feedback"></span>
                         </div>
-                        <input type="hidden" name="rating" id="rating" value="{{ old('rating', 0) }}">
-                        @error('rating')
-                            <div class="text-danger small mt-2">{{ $message }}</div>
-                        @enderror
+                        <input type="hidden" name="rating" id="rating" value="<?php echo e(old('rating', 0)); ?>">
+                        <?php $__errorArgs = ['rating'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="text-danger small mt-2"><?php echo e($message); ?></div>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <!-- Comment Textarea -->
                     <div class="mb-4">
                         <label for="comment" class="form-label fw-bold">Nhận xét chi tiết (tùy chọn)</label>
                         <textarea name="comment" id="comment" rows="5"
-                            class="form-control @error('comment') is-invalid @enderror"
-                            placeholder="Sản phẩm dùng có tốt không? Bạn thích hay không thích điểm gì?">{{ old('comment') }}</textarea>
-                        @error('comment')
-                            <div class="text-danger small mt-2">{{ $message }}</div>
-                        @enderror
+                            class="form-control <?php $__errorArgs = ['comment'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                            placeholder="Sản phẩm dùng có tốt không? Bạn thích hay không thích điểm gì?"><?php echo e(old('comment')); ?></textarea>
+                        <?php $__errorArgs = ['comment'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="text-danger small mt-2"><?php echo e($message); ?></div>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="d-flex justify-content-between align-items-center">
-                        <a href="{{ route('client.product.show', $product->slug) }}" class="btn-modern btn-secondary">
+                        <a href="<?php echo e(route('client.product.show', $product->slug)); ?>" class="btn-modern btn-secondary">
                             <i class="fas fa-arrow-left me-2"></i> Quay lại
                         </a>
                         <button type="submit" class="btn-modern btn-primary">
@@ -287,9 +306,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const starsContainer = document.getElementById('rating-stars');
@@ -395,4 +414,5 @@
             }
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('client.layouts.client', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/client/reviews/create.blade.php ENDPATH**/ ?>

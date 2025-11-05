@@ -67,7 +67,7 @@
                             </div>
                             <div class="contact-text">
                                 <strong>Địa chỉ:</strong>
-                                <span>123 Đường ABC, Q.12, TP.HCM</span>
+                                <span>30/2 Đương TA2, Phường Thới An, TP.HCM</span>
                             </div>
                         </li>
                         <li>
@@ -76,7 +76,7 @@
                             </div>
                             <div class="contact-text">
                                 <strong>Hotline:</strong>
-                                <span>1900-1234</span>
+                                <span>0784393356</span>
                             </div>
                         </li>
                         <li>

@@ -69,6 +69,15 @@
             content: '/';
             /* Đảm bảo dấu / luôn hiển thị */
         }
+        .review-notice.success {
+    background: linear-gradient(135deg, #D1FAE5, #A7F3D0); /* Xanh lá */
+    color: #065F46;
+}
+
+.review-notice.info {
+    background: linear-gradient(135deg, #DBEAFE, #BFDBFE); /* Xanh dương */
+    color: #1E40AF;
+}
     </style>
 
     
@@ -372,34 +381,33 @@
                     <?php endif; ?>
 
                     <!-- Add Review Button -->
-                    <?php if(auth()->guard()->check()): ?>
-                        <?php
-                            $hasReviewed = $reviews->where('user_id', auth()->id())->count() > 0;
-                            $hasOrdered = \DB::table('order_items')
-                                ->join('orders', 'order_items.order_id', '=', 'orders.id')
-                                ->where('orders.user_id', auth()->id())
-                                ->where('order_items.product_id', $product->id)
-                                ->where('orders.status', 'delivered')
-                                ->exists();
-                        ?>
-                        <?php if($hasOrdered && !$hasReviewed): ?>
-                            <div class="review-action">
-                                <a href="<?php echo e(route('client.reviews.create', $product->slug)); ?>" class="btn-write-review">
-                                    <i class="fas fa-star me-2"></i> Viết Đánh Giá Của Bạn
-                                </a>
-                            </div>
-                        <?php elseif($hasReviewed): ?>
-                            <div class="review-notice success">
-                                <i class="fas fa-check-circle"></i>
-                                Bạn đã đánh giá sản phẩm này
-                            </div>
-                        <?php endif; ?>
-                    <?php else: ?>
-                        <div class="review-notice info">
-                            <i class="fas fa-sign-in-alt"></i>
-                            <a href="<?php echo e(route('login')); ?>">Đăng nhập</a> để viết đánh giá
-                        </div>
-                    <?php endif; ?>
+                 
+
+
+<!-- Add Review Button -->
+<?php if(auth()->guard()->check()): ?>
+    
+    <?php if($userHasReviewed): ?>
+        
+        <div class="review-notice info">
+            <i class="fas fa-check-circle"></i>
+            Bạn đã gửi đánh giá cho sản phẩm này. Cảm ơn bạn!
+        </div>
+    <?php elseif($canUserReview): ?>
+        
+        <div class="review-action">
+            <a href="<?php echo e(route('client.reviews.create', $product->slug)); ?>" class="btn-write-review">
+                <i class="fas fa-star me-2"></i> Viết Đánh Giá Của Bạn
+            </a>
+        </div>
+    <?php endif; ?>
+<?php else: ?>
+    
+    <div class="review-notice info">
+        <i class="fas fa-sign-in-alt"></i>
+        <a href="<?php echo e(route('login')); ?>">Đăng nhập</a> để viết đánh giá
+    </div>
+<?php endif; ?>
                 </div>
             </div>
         </div>
@@ -1426,4 +1434,5 @@
         }
     }
 </style>
+
 <?php echo $__env->make('client.layouts.client', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/client/product/show.blade.php ENDPATH**/ ?>

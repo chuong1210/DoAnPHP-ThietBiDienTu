@@ -126,7 +126,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link modern-nav-link <?php echo e(request()->routeIs('client.products.*') ? 'active' : ''); ?>"
+                            <a class="nav-link modern-nav-link <?php echo e(request()->routeIs('client.product.*') ? 'active' : ''); ?>"
                                 href="<?php echo e(route('client.product.index')); ?>">
                                 <i class="fas fa-box-open"></i>
                                 <span>Sản Phẩm</span>

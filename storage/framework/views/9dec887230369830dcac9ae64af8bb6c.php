@@ -67,7 +67,7 @@
                             </div>
                             <div class="contact-text">
                                 <strong>Địa chỉ:</strong>
-                                <span>123 Đường ABC, Q.12, TP.HCM</span>
+                                <span>30/2 Đương TA2, Phường Thới An, TP.HCM</span>
                             </div>
                         </li>
                         <li>
@@ -76,7 +76,7 @@
                             </div>
                             <div class="contact-text">
                                 <strong>Hotline:</strong>
-                                <span>1900-1234</span>
+                                <span>0784393356</span>
                             </div>
                         </li>
                         <li>
@@ -446,7 +446,7 @@
 
 <script>
     // Mã JavaScript để khởi tạo bản đồ sẽ ở đây
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const VIETMAP_API_KEY = "ff51b832c09822cd2aa33bae21bdc62dec95ff85be2dc64a"; // <-- THAY KHÓA API CỦA BẠN VÀO ĐÂY
 
         // Tọa độ ví dụ của shop (Kinh độ, Vĩ độ) - Nên lấy tọa độ chính xác

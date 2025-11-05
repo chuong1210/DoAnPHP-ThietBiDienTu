@@ -291,7 +291,7 @@ ALTER TABLE products ADD FULLTEXT INDEX idx_search (name, description);
 
 -- Admin user (password: admin123)
 INSERT INTO users (email, password, full_name, phone, role) VALUES
-('admin@shop.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', '0901234567', 'admin');
+('admin@shop.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', '0784393356', 'admin');
 
 -- Sample users (password: user123)
 INSERT INTO users (email, password, full_name, phone, role) VALUES

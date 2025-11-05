@@ -215,39 +215,53 @@
                 </div>
 
                 <!-- Cập nhật trạng thái -->
+                <!-- Cập nhật trạng thái -->
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0">Cập Nhật Trạng Thái</h5>
+                        <h5 class="mb-0">Trạng Thái Đơn Hàng</h5>
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
-                            <span class="fw-bold me-2">Trạng thái hiện tại:</span>
-                            <span class="status-badge status-badge-<?php echo e($order->status); ?>"><?php echo e($order->status); ?></span>
+                        <div class="mb-3 text-center">
+                            <h6 class="text-muted">Trạng thái hiện tại</h6>
+                            <span class="status-badge status-badge-<?php echo e($order->status); ?> fs-5"><?php echo e($order->status); ?></span>
                         </div>
-                        <form action="<?php echo e(route('admin.orders.update-status', $order->id)); ?>" method="POST">
-                            <?php echo csrf_field(); ?>
-                            <?php echo method_field('PUT'); ?>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Thay đổi trạng thái:</label>
-                                <select name="status" class="form-select">
-                                    <option value="pending" <?php echo e($order->status == 'pending' ? 'selected' : ''); ?>>Chờ xử lý
-                                    </option>
-                                    <option value="confirmed" <?php echo e($order->status == 'confirmed' ? 'selected' : ''); ?>>Đã xác
-                                        nhận</option>
-                                    <option value="shipping" <?php echo e($order->status == 'shipping' ? 'selected' : ''); ?>>Đang giao
-                                        hàng</option>
-                                    <option value="delivered" <?php echo e($order->status == 'delivered' ? 'selected' : ''); ?>>Đã giao
-                                        thành công</option>
-                                    <option value="cancelled" <?php echo e($order->status == 'cancelled' ? 'selected' : ''); ?>>Hủy đơn
-                                        hàng</option>
-                                </select>
+
+                        
+                        <?php if($order->status !== 'delivered' && $order->status !== 'cancelled'): ?>
+                            <hr>
+                            <form action="<?php echo e(route('admin.orders.update-status', $order->id)); ?>" method="POST">
+                                <?php echo csrf_field(); ?>
+                                <?php echo method_field('PUT'); ?>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Thay đổi trạng thái:</label>
+                                    <select name="status" class="form-select">
+                                        
+                                        <option value="pending" <?php echo e($order->status == 'pending' ? 'selected' : ''); ?>>Chờ xử lý
+                                        </option>
+                                        <option value="confirmed" <?php echo e($order->status == 'confirmed' ? 'selected' : ''); ?>>Đã xác
+                                            nhận</option>
+                                        <option value="shipping" <?php echo e($order->status == 'shipping' ? 'selected' : ''); ?>>Đang giao
+                                            hàng</option>
+                                        <option value="delivered" <?php echo e($order->status == 'delivered' ? 'selected' : ''); ?>>Đã giao
+                                            thành công</option>
+                                        <option value="cancelled" <?php echo e($order->status == 'cancelled' ? 'selected' : ''); ?>>Hủy đơn
+                                            hàng</option>
+                                    </select>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i> Cập Nhật
+                                    </button>
+                                </div>
+                            </form>
+                        <?php else: ?>
+                            
+                            <div class="alert alert-info text-center mt-3"
+                                style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Đơn hàng đã hoàn thành hoặc đã bị hủy. Không thể thay đổi trạng thái.
                             </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i> Cập Nhật
-                                </button>
-                            </div>
-                        </form>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

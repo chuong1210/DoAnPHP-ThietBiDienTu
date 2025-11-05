@@ -136,6 +136,7 @@ Route::middleware('auth')->group(function () {
 
             // Reviews
             Route::get('/products/{slug}/review/create', [ReviewController::class, 'create'])->name('reviews.create');
+
             Route::post('/products/{slug}/review', [ReviewController::class, 'store'])->name('reviews.store');
             Route::get('/profile/reviews', [ReviewController::class, 'userReviews'])->name('profile.reviews');
 

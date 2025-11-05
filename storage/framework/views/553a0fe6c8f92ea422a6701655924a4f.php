@@ -1,9 +1,7 @@
-@extends('admin.layouts.admin')
+<?php $__env->startSection('title', 'Chỉnh Sửa Thương Hiệu'); ?>
+<?php $__env->startSection('page-title', 'Chỉnh Sửa Thương Hiệu'); ?>
 
-@section('title', 'Chỉnh Sửa Thương Hiệu')
-@section('page-title', 'Chỉnh Sửa Thương Hiệu')
-
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         /* === FORM INPUTS === */
         .form-control,
@@ -137,61 +135,90 @@
             color: #28a745;
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Cập nhật: {{ $brand->name }}</h5>
+                    <h5 class="mb-0">Cập nhật: <?php echo e($brand->name); ?></h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.brands.update', $brand->id) }}" method="POST"
+                    <form action="<?php echo e(route('admin.brands.update', $brand->id)); ?>" method="POST"
                         enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PUT'); ?>
 
                         <!-- Tên Thương Hiệu -->
                         <div class="mb-4">
                             <label for="name" class="form-label fw-bold">Tên Thương Hiệu <span
                                     class="text-danger">*</span></label>
                             <input type="text" id="name" name="name"
-                                class="form-control @error('name') is-invalid @enderror"
-                                value="{{ old('name', $brand->name) }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                                class="form-control <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                value="<?php echo e(old('name', $brand->name)); ?>" required>
+                            <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <!-- Logo -->
                         <div class="mb-4">
                             <label class="form-label fw-bold">Logo</label>
                             <div id="image-preview-container" onclick="document.getElementById('logo').click()">
-                                <img id="image-preview" src="{{ $brand->logo ? asset($brand->logo) : '#' }}" alt="Preview"
-                                    style="{{ $brand->logo ? 'display: block;' : 'display: none;' }}">
+                                <img id="image-preview" src="<?php echo e($brand->logo ? asset($brand->logo) : '#'); ?>" alt="Preview"
+                                    style="<?php echo e($brand->logo ? 'display: block;' : 'display: none;'); ?>">
                                 <div id="image-placeholder" class="placeholder"
-                                    style="{{ $brand->logo ? 'display: none;' : 'display: block;' }}">
+                                    style="<?php echo e($brand->logo ? 'display: none;' : 'display: block;'); ?>">
                                     <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
                                     <p>Nhấn để thay đổi</p>
                                 </div>
                             </div>
-                            <input type="file" id="logo" name="logo" class="d-none @error('logo') is-invalid @enderror"
+                            <input type="file" id="logo" name="logo" class="d-none <?php $__errorArgs = ['logo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                 accept="image/*">
                             <small class="form-text text-muted">Bỏ trống nếu không muốn thay đổi logo.</small>
-                            @error('logo')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['logo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <!-- Trạng Thái -->
                         <div class="mb-4">
                             <div class="form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" id="is_active"
-                                    name="is_active" value="1" {{ old('is_active', $brand->is_active) ? 'checked' : '' }}>
+                                    name="is_active" value="1" <?php echo e(old('is_active', $brand->is_active) ? 'checked' : ''); ?>>
                                 <label class="form-check-label" for="is_active">
                                     <span class="status-text">
-                                        {{ old('is_active', $brand->is_active) ? 'Bật' : 'Tắt' }}
+                                        <?php echo e(old('is_active', $brand->is_active) ? 'Bật' : 'Tắt'); ?>
+
                                     </span>
                                     Kích hoạt
                                 </label>
@@ -200,7 +227,7 @@
 
                         <!-- Action Buttons -->
                         <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('admin.brands.index') }}" class="btn btn-cancel">Hủy</a>
+                            <a href="<?php echo e(route('admin.brands.index')); ?>" class="btn btn-cancel">Hủy</a>
                             <button type="submit" class="btn btn-save">
                                 <i class="fas fa-save me-2"></i> Cập Nhật
                             </button>
@@ -210,9 +237,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         // Preview ảnh khi chọn file mới
         document.getElementById('logo').addEventListener('change', function (event) {
@@ -235,4 +262,5 @@
             statusText.style.color = this.checked ? '#28a745' : '#dc3545';
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/admin/brands/edit.blade.php ENDPATH**/ ?>
