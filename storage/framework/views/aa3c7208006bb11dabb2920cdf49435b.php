@@ -1,9 +1,7 @@
-@extends('admin.layouts.admin')
+<?php $__env->startSection('title', 'Chi Tiết Đơn Hàng: ' . $order->order_number); ?>
+<?php $__env->startSection('page-title', 'Chi Tiết Đơn Hàng'); ?>
 
-@section('title', 'Chi Tiết Đơn Hàng: ' . $order->order_number)
-@section('page-title', 'Chi Tiết Đơn Hàng')
-
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         .order-header {
             background-color: var(--background);
@@ -106,20 +104,20 @@
             color: #991B1B;
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Header: Order ID & Date -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0">Đơn hàng <span class="text-primary">{{ $order->order_number }}</span></h1>
-            <small class="text-muted">Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</small>
+            <h1 class="h3 mb-0">Đơn hàng <span class="text-primary"><?php echo e($order->order_number); ?></span></h1>
+            <small class="text-muted">Ngày đặt: <?php echo e($order->created_at->format('d/m/Y H:i')); ?></small>
         </div>
-        <a href="{{ route('admin.orders.invoice', $order->id) }}" target="_blank" class="btn btn-info"
+        <a href="<?php echo e(route('admin.orders.invoice', $order->id)); ?>" target="_blank" class="btn btn-info"
             style="background-color: #00B4D8; color: white;">
             <i class="fas fa-print me-2"></i> In Hóa Đơn
         </a>
-        <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
+        <a href="<?php echo e(route('admin.orders.index')); ?>" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-2"></i> Quay lại danh sách
         </a>
     </div>
@@ -136,26 +134,26 @@
                     <ul class="order-details-list">
                         <li>
                             <div class="label">Tên Khách Hàng</div>
-                            <div class="value">{{ $order->customer_name }}</div>
+                            <div class="value"><?php echo e($order->customer_name); ?></div>
                         </li>
                         <li>
                             <div class="label">Email</div>
-                            <div class="value">{{ $order->customer_email ?? 'N/A' }}</div>
+                            <div class="value"><?php echo e($order->customer_email ?? 'N/A'); ?></div>
                         </li>
                         <li>
                             <div class="label">Số Điện Thoại</div>
-                            <div class="value">{{ $order->customer_phone }}</div>
+                            <div class="value"><?php echo e($order->customer_phone); ?></div>
                         </li>
                         <li>
                             <div class="label">Địa Chỉ Giao Hàng</div>
-                            <div class="value">{{ $order->shipping_address }}</div>
+                            <div class="value"><?php echo e($order->shipping_address); ?></div>
                         </li>
-                        @if($order->note)
+                        <?php if($order->note): ?>
                             <li>
                                 <div class="label">Ghi Chú</div>
-                                <div class="value fst-italic">{{ $order->note }}</div>
+                                <div class="value fst-italic"><?php echo e($order->note); ?></div>
                             </li>
-                        @endif
+                        <?php endif; ?>
                     </ul>
                 </div>
             </div>
@@ -166,22 +164,23 @@
                     <h5 class="mb-0"><i class="fas fa-box-open me-2"></i> Sản Phẩm Trong Đơn</h5>
                 </div>
                 <div class="card-body">
-                    @foreach($order->items as $item)
-                        <div class="product-item {{ !$loop->last ? 'mb-3 pb-3 border-bottom' : '' }}">
-                            <img src="{{ asset($item->product_image ?? 'https://via.placeholder.com/100') }}"
-                                class="product-item-img" alt="{{ $item->product_name }}">
+                    <?php $__currentLoopData = $order->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="product-item <?php echo e(!$loop->last ? 'mb-3 pb-3 border-bottom' : ''); ?>">
+                            <img src="<?php echo e(asset($item->product_image ?? 'https://via.placeholder.com/100')); ?>"
+                                class="product-item-img" alt="<?php echo e($item->product_name); ?>">
                             <div class="product-item-info grow">
-                                <a href="{{ route('client.product.show', $item->product->slug) }}" target="_blank">
-                                    {{ $item->product_name }}
+                                <a href="<?php echo e(route('client.product.show', $item->product->slug)); ?>" target="_blank">
+                                    <?php echo e($item->product_name); ?>
+
                                 </a>
-                                <div class="text-muted small">Đơn giá: {{ number_format($item->price) }}đ</div>
+                                <div class="text-muted small">Đơn giá: <?php echo e(number_format($item->price)); ?>đ</div>
                             </div>
                             <div class="text-end">
-                                <div class="fw-bold">{{ number_format($item->subtotal) }}đ</div>
-                                <div class="text-muted small">x {{ $item->quantity }}</div>
+                                <div class="fw-bold"><?php echo e(number_format($item->subtotal)); ?>đ</div>
+                                <div class="text-muted small">x <?php echo e($item->quantity); ?></div>
                             </div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
         </div>
@@ -197,20 +196,20 @@
                     <div class="card-body price-breakdown">
                         <div class="row">
                             <div class="col">Tạm tính:</div>
-                            <div class="col text-end">{{ number_format($order->subtotal) }}đ</div>
+                            <div class="col text-end"><?php echo e(number_format($order->subtotal)); ?>đ</div>
                         </div>
                         <div class="row">
                             <div class="col">Phí vận chuyển:</div>
-                            <div class="col text-end">{{ number_format($order->shipping_fee) }}đ</div>
+                            <div class="col text-end"><?php echo e(number_format($order->shipping_fee)); ?>đ</div>
                         </div>
                         <div class="row text-danger">
                             <div class="col">Giảm giá:</div>
-                            <div class="col text-end">-{{ number_format($order->discount) }}đ</div>
+                            <div class="col text-end">-<?php echo e(number_format($order->discount)); ?>đ</div>
                         </div>
                         <hr>
                         <div class="row fw-bold h5">
                             <div class="col">Tổng Cộng:</div>
-                            <div class="col text-end text-primary">{{ number_format($order->total) }}đ</div>
+                            <div class="col text-end text-primary"><?php echo e(number_format($order->total)); ?>đ</div>
                         </div>
                     </div>
                 </div>
@@ -223,23 +222,23 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <span class="fw-bold me-2">Trạng thái hiện tại:</span>
-                            <span class="status-badge status-badge-{{ $order->status }}">{{ $order->status }}</span>
+                            <span class="status-badge status-badge-<?php echo e($order->status); ?>"><?php echo e($order->status); ?></span>
                         </div>
-                        <form action="{{ route('admin.orders.update-status', $order->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
+                        <form action="<?php echo e(route('admin.orders.update-status', $order->id)); ?>" method="POST">
+                            <?php echo csrf_field(); ?>
+                            <?php echo method_field('PUT'); ?>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Thay đổi trạng thái:</label>
                                 <select name="status" class="form-select">
-                                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Chờ xử lý
+                                    <option value="pending" <?php echo e($order->status == 'pending' ? 'selected' : ''); ?>>Chờ xử lý
                                     </option>
-                                    <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Đã xác
+                                    <option value="confirmed" <?php echo e($order->status == 'confirmed' ? 'selected' : ''); ?>>Đã xác
                                         nhận</option>
-                                    <option value="shipping" {{ $order->status == 'shipping' ? 'selected' : '' }}>Đang giao
+                                    <option value="shipping" <?php echo e($order->status == 'shipping' ? 'selected' : ''); ?>>Đang giao
                                         hàng</option>
-                                    <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Đã giao
+                                    <option value="delivered" <?php echo e($order->status == 'delivered' ? 'selected' : ''); ?>>Đã giao
                                         thành công</option>
-                                    <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Hủy đơn
+                                    <option value="cancelled" <?php echo e($order->status == 'cancelled' ? 'selected' : ''); ?>>Hủy đơn
                                         hàng</option>
                                 </select>
                             </div>
@@ -254,4 +253,5 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/admin/orders/show.blade.php ENDPATH**/ ?>

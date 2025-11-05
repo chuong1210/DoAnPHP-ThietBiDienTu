@@ -186,6 +186,8 @@ Route::prefix('admin')
         Route::resource('reviews', AdminReviewController::class);
         Route::resource('users', UserController::class);
         // Resource
+        Route::get('orders/{order}/invoice', [AdminOrderController::class, 'showInvoice'])->name('orders.invoice');
+
 
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');

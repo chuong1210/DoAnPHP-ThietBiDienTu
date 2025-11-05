@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order; // Sử dụng Model trực tiếp hoặc qua Repository đều được
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -135,7 +136,16 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.show', $order->id)
             ->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
     }
+    public function showInvoice(string $id)
+    {
+        $order = Order::with('items')->findOrFail($id);
 
+        // Load view 'invoice' và truyền dữ liệu đơn hàng vào
+        $pdf = Pdf::loadView('admin.orders.invoice', compact('order'));
+
+        // Hiển thị PDF trong trình duyệt (không tự động tải về)
+        return $pdf->stream('hoa_don_' . $order->order_number . '.pdf');
+    }
     /**
      * Các phương thức create, store, edit, destroy thường không cần thiết
      * cho việc quản lý đơn hàng từ phía admin.
