@@ -275,7 +275,11 @@
                         <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
                     </div>
                 @endif
-
+                @if(session('status'))
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>{{ session('status') }}
+                    </div>
+                @endif
                 @if(session('error'))
                     <div class="alert alert-danger">
                         <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
@@ -318,13 +322,19 @@
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
                     </div>
-                    <!-- Remember Me -->
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" name="remember" class="form-check-input" id="remember">
-                        <label class="form-check-label" for="remember" style="font-weight: 500;">
-                            Ghi nhớ đăng nhập
-                        </label>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" name="remember" class="form-check-input" id="remember">
+                            <label class="form-check-label" for="remember" style="font-weight: 500;">
+                                Ghi nhớ
+                            </label>
+                        </div>
+                        <div>
+                            <a href="{{ route('password.request') }}">Quên mật khẩu?</a>
+                        </div>
                     </div>
+
 
                     <!-- Submit -->
                     <button type="submit" class="btn btn-primary w-100 mb-3">

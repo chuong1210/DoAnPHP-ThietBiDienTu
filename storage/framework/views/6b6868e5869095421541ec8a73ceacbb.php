@@ -15,30 +15,31 @@
 
         .filter-buttons .btn:hover {
             background-color: var(--bg-main);
-            color: var(--primary-color);
+            color: #0066FF;
         }
 
         .filter-buttons .btn.active {
-            background: var(--primary-gradient);
-            color: rgb(23, 134, 208);
+            background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%);
+            color: white;
             border-color: transparent;
-            box-shadow: 0 4px 12px rgba(255, 59, 63, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
         }
 
         /* Stat Cards */
         .stat-card {
             background-color: var(--bg-white);
-            border: 1px solid var(--border-color);
+            border: 1px solid #CBD5E1;
             transition: all 0.3s ease;
         }
 
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.1);
+            border-color: #00B4D8;
         }
 
         .stat-card h6 {
-            color: var(--text-muted);
+            color: #64748B;
             font-weight: 600;
             text-transform: uppercase;
             font-size: 13px;
@@ -46,7 +47,7 @@
         }
 
         .stat-card h3 {
-            color: var(--text-dark);
+            color: #1E293B;
             font-weight: 700;
             margin-bottom: 0;
         }
@@ -71,20 +72,31 @@
             color: #991b1b;
         }
 
-        /* Chart Tooltip */
-        .apexcharts-tooltip {
-            background: #fff;
-            border: 1px solid var(--border-color) !important;
-            color: var(--text-dark);
+        /* Chart Card Styling */
+        .card {
+            border: 1px solid #CBD5E1;
+            box-shadow: 0 2px 8px rgba(30, 41, 59, 0.04);
         }
 
-        /* Bảng */
+        .card-header {
+            background-color: #F8FAFC;
+            border-bottom: 1px solid #CBD5E1;
+        }
+
+        .card-header h5 {
+            color: #1E293B;
+            font-weight: 600;
+        }
+
+        /* Table Styling */
         .table thead th {
-            background-color: var(--bg-main);
+            background-color: #F8FAFC;
+            color: #1E293B;
             font-size: 13px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            border-bottom: 2px solid #CBD5E1;
         }
 
         .table .product-img {
@@ -95,7 +107,7 @@
         }
 
         .table-hover tbody tr:hover {
-            background-color: var(--bg-main) !important;
+            background-color: #F8FAFC !important;
         }
 
         /* Badge Trạng thái */
@@ -137,7 +149,7 @@
 <?php $__env->startSection('content'); ?>
     <!-- Header & Filters -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-        <h1 class="h3 mb-0">Tổng Quan</h1>
+        <h1 class="h3 mb-0" style="color: #1E293B;">Tổng Quan</h1>
         <div class="filter-buttons btn-group" role="group">
             <a href="<?php echo e(route('admin.dashboard', ['period' => 'today'])); ?>"
                 class="btn <?php echo e($period == 'today' ? 'active' : ''); ?>">Hôm Nay</a>
@@ -236,6 +248,30 @@
         </div>
     </div>
 
+    <!-- New Analytics Row: Category & Customer Stats -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Doanh Thu Theo Danh Mục</h5>
+                </div>
+                <div class="card-body">
+                    <div id="categoryRevenueChart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Top 5 Khách Hàng Tiềm Năng</h5>
+                </div>
+                <div class="card-body">
+                    <div id="topCustomersChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Tables Row -->
     <div class="row">
         <!-- Recent Orders Table -->
@@ -259,27 +295,12 @@
                                 <?php $__empty_1 = true; $__currentLoopData = $recentOrders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                     <tr>
                                         <td><a href="<?php echo e(route('admin.orders.show', $order->id)); ?>"
-                                                class="fw-bold"><?php echo e($order->order_number); ?></a></td>
+                                                class="fw-bold text-decoration-none" style="color: #0066FF;"><?php echo e($order->order_number); ?></a></td>
                                         <td><?php echo e($order->customer_name); ?></td>
                                         <td><?php echo e(number_format($order->total)); ?>đ</td>
                                         <td class="text-center">
                                             <span
                                                 class="status-badge status-badge-<?php echo e($order->status); ?>"><?php echo e($order->status); ?></span>
-                                        </td>
-                                        <td><?php echo e($order->order_number); ?></td>
-                                        <td><?php echo e($order->customer_name); ?></td>
-                                        <td><?php echo e(number_format($order->total)); ?>đ</td>
-                                        <td>
-                                            <span class="badge bg-<?php echo e($order->status === 'pending' ? 'warning' : 'success'); ?>">
-                                                <?php echo e(ucfirst($order->status)); ?>
-
-                                            </span>
-                                        </td>
-                                        <td><?php echo e($order->created_at->format('d/m/Y H:i')); ?></td>
-                                        <td>
-                                            <a href="<?php echo e(route('admin.orders.show', $order->id)); ?>" class="btn btn-sm btn-info">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
                                         </td>
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -319,13 +340,13 @@
                                                     alt="<?php echo e($product->name); ?>" class="product-img me-3">
                                                 <div>
                                                     <a href="<?php echo e(route('admin.products.edit', $product->id)); ?>"
-                                                        class="fw-bold text-dark d-block text-decoration-none"><?php echo e(Str::limit($product->name, 30)); ?></a>
+                                                        class="fw-bold d-block text-decoration-none" style="color: #1E293B;"><?php echo e(Str::limit($product->name, 30)); ?></a>
                                                     <small class="text-muted"><?php echo e(number_format($product->price)); ?>đ</small>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-primary rounded-pill fs-6"><?php echo e($product->sold_count); ?></span>
+                                            <span class="badge rounded-pill fs-6" style="background: #0066FF; color: white;"><?php echo e($product->sold_count); ?></span>
                                         </td>
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -347,8 +368,6 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     <script>
-
-        // THÊM HÀM MỚI NÀY VÀO
         const formatNumber = (num) => {
             if (num >= 1000000) {
                 return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'tr';
@@ -358,13 +377,14 @@
             }
             return num;
         };
+
         document.addEventListener("DOMContentLoaded", function () {
             // === Chart Helpers ===
             const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
-            const chartPrimaryColor = '#FF3B3F';
-            const chartSecondaryColor = '#FF99AC';
+            const chartPrimaryColor = '#0066FF';
+            const chartSecondaryColor = '#00B4D8';
             const chartTextColor = '#64748B';
-            const chartBorderColor = '#F0D9DE';
+            const chartBorderColor = '#CBD5E1';
 
             // === 1. Revenue Timeline Chart ===
             var revenueTimelineOptions = {
@@ -372,11 +392,28 @@
                 chart: { type: 'area', height: 350, toolbar: { show: false }, zoom: { enabled: false } },
                 dataLabels: { enabled: false },
                 stroke: { curve: 'smooth', width: 3, colors: [chartPrimaryColor] },
-                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 90, 100] }, colors: [chartSecondaryColor] },
-                xaxis: { categories: <?php echo json_encode($revenueTimelineChart['labels'] ?? [], 15, 512) ?>, labels: { style: { colors: chartTextColor } }, tooltip: { enabled: false } },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.6,
+                        opacityTo: 0.1,
+                        stops: [0, 90, 100],
+                        colorStops: [
+                            { offset: 0, color: chartPrimaryColor, opacity: 0.6 },
+                            { offset: 100, color: chartSecondaryColor, opacity: 0.1 }
+                        ]
+                    }
+                },
+                xaxis: {
+                    categories: <?php echo json_encode($revenueTimelineChart['labels'] ?? [], 15, 512) ?>,
+                    labels: { style: { colors: chartTextColor } },
+                    tooltip: { enabled: false }
+                },
                 yaxis: {
                     labels: {
-                        style: { colors: chartTextColor }, formatter: (val) => formatNumber(val)
+                        style: { colors: chartTextColor },
+                        formatter: (val) => formatNumber(val)
                     }
                 },
                 tooltip: { y: { formatter: (val) => formatCurrency(val) } },
@@ -389,18 +426,26 @@
             var monthlyRevenueOptions = {
                 series: [{ name: 'Doanh thu', data: <?php echo json_encode($monthlyChartData['data'] ?? [], 15, 512) ?> }],
                 chart: { type: 'bar', height: 350, toolbar: { show: false } },
-                plotOptions: { bar: { borderRadius: 8, horizontal: false, columnWidth: '55%', dataLabels: { position: 'top' } } },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 8,
+                        horizontal: false,
+                        columnWidth: '55%',
+                        dataLabels: { position: 'top' }
+                    }
+                },
                 dataLabels: {
                     enabled: true,
-                    // formatter: (val) => (val / 1000000).toFixed(1) + 'tr',
                     formatter: (val) => formatNumber(val),
-
                     offsetY: -20,
-                    style: { fontSize: '12px', colors: ["#304758"] }
+                    style: { fontSize: '12px', colors: ["#1E293B"], fontWeight: 600 }
                 },
                 stroke: { show: true, width: 2, colors: ['transparent'] },
                 colors: [chartPrimaryColor],
-                xaxis: { categories: <?php echo json_encode($monthlyChartData['labels'] ?? [], 15, 512) ?>, labels: { style: { colors: chartTextColor } } },
+                xaxis: {
+                    categories: <?php echo json_encode($monthlyChartData['labels'] ?? [], 15, 512) ?>,
+                    labels: { style: { colors: chartTextColor } }
+                },
                 yaxis: { labels: { show: false } },
                 fill: { opacity: 1 },
                 tooltip: { y: { formatter: (val) => formatCurrency(val) } },
@@ -428,7 +473,7 @@
                 labels: statusLabels,
                 colors: statusColors,
                 legend: { position: 'bottom', horizontalAlign: 'center', offsetY: 5, fontWeight: 500 },
-                dataLabels: { enabled: true, formatter: (val, opts) => opts.w.globals.series[opts.seriesIndex] }, // Show count
+                dataLabels: { enabled: true, formatter: (val, opts) => opts.w.globals.series[opts.seriesIndex] },
                 plotOptions: {
                     pie: {
                         donut: {
@@ -451,7 +496,131 @@
             };
             var orderStatusChart = new ApexCharts(document.querySelector("#orderStatusChart"), orderStatusOptions);
             orderStatusChart.render();
+
+            // === 4. Category Revenue Chart (Horizontal Bar) ===
+            const categoryRevenue = <?php echo json_encode($categoryRevenueData ?? [], 15, 512) ?>;
+            const categoryLabels = categoryRevenue.map(item => item.category_name);
+            const categoryValues = categoryRevenue.map(item => parseFloat(item.total_revenue));
+
+            var categoryRevenueOptions = {
+                series: [{ name: 'Doanh thu', data: categoryValues }],
+                chart: { type: 'bar', height: 350, toolbar: { show: false } },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        borderRadius: 8,
+                        barHeight: '70%',
+                        distributed: true,
+                        dataLabels: { position: 'top' }
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: (val) => formatNumber(val),
+                    offsetX: 30,
+                    style: { fontSize: '12px', colors: ['#1E293B'], fontWeight: 600 }
+                },
+                colors: ['#0066FF', '#00B4D8', '#1E90FF', '#4169E1', '#6495ED'],
+                xaxis: {
+                    categories: categoryLabels,
+                    labels: { show: false }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#1E293B', fontSize: '13px', fontWeight: 500 }
+                    }
+                },
+                grid: { borderColor: '#CBD5E1', strokeDashArray: 3, xaxis: { lines: { show: true } } },
+                tooltip: {
+                    y: { formatter: (val) => formatCurrency(val) },
+                    theme: 'light'
+                },
+                legend: { show: false }
+            };
+            var categoryRevenueChart = new ApexCharts(document.querySelector("#categoryRevenueChart"), categoryRevenueOptions);
+            categoryRevenueChart.render();
+
+            // === 5. Top Customers Chart (Radial Bar) ===
+            const topCustomers = <?php echo json_encode($topCustomersData ?? [], 15, 512) ?>;
+            const customerNames = topCustomers.map(c => c.customer_name.split(' ').slice(-2).join(' ')); // Lấy 2 từ cuối
+            const customerValues = topCustomers.map(c => parseFloat(c.total_spent));
+            const maxCustomerValue = Math.max(...customerValues);
+            const customerPercentages = customerValues.map(val => Math.round((val / maxCustomerValue) * 100));
+
+            var topCustomersOptions = {
+                series: customerPercentages,
+                chart: { type: 'radialBar', height: 380 },
+                plotOptions: {
+                    radialBar: {
+                        offsetY: 0,
+                        startAngle: 0,
+                        endAngle: 270,
+                        hollow: {
+                            margin: 5,
+                            size: '30%',
+                            background: 'transparent',
+                        },
+                        dataLabels: {
+                            name: {
+                                show: true,
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                color: '#1E293B',
+                                offsetY: -5
+                            },
+                            value: {
+                                show: true,
+                                fontSize: '16px',
+                                fontWeight: 700,
+                                color: '#0066FF',
+                                offsetY: 5,
+                                formatter: function(val, opts) {
+                                    return formatNumber(customerValues[opts.seriesIndex]);
+                                }
+                            },
+                            total: {
+                                show: true,
+                                label: 'Tổng',
+                                fontSize: '14px',
+                                fontWeight: 600,
+                                color: '#64748B',
+                                formatter: function (w) {
+                                    const total = customerValues.reduce((a, b) => a + b, 0);
+                                    return formatNumber(total);
+                                }
+                            }
+                        },
+                        track: {
+                            background: '#F8FAFC',
+                            strokeWidth: '100%',
+                            margin: 8,
+                        }
+                    }
+                },
+                colors: ['#0066FF', '#00B4D8', '#1E90FF', '#4169E1', '#6495ED'],
+                labels: customerNames,
+                legend: {
+                    show: true,
+                    position: 'bottom',
+                    offsetY: 5,
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    markers: { width: 12, height: 12, radius: 12 },
+                    formatter: function(seriesName, opts) {
+                        return seriesName + ' - ' + formatCurrency(customerValues[opts.seriesIndex]);
+                    }
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        legend: { show: false }
+                    }
+                }]
+            };
+            var topCustomersChart = new ApexCharts(document.querySelector("#topCustomersChart"), topCustomersOptions);
+            topCustomersChart.render();
         });
     </script>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/admin/dashboard/index.blade.php ENDPATH**/ ?>

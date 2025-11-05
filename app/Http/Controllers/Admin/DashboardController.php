@@ -15,7 +15,7 @@ use Illuminate\Foundation\Auth\User as AuthUser;
 
 class DashboardController extends Controller
 {
-    // === CÁC HÀM HỖ TRỢ (Đã đúng) ===
+    // === CÁC HÀM HỖ TRỢ ===
     private function getDateRange($period): array
     {
         return match ($period) {
@@ -23,7 +23,7 @@ class DashboardController extends Controller
             'last_7_days' => [now()->subDays(6)->startOfDay(), now()->endOfDay()],
             'this_month' => [now()->startOfMonth(), now()->endOfMonth()],
             'this_year' => [now()->startOfYear(), now()->endOfYear()],
-            default => [now()->subDays(6)->startOfDay(), now()->endOfDay()], // Mặc định là 7 ngày
+            default => [now()->subDays(6)->startOfDay(), now()->endOfDay()],
         };
     }
 
@@ -48,17 +48,30 @@ class DashboardController extends Controller
         [$previousStartDate, $previousEndDate] = $this->getPreviousDateRange($period);
 
         // === 2. THỐNG KÊ CHO CÁC THẺ (dựa trên bộ lọc) ===
-        $revenueCurrentPeriod = Order::where('payment_status', 'paid')->whereBetween('created_at', [$startDate, $endDate])->sum('total');
+        $revenueCurrentPeriod = Order::where('payment_status', 'paid')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('total');
+
         $ordersCurrentPeriod = Order::whereBetween('created_at', [$startDate, $endDate])->count();
-        $revenuePreviousPeriod = Order::where('payment_status', 'paid')->whereBetween('created_at', [$previousStartDate, $previousEndDate])->sum('total');
+
+        $revenuePreviousPeriod = Order::where('payment_status', 'paid')
+            ->whereBetween('created_at', [$previousStartDate, $previousEndDate])
+            ->sum('total');
+
         $ordersPreviousPeriod = Order::whereBetween('created_at', [$previousStartDate, $previousEndDate])->count();
 
         $stats = [
             'revenue' => $revenueCurrentPeriod,
-            'revenue_change' => $revenuePreviousPeriod > 0 ? (($revenueCurrentPeriod - $revenuePreviousPeriod) / $revenuePreviousPeriod) * 100 : ($revenueCurrentPeriod > 0 ? 100 : 0),
+            'revenue_change' => $revenuePreviousPeriod > 0
+                ? (($revenueCurrentPeriod - $revenuePreviousPeriod) / $revenuePreviousPeriod) * 100
+                : ($revenueCurrentPeriod > 0 ? 100 : 0),
             'orders' => $ordersCurrentPeriod,
-            'orders_change' => $ordersPreviousPeriod > 0 ? (($ordersCurrentPeriod - $ordersPreviousPeriod) / $ordersPreviousPeriod) * 100 : ($ordersCurrentPeriod > 0 ? 100 : 0),
-            'new_users' => AuthUser::where('role', 'user')->whereBetween('created_at', [$startDate, $endDate])->count(),
+            'orders_change' => $ordersPreviousPeriod > 0
+                ? (($ordersCurrentPeriod - $ordersPreviousPeriod) / $ordersPreviousPeriod) * 100
+                : ($ordersCurrentPeriod > 0 ? 100 : 0),
+            'new_users' => AuthUser::where('role', 'user')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->count(),
             'avg_order_value' => $ordersCurrentPeriod > 0 ? $revenueCurrentPeriod / $ordersCurrentPeriod : 0,
         ];
 
@@ -66,7 +79,10 @@ class DashboardController extends Controller
         $dateFormat = ($period == 'this_year') ? '%Y-%m' : '%Y-%m-%d';
         $revenueData = Order::where('payment_status', 'paid')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->select(DB::raw("DATE_FORMAT(created_at, '{$dateFormat}') as date"), DB::raw('SUM(total) as revenue'))
+            ->select(
+                DB::raw("DATE_FORMAT(created_at, '{$dateFormat}') as date"),
+                DB::raw('SUM(total) as revenue')
+            )
             ->groupBy('date')
             ->orderBy('date', 'ASC')
             ->get();
@@ -86,7 +102,6 @@ class DashboardController extends Controller
         }
         $revenueTimelineChart = ['labels' => $chartLabels, 'data' => $chartRevenues];
 
-
         // === 4. DỮ LIỆU CHO BIỂU ĐỒ DOANH THU THEO THÁNG (CẢ NĂM) ===
         $monthlyRevenueData = Order::where('payment_status', 'paid')
             ->whereYear('created_at', now()->year)
@@ -100,7 +115,7 @@ class DashboardController extends Controller
             $monthlyChartData['data'][] = (float)($monthlyRevenueData[$i] ?? 0);
         }
 
-        // === 5. DỮ LIỆU CHO BIỂU ĐỒ TỶ LỆ SẢN PHẨM THEO DANH MỤC ===
+        // === 5. DỮ LIỆU CHO BIỂU ĐỒ TỶ LỆ SẢN PHẨM THEO DANH MỤC (Không dùng nữa) ===
         $categoryProductData = Product::join('categories', 'products.category_id', '=', 'categories.id')
             ->select('categories.name', DB::raw('count(products.id) as count'))
             ->groupBy('categories.name')
@@ -118,10 +133,40 @@ class DashboardController extends Controller
             ->pluck('count', 'status')
             ->toArray();
 
-        // === 7. ĐƠN HÀNG MỚI NHẤT & SẢN PHẨM BÁN CHẠY ===
-        $recentOrders = Order::with('user')->orderBy('created_at', 'DESC')->limit(8)->get();
-        $topProducts = Product::orderBy('sold_count', 'DESC')->where('sold_count', '>', 0)->limit(5)->get();
+        // === 7. DỮ LIỆU CHO BIỂU ĐỒ DOANH THU THEO DANH MỤC ===
+        $categoryRevenueData = DB::table('order_items')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.payment_status', 'paid')
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->select('categories.name as category_name', DB::raw('SUM(order_items.subtotal) as total_revenue'))
+            ->groupBy('categories.id', 'categories.name')
+            ->orderBy('total_revenue', 'DESC')
+            ->limit(5)
+            ->get();
 
+        // === 8. DỮ LIỆU CHO TOP 5 KHÁCH HÀNG ===
+        $topCustomersData = Order::select('customer_name', DB::raw('SUM(total) as total_spent'))
+            ->where('payment_status', 'paid')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('customer_name')
+            ->orderBy('total_spent', 'DESC')
+            ->limit(5)
+            ->get();
+
+        // === 9. ĐƠN HÀNG MỚI NHẤT & SẢN PHẨM BÁN CHẠY ===
+        $recentOrders = Order::with('user')
+            ->orderBy('created_at', 'DESC')
+            ->limit(8)
+            ->get();
+
+        $topProducts = Product::orderBy('sold_count', 'DESC')
+            ->where('sold_count', '>', 0)
+            ->limit(5)
+            ->get();
+
+        // === 10. TRẢ VỀ VIEW ===
         return view('admin.dashboard.index', compact(
             'stats',
             'recentOrders',
@@ -130,6 +175,8 @@ class DashboardController extends Controller
             'monthlyChartData',
             'categoryChartData',
             'orderStatusStats',
+            'categoryRevenueData',
+            'topCustomersData',
             'period'
         ));
     }

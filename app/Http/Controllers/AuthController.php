@@ -13,7 +13,10 @@ use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Password as PasswordBroker; // Quan trọng: Đặt alias để tránh xung đột với Password Rule
+
 
 class AuthController extends Controller
 {
@@ -259,6 +262,69 @@ class AuthController extends Controller
             ->with('success', 'Đăng ký thành công! Vui lòng email của bạn để xác thực tài khoản.');
     }
 
+    public function showForgotPasswordForm()
+    {
+        return view('auth.forgot-password');
+    }
+
+    /**
+     * Xử lý gửi email chứa link reset.
+     */
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        // Gửi link reset...
+        $status = PasswordBroker::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status == PasswordBroker::RESET_LINK_SENT
+            ? back()->with(['status' => __($status)])
+            : back()->withErrors(['email' => __($status)]);
+    }
+
+    /**
+     * Hiển thị form nhập mật khẩu mới.
+     * {token} được lấy từ URL.
+     */
+    public function showResetPasswordForm(Request $request, $token)
+    {
+        return view('auth.reset-password', [
+            'request' => $request,
+            'token' => $token
+        ]);
+    }
+
+    /**
+     * Xử lý cập nhật mật khẩu mới.
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)],
+        ]);
+
+        // Cập nhật mật khẩu...
+        $status = PasswordBroker::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                    'remember_token' => STR::random(60),
+                ])->save();
+
+                // (Tùy chọn) Kích hoạt sự kiện PasswordReset
+                // event(new PasswordReset($user));
+            }
+        );
+
+        return $status == PasswordBroker::PASSWORD_RESET
+            ? redirect()->route('login')->with('status', __($status))
+            : back()->withErrors(['email' => __($status)]);
+    }
     public function logout(Request $request)
     {
         Auth::logout();

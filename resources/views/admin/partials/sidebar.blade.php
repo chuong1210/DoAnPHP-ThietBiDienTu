@@ -13,7 +13,7 @@
     <nav class="sidebar-nav mt-3">
         <!-- Main Section -->
         <div class="nav-section-title" style="font-size: small; color: rgb(4, 146, 233);">
-           Tổng Quan
+            Tổng Quan
         </div>
 
         <a href="{{ route('admin.dashboard') }}"
@@ -24,7 +24,7 @@
 
         <!-- Products Section -->
         <div class="nav-section-title" style="font-size: small ; color: rgb(4, 146, 233);">
-         Sản Phẩm
+            Sản Phẩm
         </div>
 
         <a href="{{ route('admin.products.index') }}"
@@ -47,7 +47,7 @@
 
         <!-- Orders Section -->
         <div class="nav-section-title" style="font-size: small ; color: rgb(4, 146, 233);">
-             Đơn Hàng
+            Đơn Hàng
         </div>
 
         <a href="{{ route('admin.orders.index') }}"
@@ -61,7 +61,7 @@
 
         <!-- Communication Section -->
         <div class="nav-section-title" style="font-size: small ; color: rgb(4, 146, 233);">
-             Khách Hàng
+            Khách Hàng
         </div>
 
         <a href="{{ route('admin.chat.index') }}"
@@ -69,8 +69,8 @@
             <i class="fas fa-comments"></i>
             <span>Chat Hỗ Trợ</span>
             @php
-$unreadCount = \App\Models\ChatMessage::whereHas('room', fn($q) => $q->where('status', 'open'))
-    ->where('is_admin', false)->where('is_read', false)->count();
+                $unreadCount = \App\Models\ChatMessage::whereHas('room', fn($q) => $q->where('status', 'open'))
+                    ->where('is_admin', false)->where('is_read', false)->count();
             @endphp
             @if($unreadCount > 0)
                 <span class="nav-badge">{{ $unreadCount }}</span>
@@ -106,7 +106,7 @@ $unreadCount = \App\Models\ChatMessage::whereHas('room', fn($q) => $q->where('st
         <a href="{{ route('admin.contact.index') }}"
             class="nav-link {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}">
             <i class="fas fa-headset"></i>
-            <span>Quản Lý Liên Hệ</span>
+            <span>Quản Lý Contact</span>
         </a>
 
         <a href="{{ route('admin.faqs.index') }}"
