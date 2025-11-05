@@ -6,7 +6,8 @@
         /* Nút Thêm Mới */
         .btn-add-category {
             background: var(--primary-gradient);
-            color: white;
+            color: rgb(4, 146, 233);
+
             border: none;
             border-radius: 12px;
             padding: 10px 20px;

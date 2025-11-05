@@ -8,7 +8,8 @@
         /* Nút Thêm Mới */
         .btn-add-product {
             background: var(--primary-gradient);
-            color: white;
+            color: rgb(21, 177, 204);
+
             border: none;
             border-radius: 12px;
             padding: 10px 20px;

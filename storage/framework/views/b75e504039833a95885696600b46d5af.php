@@ -2,50 +2,80 @@
 
 <?php $__env->startSection('content'); ?>
     <div class="container-fluid py-4">
-        <h3 class="fw-bold mb-3">Chỉnh Sửa Người Dùng</h3>
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); padding: 30px; border-radius: 12px; color: white;">
+                    <h2 class="fw-bold mb-1" style="font-size: 28px;">✏️ Chỉnh Sửa Người Dùng</h2>
+                    <p style="margin: 0; opacity: 0.95;">Cập nhật thông tin tài khoản người dùng</p>
+                </div>
+            </div>
+        </div>
 
+        <!-- Form Card -->
         <form action="<?php echo e(route('admin.users.update', $user->id)); ?>" method="POST">
             <?php echo csrf_field(); ?>
             <?php echo method_field('PUT'); ?>
 
-            <div class="card p-4 shadow-sm">
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" value="<?php echo e($user->email); ?>" disabled>
+            <div class="card shadow-sm border-0" style="border-radius: 12px; border-top: 4px solid #0066FF;">
+                <div class="card-header" style="background-color: #F8FAFC; border-bottom: 1px solid #CBD5E1; padding: 20px;">
+                    <h5 class="mb-0" style="color: #1E293B; font-weight: 600;">
+                        <i class="fas fa-info-circle" style="color: #0066FF; margin-right: 8px;"></i>Thông Tin Người Dùng
+                    </h5>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Họ Tên</label>
-                    <input type="text" name="full_name" value="<?php echo e(old('full_name', $user->full_name)); ?>"
-                        class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Số Điện Thoại</label>
-                    <input type="text" name="phone" value="<?php echo e(old('phone', $user->phone)); ?>" class="form-control">
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Quyền</label>
-                        <select name="role" class="form-select">
-                            <option value="user" <?php echo e($user->role === 'user' ? 'selected' : ''); ?>>User</option>
-                            <option value="admin" <?php echo e($user->role === 'admin' ? 'selected' : ''); ?>>Admin</option>
-                        </select>
+                <div class="card-body" style="padding: 30px;">
+                    <!-- Email Field (Disabled) -->
+                    <div class="mb-4">
+                        <label class="form-label" style="color: #1E293B; font-weight: 600; margin-bottom: 10px;">📧 Email</label>
+                        <input type="email" class="form-control" value="<?php echo e($user->email); ?>" disabled
+                            style="background-color: #F8FAFC; border: 1px solid #CBD5E1; color: #1E293B; border-radius: 8px; padding: 12px;">
+                        <small style="color: #64748B;">Email không thể thay đổi</small>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Trạng Thái</label>
-                        <select name="status" class="form-select">
-                            <option value="active" <?php echo e($user->status === 'active' ? 'selected' : ''); ?>>Active</option>
-                            <option value="inactive" <?php echo e($user->status === 'inactive' ? 'selected' : ''); ?>>Inactive</option>
-                        </select>
+
+                    <!-- Full Name Field -->
+                    <div class="mb-4">
+                        <label class="form-label" style="color: #1E293B; font-weight: 600; margin-bottom: 10px;">👤 Họ Tên</label>
+                        <input type="text" name="full_name" value="<?php echo e(old('full_name', $user->full_name)); ?>"
+                            class="form-control" style="border: 1px solid #CBD5E1; border-radius: 8px; padding: 12px; background-color: white;">
+                    </div>
+
+                    <!-- Phone Field -->
+                    <div class="mb-4">
+                        <label class="form-label" style="color: #1E293B; font-weight: 600; margin-bottom: 10px;">📱 Số Điện Thoại</label>
+                        <input type="text" name="phone" value="<?php echo e(old('phone', $user->phone)); ?>"
+                            class="form-control" style="border: 1px solid #CBD5E1; border-radius: 8px; padding: 12px; background-color: white;">
+                    </div>
+
+                    <!-- Role and Status Row -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label" style="color: #1E293B; font-weight: 600; margin-bottom: 10px;">👑 Quyền</label>
+                            <select name="role" class="form-select" style="border: 1px solid #CBD5E1; border-radius: 8px; padding: 12px; background-color: white; color: #1E293B;">
+                                <option value="user" <?php echo e($user->role === 'user' ? 'selected' : ''); ?>>👤 User</option>
+                                <option value="admin" <?php echo e($user->role === 'admin' ? 'selected' : ''); ?>>👑 Admin</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label" style="color: #1E293B; font-weight: 600; margin-bottom: 10px;">🔄 Trạng Thái</label>
+                            <select name="status" class="form-select" style="border: 1px solid #CBD5E1; border-radius: 8px; padding: 12px; background-color: white; color: #1E293B;">
+                                <option value="active" <?php echo e($user->status === 'active' ? 'selected' : ''); ?>>✅ Active</option>
+                                <option value="inactive" <?php echo e($user->status === 'inactive' ? 'selected' : ''); ?>>⏸️ Inactive</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Căn 2 nút trên cùng một hàng -->
-                <div class="d-flex justify-content-start gap-2 mt-3">
-                    <button class="btn btn-success"><i class="fas fa-save"></i> Lưu Thay Đổi</button>
-                    <a href="<?php echo e(route('admin.users.index')); ?>" class="btn btn-secondary">Quay lại</a>
+                <!-- Action Buttons -->
+                <div class="card-footer" style="background-color: #F8FAFC; border-top: 1px solid #CBD5E1; padding: 20px;">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn" style="background-color: #0066FF; color: white; border: none; border-radius: 8px; padding: 12px 24px; font-weight: 600; transition: all 0.2s;">
+                            <i class="fas fa-save"></i> Lưu Thay Đổi
+                        </button>
+                        <a href="<?php echo e(route('admin.users.index')); ?>" class="btn" style="background-color: #CBD5E1; color: #1E293B; border: none; border-radius: 8px; padding: 12px 24px; font-weight: 600; transition: all 0.2s;">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
                 </div>
             </div>
         </form>
