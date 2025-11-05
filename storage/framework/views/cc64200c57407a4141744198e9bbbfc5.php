@@ -11,6 +11,50 @@
             --danger: #EF4444;
         }
 
+        /* === THÊM CSS CHO BREADCRUMB FRAMELESS VÀO ĐÂY === */
+        .breadcrumb-frameless {
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+            font-size: 0.95rem;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item a i {
+            margin-right: 0.4rem;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item.active {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .breadcrumb-frameless .breadcrumb-item+.breadcrumb-item::before {
+            color: var(--neutral);
+            padding-right: 0.75rem;
+            padding-left: 0.75rem;
+            content: '/';
+        }
+
         .checkout-step {
             position: relative;
             padding: 1.5rem;
@@ -175,23 +219,24 @@
         \Log::info('Available coupons:', [$availablecoupons ?? null]);
     ?>
     <div class="container py-5">
-        <hr class="my-3" id="discount-hr">
+        
 
         <!-- Dòng giảm giá sẽ được JS chèn vào -->
-        <div id="discount-row" class="d-flex justify-content-between mb-2 text-success" style="display: none;">
-            <span class="fw-semibold">Giảm giá:</span>
-            <strong id="discount" class="text-success">-0đ</strong>
-        </div>
+        
 
-        <hr class="my-3">
+        
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb bg-white rounded-3 p-3 shadow-sm">
-                <li class="breadcrumb-item"><a href="<?php echo e(route('client.home.index')); ?>" class="text-primary"><i
-                            class="fas fa-home me-1"></i> Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="<?php echo e(route('client.cart.index')); ?>" class="text-primary">Giỏ hàng</a>
+            <ol class="breadcrumb breadcrumb-frameless">
+                <li class="breadcrumb-item">
+                    <a href="<?php echo e(route('client.home.index')); ?>">
+                        <i class="fas fa-home me-1"></i> Trang chủ
+                    </a>
                 </li>
-                <li class="breadcrumb-item active text-text" aria-current="page">Thanh toán</li>
+                <li class="breadcrumb-item">
+                    <a href="<?php echo e(route('client.cart.index')); ?>">Giỏ hàng</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Thanh toán</li>
             </ol>
         </nav>
 
@@ -898,9 +943,9 @@ unset($__errorArgs, $__bag); ?>
                     discountRow.id = 'discount-row';
                     discountRow.className = 'd-flex justify-content-between mb-2 text-success';
                     discountRow.innerHTML = `
-                                                                                                                                            <span class="fw-semibold">Giảm giá:</span>
-                                                                                                                                            <strong id="discount" class="text-success">-0đ</strong>
-                                                                                                                                        `;
+                                                                                                                                                            <span class="fw-semibold">Giảm giá:</span>
+                                                                                                                                                            <strong id="discount" class="text-success">-0đ</strong>
+                                                                                                                                                        `;
                     hr.insertAdjacentElement('afterend', discountRow);
                 }
             }
@@ -918,14 +963,14 @@ unset($__errorArgs, $__bag); ?>
                 couponAlert.id = 'applied-coupon-alert';
                 couponAlert.className = 'alert alert-success d-flex justify-content-between align-items-center mb-3 rounded-3 border-0';
                 couponAlert.innerHTML = `
-                                                                                                                                        <div>
-                                                                                                                                            <strong class="text-text">${code}</strong><br>
-                                                                                                                                            <small class="text-success">-${discount}đ</small>
-                                                                                                                                        </div>
-                                                                                                                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removeCoupon()">
-                                                                                                                                            <i class="fas fa-times"></i>
-                                                                                                                                        </button>
-                                                                                                                                    `;
+                                                                                                                                                        <div>
+                                                                                                                                                            <strong class="text-text">${code}</strong><br>
+                                                                                                                                                            <small class="text-success">-${discount}đ</small>
+                                                                                                                                                        </div>
+                                                                                                                                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="removeCoupon()">
+                                                                                                                                                            <i class="fas fa-times"></i>
+                                                                                                                                                        </button>
+                                                                                                                                                    `;
                 inputGroup.insertAdjacentElement('beforebegin', couponAlert);
             } else {
                 couponAlert.querySelector('strong').textContent = code;
