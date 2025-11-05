@@ -22,6 +22,21 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        View::composer('admin.partials.header', function ($view) {
+            $totalNotifications = 0;
+            // Đảm bảo model tồn tại trước khi truy vấn
+            if (class_exists(ChatMessage::class)) {
+                $totalNotifications = ChatMessage::whereHas('room', function ($q) {
+                    $q->where('status', 'open');
+                })
+                    ->where('is_admin', false)
+                    ->where('is_read', false)
+                    ->count();
+            }
+
+            $view->with('totalNotifications', $totalNotifications);
+        });
+
         // Sử dụng View Composer để chia sẻ dữ liệu cho một partial view cụ thể
         View::composer('admin.partials.sidebar', function ($view) {
             // Truy vấn số đơn hàng chờ xử lý

@@ -8,27 +8,19 @@
     <div class="top-bar-actions">
         <!-- Notifications -->
         <div class="dropdown">
-            <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown">
+            <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
                 <i class="fas fa-bell"></i>
-                @php
-                    $totalNotifications = \App\Models\ChatMessage::whereHas('room', function ($q) {
-                        $q->where('status', 'open');
-                    })
-                        ->where('is_admin', false)
-                        ->where('is_read', false)
-                        ->count();
-                @endphp
-                @if($totalNotifications > 0)
+                {{-- Sử dụng biến từ View Composer --}}
+                @if(isset($totalNotifications) && $totalNotifications > 0)
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {{ $totalNotifications }}
+                        {{ $totalNotifications > 9 ? '9+' : $totalNotifications }}
                     </span>
                 @endif
             </button>
             <ul class="dropdown-menu dropdown-menu-end" style="min-width: 300px;">
-                <li class="dropdown-header">
-                    <strong>Thông Báo</strong>
-                </li>
-                @if($totalNotifications > 0)
+                <li class="dropdown-header"><strong>Thông Báo</strong></li>
+                @if(isset($totalNotifications) && $totalNotifications > 0)
                     <li>
                         <a class="dropdown-item" href="{{ route('admin.chat.index') }}">
                             <i class="fas fa-comment text-danger me-2"></i>
@@ -36,9 +28,7 @@
                         </a>
                     </li>
                 @else
-                    <li class="dropdown-item text-muted text-center">
-                        <small>Không có thông báo mới</small>
-                    </li>
+                    <li class="dropdown-item text-muted text-center"><small>Không có thông báo mới</small></li>
                 @endif
             </ul>
         </div>
