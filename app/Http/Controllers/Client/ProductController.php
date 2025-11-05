@@ -47,16 +47,29 @@ class ProductController extends Controller
 
         $brands = $this->brandRepository->getActiveBrands();
 
-        // Gọi service để lấy products (không xử lý DB ở Controller nữa)
-        $products = $this->productService->search(
+        // Xử lý category_id để bao gồm cả subcategories
+        $categoryId = $request->get('category_id');
+        $categoryIds = [];
+
+        if ($categoryId) {
+            // Tìm category và lấy tất cả con cháu
+            $selectedCategory = $categories->find($categoryId);
+            if ($selectedCategory) {
+                $categoryIds = $this->getAllChildIds($selectedCategory);
+                $categoryIds[] = $categoryId; // Thêm chính nó
+            }
+        }
+
+        $products = $this->productRepository->searchProducts(
             $request->get('keyword'),  // keyword tìm kiếm (nếu có)
             [
-                'category_id' => $request->get('category_id'),
+                'category_id' => $categoryIds ? $categoryIds : null,  // Truyền mảng ids hoặc null
                 'brand_id'    => $request->get('brand_id'),
                 'price_from'  => $request->get('price_from'),
                 'price_to'    => $request->get('price_to'),
-                'sort'        => $request->get('sort', 'created_at'),
-                'order'       => $request->get('order', 'DESC'),
+                'sort_by'     => $request->get('sort', 'created_at'),
+                'sort_order'  => $request->get('order', 'DESC'),
+                'per_page'    => $request->get('per_page', 20),
             ]
         );
 
@@ -67,6 +80,20 @@ class ProductController extends Controller
         ));
     }
 
+    // Helper method để lấy tất cả child ids recursively
+    private function getAllChildIds($category)
+    {
+        $ids = [];
+
+        if ($category->children) {
+            foreach ($category->children as $child) {
+                $ids[] = $child->id;
+                $ids = array_merge($ids, $this->getAllChildIds($child));
+            }
+        }
+
+        return $ids;
+    }
     /**
      * Chi tiết sản phẩm
      */
@@ -116,13 +143,13 @@ class ProductController extends Controller
         $keyword = $request->get('q');
 
         $filters = [
-            'category_id' => $request->category_id,
-            'brand_id'    => $request->brand_id,
-            'price_from'  => $request->price_from,
-            'price_to'    => $request->price_to,
+            'category_id' => $request->get('category_id'),
+            'brand_id'    => $request->get('brand_id'),
+            'price_from'  => $request->get('price_from'),
+            'price_to'    => $request->get('price_to'),
             'sort_by'     => $request->get('sort', 'created_at'),
             'sort_order'  => $request->get('order', 'DESC'),
-            'per_page'    => 20
+            'per_page'    => $request->get('per_page', 20),
         ];
 
         $products = $this->productRepository->searchProducts($keyword, $filters);
@@ -143,6 +170,7 @@ class ProductController extends Controller
         // Lấy category + products qua service
         $data = $this->productRepository->getProductsByCategorySlug($slug, 20);
 
+
         // Lấy categories cho sidebar
         $categories = $this->categoryRepository->getSidebarCategories();
 
@@ -153,10 +181,6 @@ class ProductController extends Controller
         ]);
     }
 
-
-    /**
-     * Hiển thị tất cả sản phẩm
-     */
     public function all(Request $request)
     {
         // Lấy categories cho sidebar
@@ -165,14 +189,47 @@ class ProductController extends Controller
         // Lấy brands cho filter
         $brands = $this->brandRepository->getActiveBrands();
 
-        // Lấy tất cả sản phẩm active và in stock, paginated
+        // Xử lý sort và order
+        $sort = $request->get('sort', 'created_at');
+        $order = $request->get('order');
+
+        if (!$order) {
+            $order = match ($sort) {
+                'price' => 'ASC',
+                'name' => 'ASC',
+                'sold_count' => 'DESC',
+                default => 'DESC'
+            };
+        }
+
+        // Xây dựng filters
+        $filters = [
+            'sort_by'     => $sort,
+            'sort_order'  => $order,
+            'per_page'    => $request->get('per_page', 20),
+        ];
+
+        // Thêm filter nếu có giá trị
+        if ($request->filled('category_id')) {
+            $filters['category_id'] = $request->get('category_id');
+        }
+
+        if ($request->filled('brand_id')) {
+            $filters['brand_id'] = $request->get('brand_id');
+        }
+
+        if ($request->filled('price_from')) {
+            $filters['price_from'] = $request->get('price_from');
+        }
+
+        if ($request->filled('price_to')) {
+            $filters['price_to'] = $request->get('price_to');
+        }
+
+        // Lấy tất cả sản phẩm với filters
         $products = $this->productRepository->searchProducts(
-            null,  // Không có keyword
-            [
-                'per_page' => 20,
-                'sort_by'  => $request->get('sort', 'created_at'),
-                'sort_order' => $request->get('order', 'DESC')
-            ]
+            $request->get('keyword'),  // Cho phép keyword nếu có
+            $filters
         );
 
         return view('client.product.all', compact(

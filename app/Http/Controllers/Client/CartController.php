@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use App\Repositories\BrandRepository;
 use App\Repositories\CartRepository;
 use App\Repositories\CartItemRepository;
@@ -52,7 +53,9 @@ class CartController extends Controller
         );
         $categories = $this->categoryRepository->getCategoriesWithChildren();
         $brands = $this->brandRepository->getActiveBrands();
-        return view('client.cart.index', compact('cart', 'categories', 'brands'));
+        $coupons = Coupon::active()->get(); // Load active coupons
+
+        return view('client.cart.index', compact('cart', 'categories', 'brands', 'coupons'));
     }
 
     /**

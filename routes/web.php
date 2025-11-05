@@ -15,6 +15,7 @@ use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\ProductController as ClientsProductController;
 use App\Http\Controllers\Client\ReviewController;
+use App\Http\Controllers\Client\SupportController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\BannerController;
@@ -33,6 +34,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login.post');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('auth.register');
     Route::post('/register', [AuthController::class, 'register'])->name('auth.register.post');
+
+
+    Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
 
 /*
@@ -42,7 +47,9 @@ Route::middleware('guest')->group(function () {
 */
 Route::prefix('client')->name('client.')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home.index');
-    Route::get('/products', [ClientsProductController::class, 'all'])->name('product.index');
+    Route::get('/products-all', [ClientsProductController::class, 'all'])->name('product.all');
+    Route::get('/products', [ClientsProductController::class, 'index'])->name('product.index');
+
     Route::get('/product/{slug}', [ClientsProductController::class, 'show'])->name('product.show');
     Route::get('/search', [ClientsProductController::class, 'search'])->name('search');
     Route::get('/category/{slug}', [ClientsProductController::class, 'category'])->name('product.category.index');
@@ -62,7 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile.index');
     Route::put('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
-    Route::put('/profile/update/password', [AuthController::class, 'updatePassword'])->name('profile.update.password');
+    Route::post('/profile/update/password', [AuthController::class, 'updatePassword'])->name('profile.update.password');
 
     // Reviews
     Route::get('/products/{slug}/review', [ReviewController::class, 'create'])->name('reviews.create');
@@ -77,6 +84,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/remove/{item}', [CartController::class, 'remove'])->name('remove');
     });
 
+    Route::get('/support', [SupportController::class, 'index'])->name('client.support.index');
+    Route::post('/support/contact', [SupportController::class, 'contact'])->name('client.support.contact');
+
     // Checkout
     Route::prefix('client/checkout')->name('client.checkout.')->group(function () {
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
@@ -85,7 +95,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/process', [CheckoutController::class, 'process'])->name('process');
         Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
 
-        Route::post('/apply-voucher', [CheckoutController::class, 'applyVoucher'])->name('apply-voucher');
+        Route::post('/apply-coupon', [CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
+        // routes/web.php
+        Route::post('/remove-coupon', [CheckoutController::class, 'removeCoupon'])
+            ->name('remove-coupon');
     });
 
     // Orders
@@ -96,6 +109,10 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+use App\Http\Controllers\Client\NewsletterController;
+
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
+    ->name('newsletter.subscribe');
 /*
 |--------------------------------------------------------------------------
 | Admin Routes (Quản trị viên)

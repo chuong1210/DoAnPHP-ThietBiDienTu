@@ -32,6 +32,12 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+            $recentOrders = Order::with('user:id,name,email')
+    ->orderBy('created_at', 'DESC')
+    ->limit(10)
+    ->get();
+
+
         // Sản phẩm bán chạy
         $topProducts = Product::orderBy('sold_count', 'DESC')
             ->limit(5)

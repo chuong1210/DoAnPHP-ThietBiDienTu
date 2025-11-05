@@ -1,227 +1,278 @@
 @extends('client.layouts.client')
 
-@section('title', 'Danh Sách Sản Phẩm')
+@section('title', 'Tất cả sản phẩm')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mb-0">
-            <i class="fas fa-box"></i> Tất Cả Sản Phẩm
-            <small class="text-muted">({{ $products->total() }} sản phẩm)</small>
-        </h3>
-
-        <!-- Sort -->
-        <div class="d-flex gap-2">
-            <select class="form-select form-select-sm" onchange="sortProducts(this.value)" style="width: 200px;">
-                <option value="">Sắp xếp</option>
-                <option value="created_at-DESC" {{ request('sort') == 'created_at' && request('order') == 'DESC' ? 'selected' : '' }}>
-                    Mới nhất
-                </option>
-                <option value="price-ASC" {{ request('sort') == 'price' && request('order') == 'ASC' ? 'selected' : '' }}>
-                    Giá: Thấp → Cao
-                </option>
-                <option value="price-DESC" {{ request('sort') == 'price' && request('order') == 'DESC' ? 'selected' : '' }}>
-                    Giá: Cao → Thấp
-                </option>
-                <option value="name-ASC" {{ request('sort') == 'name' && request('order') == 'ASC' ? 'selected' : '' }}>
-                    Tên: A → Z
-                </option>
-                <option value="sold_count-DESC" {{ request('sort') == 'sold_count' && request('order') == 'DESC' ? 'selected' : '' }}>
-                    Bán chạy
-                </option>
-            </select>
-
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-outline-secondary active" onclick="viewGrid()">
-                    <i class="fas fa-th"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="viewList()">
-                    <i class="fas fa-list"></i>
-                </button>
+    <div class="container py-5">
+        <div class="row g-5">
+            <!-- Sidebar (nếu cần sau này) -->
+            <div class="col-lg-3 d-none d-lg-block">
+                <!-- Sidebar sẽ thêm sau nếu cần -->
             </div>
-        </div>
-    </div>
 
-    <!-- Active Filters -->
-    @if(request()->hasAny(['category_id', 'brand_id', 'price_from', 'price_to']))
-        <div class="mb-3">
-            <span class="fw-bold">Bộ lọc đang áp dụng:</span>
+            <!-- Main Content -->
+            <div class="col-lg-12">
+                <!-- Page Title -->
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-cubes me-3 text-primary" style="font-size: 2rem;"></i>
+                    <h1 class="fw-bold text-gradient mb-0">Tất cả sản phẩm</h1>
+                </div>
 
-            @if(request('category_id'))
-                <span class="badge bg-primary">
-                    Danh mục: {{ $categories->find(request('category_id'))->name ?? '' }}
-                    <a href="{{ route('client.product.index', Illuminate\Support\Arr::except(request()->all(), 'category_id')) }}"
-                        class="text-white ms-1">×</a>
-                </span>
-            @endif
+                <!-- Filter Bar -->
+                <div class="filter-bar bg-white rounded-4 shadow-sm p-4 mb-5 border border-neutral">
+                    <form method="GET" action="{{ route('client.product.index') }}" class="row g-3 align-items-end">
+                        <!-- Search -->
+                        <div class="col-md-3 col-12">
+                            <label class="form-label fw-semibold text-text small">
+                                <i class="fas fa-search me-1 text-secondary"></i> Tìm kiếm
+                            </label>
+                            <input type="text" name="keyword" class="form-control modern-input"
+                                placeholder="Tên sản phẩm..." value="{{ request('keyword') }}">
+                        </div>
 
-            @if(request('brand_id'))
-                <span class="badge bg-primary">
-                    Thương hiệu: {{ $brands->find(request('brand_id'))->name ?? '' }}
-                    <a href="{{ route('client.product.index', Illuminate\Support\Arr::except(request()->all(), 'brand_id')) }}"
-                        class="text-white ms-1">×</a>
-                </span>
-            @endif
+                        <!-- Category -->
+                        <div class="col-md-2 col-6">
+                            <label class="form-label fw-semibold text-text small">
+                                <i class="fas fa-layer-group me-1 text-secondary"></i> Danh mục
+                            </label>
+                            <select name="category_id" class="form-select modern-select">
+                                <option value="">Tất cả</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-            @if(request('price_from') || request('price_to'))
-                <span class="badge bg-primary">
-                    Giá: {{ number_format(request('price_from', 0)) }} - {{ number_format(request('price_to', 0)) }}đ
-                    <a href="{{ route('client.product.index', request()->except(['price_from', 'price_to'])) }}"
-                        class="text-white ms-1">×</a>
-                </span>
-            @endif
-
-            <a href="{{ route('client.product.index') }}" class="btn btn-sm btn-outline-danger">
-                <i class="fas fa-times"></i> Xóa tất cả
-            </a>
-        </div>
-    @endif
-
-    <!-- Products Grid -->
-    <div class="row" id="productsGrid">
-        @forelse($products as $product)
-            <div class="col-md-4 mb-4">
-                <div class="card product-card h-100">
-                    <!-- Badge -->
-                    @if($product->is_featured)
-                        <span class="badge bg-danger position-absolute top-0 start-0 m-2">
-                            <i class="fas fa-fire"></i> Nổi bật
-                        </span>
-                    @endif
-
-                    @if($product->sale_price)
-                        <span class="badge bg-warning position-absolute top-0 end-0 m-2">
-                            -{{ $product->discount_percent }}%
-                        </span>
-                    @endif
-
-                    <!-- Image -->
-                    <a href="{{ route('client.product.show', $product->slug) }}">
-                        @if($product->image)
-                            <img src="{{ asset($product->image) }}" class="card-img-top product-image" alt="{{ $product->name }}">
-                        @else
-                            <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
-                                <i class="fas fa-image fa-3x text-muted"></i>
-                            </div>
-                        @endif
-                    </a>
-
-                    <div class="card-body d-flex flex-column">
                         <!-- Brand -->
-                        <p class="text-muted small mb-2">
-                            <i class="fas fa-tag"></i> {{ $product->brand->name }}
-                        </p>
+                        <div class="col-md-2 col-6">
+                            <label class="form-label fw-semibold text-text small">
+                                <i class="fas fa-tag me-1 text-secondary"></i> Thương hiệu
+                            </label>
+                            <select name="brand_id" class="form-select modern-select">
+                                <option value="">Tất cả</option>
+                                @foreach($brands as $brand)
+                                    <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                        <!-- Name -->
-                        <h6 class="card-title">
-                            <a href="{{ route('client.product.show', $product->slug) }}" class="text-decoration-none text-dark">
-                                {{ Str::limit($product->name, 60) }}
-                            </a>
-                        </h6>
+                        <!-- Sort -->
+                        <div class="col-md-2 col-6">
+                            <label class="form-label fw-semibold text-text small">
+                                <i class="fas fa-sort me-1 text-secondary"></i> Sắp xếp
+                            </label>
+                            <select name="sort" class="form-select modern-select">
+                                <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Mới nhất
+                                </option>
+                                <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>Giá tăng dần</option>
+                                <option value="price desc" {{ request('sort') == 'price desc' ? 'selected' : '' }}>Giá giảm
+                                    dần</option>
+                            </select>
+                        </div>
 
-                        <!-- Rating -->
-                        <div class="mb-2">
-                            @for($i = 1; $i <= 5; $i++)
-                                @if($i <= $product->average_rating)
-                                    <i class="fas fa-star text-warning"></i>
-                                @else
-                                    <i class="far fa-star text-warning"></i>
+                        <!-- Submit -->
+                        <div class="col-md-3 col-12">
+                            <button type="submit" class="btn btn-primary w-100 btn-modern">
+                                <i class="fas fa-filter me-1"></i> Lọc sản phẩm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="row g-4">
+                    @forelse($products as $product)
+                        <div class="col-lg-3 col-md-4 col-6">
+                            <div
+                                class="product-card-modern h-100 position-relative overflow-hidden rounded-4 shadow-sm hover-lift">
+                                <!-- Sale Badge -->
+                                @if($product->sale_price)
+                                    <div class="position-absolute top-0 start-0 m-3 z-3">
+                                        <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold">
+                                            -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}%
+                                        </span>
+                                    </div>
                                 @endif
-                            @endfor
-                            <span class="text-muted small">({{ $product->reviews->count() }})</span>
-                        </div>
 
-                        <!-- Price -->
-                        <div class="mb-3">
-                            @if($product->sale_price)
-                                <span class="h5 text-danger mb-0">{{ number_format($product->sale_price) }}đ</span>
-                                <br>
-                                <span class="price-old small">{{ number_format($product->price) }}đ</span>
-                            @else
-                                <span class="h5 text-primary mb-0">{{ number_format($product->price) }}đ</span>
-                            @endif
-                        </div>
+                                <!-- Image -->
+                                <div class="position-relative overflow-hidden rounded-4">
+                                    <img src="{{ asset($product->image) }}" class="card-img-top product-img"
+                                        alt="{{ $product->name }}"
+                                        style="height: 220px; object-fit: cover; transition: transform .4s ease;">
+                                    <div class="overlay"></div>
+                                </div>
 
-                        <!-- Stock -->
-                        <div class="mb-3">
-                            @if($product->quantity > 0)
-                                <span class="badge bg-success">
-                                    <i class="fas fa-check"></i> Còn hàng
-                                </span>
-                            @else
-                                <span class="badge bg-danger">
-                                    <i class="fas fa-times"></i> Hết hàng
-                                </span>
-                            @endif
-                        </div>
+                                <!-- Body -->
+                                <div class="card-body p-4">
+                                    <h5 class="card-title fw-bold text-text mb-2 line-clamp-2">
+                                        {{ $product->name }}
+                                    </h5>
+                                    <p class="card-text text-muted small line-clamp-2 mb-3">
+                                        {{ Str::limit($product->description, 80) }}
+                                    </p>
 
-                        <!-- Actions -->
-                        <div class="mt-auto">
-                            <div class="d-grid gap-2">
-                                <a href="{{ route('client.product.show', $product->slug) }}"
-                                    class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-eye"></i> Xem Chi Tiết
-                                </a>
+                                    <!-- Price -->
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        @if($product->sale_price)
+                                            <div>
+                                                <span class="h5 fw-bold text-danger mb-0">
+                                                    {{ number_format($product->sale_price) }}đ
+                                                </span>
+                                                <del class="text-muted small ms-2">
+                                                    {{ number_format($product->price) }}đ
+                                                </del>
+                                            </div>
+                                        @else
+                                            <span class="h5 fw-bold text-primary mb-0">
+                                                {{ number_format($product->price) }}đ
+                                            </span>
+                                        @endif
+                                    </div>
 
-                                @if($product->quantity > 0)
-                                    <form action="{{ route('client.cart.add', $product->id) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="btn btn-primary btn-sm w-100">
-                                            <i class="fas fa-cart-plus"></i> Thêm Vào Giỏ
-                                        </button>
-                                    </form>
-                                @endif
+                                    <!-- Action -->
+                                    <a href="{{ route('client.product.show', $product->slug) }}"
+                                        class="btn btn-outline-primary w-100 btn-sm rounded-pill fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                        <i class="fas fa-eye"></i>
+                                        Xem chi tiết
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @empty
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-box-open fa-3x text-neutral mb-3"></i>
+                            <p class="text-muted">Không tìm thấy sản phẩm nào.</p>
+                        </div>
+                    @endforelse
                 </div>
-            </div>
-        @empty
-            <div class="col-12">
-                <div class="alert alert-info text-center">
-                    <i class="fas fa-info-circle fa-3x mb-3"></i>
-                    <h5>Không tìm thấy sản phẩm nào</h5>
-                    <p class="mb-0">Vui lòng thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc</p>
-                </div>
-            </div>
-        @endforelse
-    </div>
 
-    <!-- Pagination -->
-    <div class="d-flex justify-content-center mt-4">
-        {{ $products->appends(request()->query())->links() }}
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-5">
+                    {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
-@section('scripts')
-    <script>
-        function sortProducts(value) {
-            if (!value) return;
-
-            const [sort, order] = value.split('-');
-            const url = new URL(window.location.href);
-            url.searchParams.set('sort', sort);
-            url.searchParams.set('order', order);
-            window.location.href = url.toString();
+{{-- CSS ĐẶC BIỆT CHO TRANG NÀY --}}
+@push('styles')
+    <style>
+        :root {
+            --primary: #0066FF;
+            --secondary: #00B4D8;
+            --bg: #F8FAFC;
+            --text: #1E293B;
+            --neutral: #CBD5E1;
+            --danger: #EF4444;
         }
 
-        function viewGrid() {
-            // Toggle active button
-            document.querySelectorAll('.btn-group button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.closest('button').classList.add('active');
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        function viewList() {
-            // Toggle active button
-            document.querySelectorAll('.btn-group button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.closest('button').classList.add('active');
-
-            // TODO: Implement list view
-            alert('Chế độ xem danh sách - Coming soon!');
+        .filter-bar {
+            background: white;
+            border: 1.5px solid var(--neutral);
         }
-    </script>
-@endsection
+
+        .modern-input,
+        .modern-select {
+            border: 1.5px solid var(--neutral);
+            border-radius: 12px;
+            padding: 0.65rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .modern-input:focus,
+        .modern-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1);
+            outline: none;
+        }
+
+        .btn-modern {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+        }
+
+        .product-card-modern {
+            background: white;
+            border: 1.5px solid var(--neutral);
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .product-card-modern:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .product-card-modern:hover .product-img {
+            transform: scale(1.08);
+        }
+
+        .product-img {
+            transition: transform 0.4s ease;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.05));
+            pointer-events: none;
+        }
+
+        .hover-lift {
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Pagination */
+        .pagination .page-link {
+            border: none;
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin: 0 4px;
+            font-weight: 500;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+        }
+
+        .pagination .page-link:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+    </style>
+@endpush

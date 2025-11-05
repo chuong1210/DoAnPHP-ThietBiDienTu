@@ -94,7 +94,7 @@
                             <tbody>
                                 @foreach($recentOrders as $order)
                                     <tr>
-                                        <td>{{ $order->order_number }}</td>
+                                        <!-- <td>{{ $order->order_number }}</td>
                                         <td>{{ $order->customer_name }}</td>
                                         <td>{{ number_format($order->total) }}đ</td>
                                         <td>
@@ -107,7 +107,7 @@
                                             <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                        </td>
+                                        </td> -->
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -6,145 +6,111 @@ use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Http\Request;
-use App\Mail\ReplyContactMail;
-use Illuminate\Support\Facades\Mail;
 use App\Models\Contact;
+use App\Mail\ReplyContactMail;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+
 class ReviewController extends Controller
 {
-    /**
-     * Hiển thị danh sách review theo trạng thái
-     */
     public function index(Request $request)
     {
-        $status = $request->get('status', 'pending');
+        $status = $request->query('status');
 
-        $reviews = Review::where('status', $status)
-                        ->orderBy('created_at', 'DESC')
-                        ->paginate(20);
+        $reviews = Review::with(['user', 'product'])
+            ->when($status, fn($q, $s) => $q->where('status', $s))
+            ->orderByDesc('created_at')
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.reviews.index', compact('reviews', 'status'));
     }
 
-    /**
-     * Hiển thị form thêm đánh giá
-     */
     public function create()
     {
-        $users = User::all();       // Lấy tất cả người dùng
-        $products = Product::all(); // Lấy tất cả sản phẩm
+        $users = User::select('id', 'name')->whereNotNull('name')->get();
+        $products = Product::select('id', 'name')->get();
 
         return view('admin.reviews.create', compact('users', 'products'));
     }
 
-    /**
-     * Lưu đánh giá mới
-     */
     public function store(Request $request)
     {
-        // Validate dữ liệu từ form
         $validated = $request->validate([
-            'comment' => 'required|string|max:1000',
-            'user_name' => 'required|string|max:255', // để tạo user nếu cần
-            'product_id' => 'required|exists:products,id',
-            'rating' => 'required|integer|min:1|max:5',
-            'is_active' => 'sometimes|boolean',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'comment'     => 'required|string|max:1000',
+            'user_id'     => 'required|exists:users,id', // ← BẮT BUỘC user_id
+            'product_id'  => 'required|exists:products,id',
+            'rating'      => 'required|integer|min:1|max:5',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // === XỬ LÝ USER_ID ===
-        // Giả sử cột tên người dùng trong bảng users là 'full_name'
-        if (empty($validated['user_id']) && !empty($validated['user_name'])) {
-            $user = User::firstOrCreate(
-                ['full_name' => $validated['user_name']], // cột thật trong bảng users
-                ['email' => $validated['user_name'].'@example.com', 'password' => bcrypt('123456')] // trường bắt buộc khác
-            );  
-            $validated['user_id'] = $user->id;
-        }
+        $data = [
+            'user_id'     => $validated['user_id'],
+            'product_id'  => $validated['product_id'],
+            'rating'      => $validated['rating'],
+            'comment'     => $validated['comment'],
+            'status'      => 'pending',
+        ];
 
-        // Thiết lập các trường mặc định
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
-        $validated['status'] = 'pending';
-
-        // === XỬ LÝ UPLOAD ẢNH ===
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $fileName = time().'_'.$file->getClientOriginalName();
-            $file->move(public_path('images'), $fileName);
-            $validated['image'] = $fileName;
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/reviews'), $fileName);
+            $data['image'] = $fileName;
         }
 
-        // Tạo đánh giá
-        Review::create($validated);
+        Review::create($data);
 
-        return redirect()->route('admin.reviews.index')
-                        ->with('success', 'Đánh giá đã được thêm thành công!');
+        return redirect()
+            ->route('admin.reviews.index')
+            ->with('success', 'Thêm đánh giá thành công!');
     }
 
-
-    /**
-     * Hiển thị form chỉnh sửa đánh giá
-     */
     public function edit($id)
     {
-        $review = Review::findOrFail($id);
-        $users = User::all();
-        $products = Product::all();
-
-        return view('admin.reviews.edit', compact('review', 'users', 'products'));
+        $review = Review::with(['user', 'product'])->findOrFail($id);
+        return view('admin.reviews.edit', compact('review'));
     }
 
-    /**
-     * Cập nhật đánh giá
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, Review $review)
     {
-        $validated = $request->validate([
-            'comment' => 'required|string|max:1000',
-            'user_name' => 'required|string|max:255',
-            'product_id' => 'required|exists:products,id',
-            'rating' => 'required|integer|min:1|max:5',
-            'is_active' => 'nullable|boolean',
+        $request->validate([
+            'status' => 'required|in:pending,approved,rejected'
         ]);
 
-        $review = Review::findOrFail($id);
+        $review->status = $request->status;
+        $review->save();
 
-        // Xử lý user_name → cập nhật user_id nếu tên thay đổi
-        if (!empty($validated['user_name'])) {
-            $user = User::firstOrCreate(['name' => $validated['user_name']]);
-            $validated['user_id'] = $user->id;
-        }
-
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
-
-        $review->update($validated);
-
-        return redirect()->route('admin.reviews.index')->with('success', 'Đánh giá đã được cập nhật!');
+        return redirect()
+            ->route('admin.reviews.index')
+            ->with('success', 'Cập nhật trạng thái thành công!');
     }
-public function markAsReplied($id)
-{
-    $contact = Contact::findOrFail($id);
 
-    // Nội dung reply bạn có thể lấy từ request hoặc mặc định
-    $replyMessage = "Cảm ơn bạn đã liên hệ, chúng tôi sẽ xử lý sớm!";
-
-    // Gửi email
-    Mail::to($contact->email)->send(new ReplyContactMail($contact, $replyMessage));
-
-    // Cập nhật trạng thái contact
-    $contact->status = 'replied';
-    $contact->save();
-
-    return redirect()->back()->with('success', 'Đã gửi phản hồi và cập nhật trạng thái!');
-}
-    /**
-     * Xóa đánh giá
-     */
     public function destroy($id)
     {
         $review = Review::findOrFail($id);
+
+        if ($review->image && file_exists(public_path('uploads/reviews/' . $review->image))) {
+            unlink(public_path('uploads/reviews/' . $review->image));
+        }
+
         $review->delete();
 
-        return redirect()->route('admin.reviews.index')->with('success', 'Đã xóa đánh giá thành công!');
+        return redirect()
+            ->route('admin.reviews.index')
+            ->with('success', 'Xóa đánh giá thành công!');
+    }
+
+    public function markAsReplied($id)
+    {
+        $contact = Contact::findOrFail($id);
+        $replyMessage = "Cảm ơn bạn đã liên hệ! Chúng tôi đã nhận được tin nhắn và sẽ xử lý sớm nhất.";
+
+        Mail::to($contact->email)->send(new ReplyContactMail($contact, $replyMessage));
+
+        $contact->status = 'replied';
+        $contact->save();
+
+        return redirect()->back()->with('success', 'Đã gửi phản hồi và cập nhật trạng thái!');
     }
 }

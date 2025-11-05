@@ -8,8 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-     protected $fillable = ['comment','user_id','user_name','product_id','rating','is_active','status'];
-
+        // app/Models/Review.php
+    protected $fillable = [
+        'comment',
+        'user_id',     // ← Chỉ cần user_id
+        'product_id',
+        'rating',
+        'status',      // ← Giữ lại
+        // 'user_name' → XÓA DÒNG NÀY
+    ];
 
 
     protected $casts = [

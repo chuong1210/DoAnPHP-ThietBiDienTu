@@ -4,9 +4,10 @@
 // app/Models/User.php
 // ==========================================
 namespace App\Models;
-
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -19,6 +20,8 @@ class User extends Authenticatable
         'phone',
         'role',
         'status',
+        'google_id',
+        'avatar',
     ];
 
     protected $hidden = [
@@ -29,8 +32,26 @@ class User extends Authenticatable
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
+    public function setPasswordAttribute($value)
+    {
+        if ($value) {
+            $this->attributes['password'] = Hash::make($value);
+        } else {
+            $this->attributes['password'] = null; // Cho social login
+        }
+    }
+    public function scopeByGoogleId($query, $googleId)
+    {
+        return $query->where('google_id', $googleId);
+    }
+    public function getIsSocialAttribute()
+    {
+        return is_null($this->password);
+    }
     // Relationships
     public function cart()
     {
