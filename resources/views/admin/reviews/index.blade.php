@@ -3,107 +3,124 @@
 @section('title', 'Quản Lý Đánh Giá')
 
 @section('content')
-<div class="container-fluid" style="background-color: #FFF5F7; min-height: 100vh; padding: 20px 0;">
+<div class="container-fluid" style="background: linear-gradient(135deg, #F8FAFC 0%, #E0F2FE 100%); min-height: 100vh; padding: 20px 0;">
     <!-- Header -->
-    <div class="mb-4" style="background: linear-gradient(135deg, #FF3B3F 0%, #FF6B81 100%); color: white; padding: 25px; border-radius: 8px;">
-        <h1 class="h3 mb-0">Quản Lý Đánh Giá</h1>
+    <div class="mb-4" style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); color: white; padding: 28px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 102, 255, 0.2);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <h1 class="h3 mb-0">Quản Lý Đánh Giá</h1>
+        </div>
     </div>
 
-    <!-- FLASH MESSAGE -->
-    @if(session('success'))
-        <div class="alert alert-success d-flex align-items-center mb-3" style="background-color: #E6F7E9; border: 1px solid #69DB7C; color: #1E293B; border-radius: 8px; padding: 12px 16px;" role="alert">
-            <i class="fas fa-check-circle me-2" style="color: #69DB7C;"></i>
-            <strong>{{ session('success') }}</strong>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger d-flex align-items-center mb-3" style="background-color: #FFE8ED; border: 1px solid #FF6B81; color: #1E293B; border-radius: 8px; padding: 12px 16px;" role="alert">
-            <i class="fas fa-exclamation-triangle me-2" style="color: #FF6B81;"></i>
-            <strong>{{ session('error') }}</strong>
-        </div>
-    @endif
-
     <!-- Lọc trạng thái -->
-    <div class="d-flex justify-content-end align-items-center mb-3">
-        <form method="GET" class="d-flex gap-2">
-            <select name="status" class="form-select" style="width: auto; border-color: #F0D9DE; font-size: 0.9rem;" onchange="this.form.submit()">
+    <div class="mb-4 d-flex gap-3 align-items-center flex-wrap">
+        <div class="d-flex align-items-center gap-2">
+            <label class="form-label mb-0" style="color: #1E293B; font-weight: 500; white-space: nowrap;">Lọc theo trạng thái:</label>
+            <select id="status-filter" class="form-select" style="width: auto; min-width: 200px; border-color: #CBD5E1; border-radius: 8px;">
                 <option value="">Tất cả</option>
                 <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Chờ duyệt</option>
                 <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Đã duyệt</option>
                 <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Từ chối</option>
             </select>
-        </form>
+        </div>
+        <button id="clear-status-filter" class="btn btn-outline-secondary" style="border-color: #CBD5E1; color: #64748B; padding: 6px 16px; border-radius: 8px; display: none;">
+            Xóa lọc
+        </button>
     </div>
 
-    <!-- Bảng danh sách -->
-    <div class="card shadow-sm" style="border: 1px solid #F0D9DE; border-radius: 8px; overflow: hidden;">
+    <!-- JS Lọc trạng thái -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusSelect = document.getElementById('status-filter');
+            const clearStatusBtn = document.getElementById('clear-status-filter');
+            const currentUrl = new URL(window.location);
+
+            if (statusSelect) {
+                statusSelect.addEventListener('change', function () {
+                    const val = this.value;
+                    if (val) {
+                        currentUrl.searchParams.set('status', val);
+                    } else {
+                        currentUrl.searchParams.delete('status');
+                    }
+                    window.location = currentUrl;
+                });
+
+                if (statusSelect.value) {
+                    clearStatusBtn.style.display = 'inline-flex';
+                }
+
+                clearStatusBtn.addEventListener('click', function () {
+                    currentUrl.searchParams.delete('status');
+                    window.location = currentUrl;
+                });
+            }
+        });
+    </script>
+
+    <!-- Bảng đánh giá -->
+    <div class="card shadow-sm" style="border: 1px solid #CBD5E1; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead style="background: linear-gradient(135deg, #FF3B3F 0%, #FF6B81 100%); color: white;">
+                <table class="table table-hover mb-0" style="border-color: #CBD5E1;">
+                    <thead style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); color: white;">
                         <tr>
-                            <th>ID</th>
-                            <th>Người dùng</th>
-                            <th>Sản phẩm</th>
-                            <th>Nội dung</th>
-                            <th>Điểm</th>
-                            <th>Trạng thái</th>
-                            <th>Thời gian</th>
-                            <th>Thao tác</th>
+                            <th style="padding: 16px; font-weight: 600;">ID</th>
+                            <th style="padding: 16px; font-weight: 600;">Người dùng</th>
+                            <th style="padding: 16px; font-weight: 600;">Sản phẩm</th>
+                            <th style="padding: 16px; font-weight: 600;">Đánh giá</th>
+                            <th style="padding: 16px; font-weight: 600;">Nội dung</th>
+                            <th style="padding: 16px; font-weight: 600;">Trạng thái</th>
+                            <th style="padding: 16px; font-weight: 600;">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($reviews as $review)
-                            <tr style="border-bottom: 1px solid #F0D9DE;">
-                                <td style="color: #1E293B; font-weight: 500;">#{{ $review->id }}</td>
-
-                                <!-- Người dùng: không bao giờ N/A -->
-                                <td style="color: #1E293B;">
-                                     {{ $review->user->full_name ?? 'Khách vãng lai' }}
+                            <tr style="border-bottom: 1px solid #CBD5E1;">
+                                <td style="color: #1E293B; padding: 16px;">#{{ $review->id }}</td>
+                                <td style="color: #1E293B; font-weight: 500; padding: 16px;">
+                                    {{ $review->user_name }}
+                                    <small class="d-block text-muted">ID: {{ $review->user_id }}</small>
                                 </td>
-
-                                <td style="color: #1E293B;">
+                                <td style="color: #1E293B; padding: 16px;">
                                     {{ $review->product->name ?? 'Sản phẩm đã xóa' }}
                                 </td>
-
-                                <td style="max-width: 220px; color: #1E293B; line-height: 1.5;">
-                                    {{ Str::limit(strip_tags($review->comment), 60) }}
+                                <td style="padding: 16px;">
+                                    <div style="display: flex; gap: 2px; font-size: 16px;">
+                                        @for($i = 0; $i < $review->rating; $i++)
+                                            <span style="color: #FFB800;">★</span>
+                                        @endfor
+                                        @for($i = $review->rating; $i < 5; $i++)
+                                            <span style="color: #CBD5E1;">★</span>
+                                        @endfor
+                                    </div>
                                 </td>
-
-                                <td>
-                                    <span style="color: #FF6B81; font-size: 1.1em;">
-                                        @for($i = 0; $i < $review->rating; $i++) ⭐ @endfor
+                                <td style="padding: 16px; max-width: 300px;">
+                                    <p class="text-muted mb-0" style="font-size: 0.875rem; line-height: 1.4;">
+                                        {{ Str::limit($review->comment, 80) }}
+                                    </p>
+                                </td>
+                                <td style="padding: 16px;">
+                                    <span class="badge" style="
+                                        background-color:
+                                            {{ $review->status === 'pending' ? '#F59E0B' :
+                                               ($review->status === 'approved' ? '#10B981' : '#EF4444') }};
+                                        color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem;">
+                                        {{ $review->status === 'pending' ? 'Chưa duyệt' :
+                                           ($review->status === 'approved' ? 'Đã duyệt' : 'Từ chối') }}
                                     </span>
-                                    <small class="text-muted">({{ $review->rating }})</small>
                                 </td>
-
-                                <!-- Trạng thái -->
-                                <td>
-                                    @php
-                                        $statusConfig = [
-                                            'pending'   => ['label' => 'Chờ duyệt', 'bg' => '#FFD43B', 'text' => '#1E293B'],
-                                            'approved'  => ['label' => 'Đã duyệt',  'bg' => '#69DB7C', 'text' => 'white'],
-                                            'rejected'  => ['label' => 'Từ chối',   'bg' => '#FF6B81', 'text' => 'white'],
-                                        ];
-                                        $cfg = $statusConfig[$review->status] ?? ['label' => 'Không xác định', 'bg' => '#F0D9DE', 'text' => '#1E293B'];
-                                    @endphp
-                                    <span class="badge fw-medium px-2 py-1" style="background-color: {{ $cfg['bg'] }}; color: {{ $cfg['text'] }}; font-size: 0.8rem;">
-                                        {{ $cfg['label'] }}
-                                    </span>
-                                </td>
-
-                                <td style="color: #475569; font-size: 0.875rem;">
-                                    {{ $review->created_at->format('d/m H:i') }}
-                                </td>
-
-                                <td class="text-center">
-                                    <a href="{{ route('admin.reviews.edit', $review->id) }}" class="btn btn-sm" style="background: linear-gradient(135deg, #FF3B3F 0%, #FF6B81 100%); color: white; border: none; padding: 0.4rem 0.6rem;">
-                                        <i class="fas fa-edit"></i>
+                                <td style="padding: 16px; display: flex; gap: 8px; align-items: center;">
+                                    <!-- Xem -->
+                                    <a href="{{ route('admin.reviews.show', $review->id) }}" class="btn btn-sm" style="background: #0066FF; color: white; padding: 6px 12px; border-radius: 6px;" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
                                     </a>
-                                    <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Xóa vĩnh viễn đánh giá này?')">
+                                    <!-- Xóa -->
+                                    <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Xóa đánh giá này vĩnh viễn?')">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm" style="background-color: #FF99AC; color: white; border: none; padding: 0.4rem 0.6rem;">
+                                        <button class="btn btn-sm btn-danger" style="padding: 6px 12px; border-radius: 6px;" title="Xóa">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -111,9 +128,13 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center py-5" style="color: #94A3B8;">
-                                    <i class="fas fa-inbox fa-2x mb-3"></i><br>
-                                    <span>Không có đánh giá nào.</span>
+                                <td colspan="7" class="text-center" style="color: #64748B; padding: 40px;">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                        </svg>
+                                        <p class="mb-0">Chưa có đánh giá nào</p>
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse
@@ -122,10 +143,40 @@
             </div>
 
             <!-- Phân trang -->
-            <div class="px-4 py-3 bg-white border-top" style="border-color: #F0D9DE !important;">
+            <div class="px-4 py-3 bg-white border-top" style="border-color: #CBD5E1;">
                 {{ $reviews->appends(request()->query())->links() }}
             </div>
         </div>
     </div>
 </div>
+
+<!-- JS Lọc sản phẩm -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const select = document.getElementById('product-filter');
+        const clearBtn = document.getElementById('clear-filter');
+        const currentUrl = new URL(window.location);
+
+        if (select) {
+            select.addEventListener('change', function () {
+                const val = this.value;
+                if (val) {
+                    currentUrl.searchParams.set('product_id', val);
+                } else {
+                    currentUrl.searchParams.delete('product_id');
+                }
+                window.location = currentUrl;
+            });
+
+            if (select.value) {
+                clearBtn.style.display = 'inline-flex';
+            }
+
+            clearBtn.addEventListener('click', function () {
+                currentUrl.searchParams.delete('product_id');
+                window.location = currentUrl;
+            });
+        }
+    });
+</script>
 @endsection

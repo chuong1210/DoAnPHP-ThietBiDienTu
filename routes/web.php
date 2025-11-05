@@ -129,7 +129,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
     Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::resource('banners', BannerController::class);
-    Route::resource('reviews', AdminReviewController::class);
+    Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::get('reviews/{id}', [AdminReviewController::class, 'show'])->name('reviews.show');
+    Route::patch('reviews/{id}/status', [AdminReviewController::class, 'updateStatus'])->name('reviews.updateStatus');
+    Route::delete('reviews/{id}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Contact
     Route::get('contact', [ContactController::class, 'index'])->name('contact.index');

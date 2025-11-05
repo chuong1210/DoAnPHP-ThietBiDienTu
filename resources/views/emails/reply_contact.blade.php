@@ -19,20 +19,21 @@
         .email-container {
             max-width: 600px;
             margin: 0 auto;
-            background-color: #FFF5F7;
-            border-radius: 8px;
+            background-color: #FFFFFF;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 102, 255, 0.1);
         }
+        /* Tech Blue Pro gradient header -->
         .header {
-            background: linear-gradient(135deg, #FF3B3F 0%, #FF6B81 100%);
+            background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%);
             color: white;
-            padding: 32px 24px;
+            padding: 40px 32px;
             text-align: center;
         }
         .header h1 {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 26px;
+            font-weight: 700;
             margin-bottom: 8px;
         }
         .header p {
@@ -40,22 +41,23 @@
             opacity: 0.95;
         }
         .content {
-            padding: 32px 24px;
+            padding: 40px 32px;
         }
         .greeting {
             font-size: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             color: #1E293B;
+            font-weight: 500;
         }
         .greeting strong {
-            color: #FF3B3F;
+            color: #0066FF;
         }
         .message-box {
-            background-color: white;
-            border-left: 4px solid #FF6B81;
-            padding: 20px;
-            margin: 24px 0;
-            border-radius: 4px;
+            background: linear-gradient(135deg, #F8FAFC 0%, #E0F2FE 100%);
+            border-left: 4px solid #0066FF;
+            padding: 24px;
+            margin: 28px 0;
+            border-radius: 8px;
         }
         .message-box p {
             font-size: 15px;
@@ -64,51 +66,64 @@
         }
         .footer-section {
             margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1px solid #F0D9DE;
+            padding-top: 24px;
+            border-top: 1px solid #CBD5E1;
         }
         .footer-text {
             font-size: 14px;
-            color: #666;
-            line-height: 1.6;
+            color: #64748B;
+            line-height: 1.8;
         }
         .divider {
             height: 1px;
-            background-color: #F0D9DE;
-            margin: 20px 0;
+            background-color: #CBD5E1;
+            margin: 24px 0;
         }
         .signature {
             color: #1E293B;
             font-size: 15px;
-            margin-top: 16px;
+            margin-top: 20px;
         }
         .signature strong {
-            color: #FF3B3F;
+            color: #0066FF;
             display: block;
             margin-top: 8px;
+            font-weight: 600;
         }
         .cta-button {
             display: inline-block;
-            background: linear-gradient(135deg, #FF3B3F 0%, #FF6B81 100%);
+            background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%);
             color: white;
-            padding: 12px 28px;
-            border-radius: 6px;
+            padding: 14px 32px;
+            border-radius: 8px;
             text-decoration: none;
-            font-weight: 500;
-            margin-top: 16px;
+            font-weight: 600;
+            margin-top: 20px;
             font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
         }
         .cta-button:hover {
             opacity: 0.95;
+        }
+        .icon {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            text-align: center;
+            line-height: 40px;
+            margin-bottom: 16px;
         }
     </style>
 </head>
 <body>
     <div class="email-container">
-        <!-- Header -->
+        <!-- Header with icon -->
         <div class="header">
-            <h1>📧 Phản hồi liên hệ của bạn</h1>
-            <p>Cảm ơn bạn đã liên hệ với chúng tôi</p>
+            <div class="icon">💬</div>
+            <h1>Phản hồi từ chúng tôi</h1>
+            <p>Cảm ơn bạn đã liên hệ</p>
         </div>
 
         <!-- Content -->
@@ -117,13 +132,13 @@
                 Xin chào <strong>{{ $contact->name }}</strong>,
             </div>
 
-            <p style="font-size: 15px; color: #1E293B; margin-bottom: 16px;">
-                Chúng tôi đã nhận được tin nhắn của bạn và rất vui lòng được phản hồi.
+            <p style="font-size: 15px; color: #1E293B; margin-bottom: 20px; line-height: 1.8;">
+                Chúng tôi đã nhận được tin nhắn của bạn và rất vui lòng được phản hồi bằng thông tin chi tiết dưới đây.
             </p>
 
-            <!-- Message Box -->
+            <!-- Message Box with gradient -->
             <div class="message-box">
-                {!! nl2br(e($replyMessage)) !!}
+                <p>{!! nl2br(e($replyMessage)) !!}</p>
             </div>
 
             <!-- Divider -->
@@ -132,12 +147,12 @@
             <!-- Footer Section -->
             <div class="footer-section">
                 <p class="footer-text">
-                    Nếu bạn có thêm bất kỳ câu hỏi nào, vui lòng không ngần ngại liên hệ với chúng tôi.
+                    Nếu bạn có bất kỳ câu hỏi bổ sung nào hoặc cần hỗ trợ thêm, vui lòng đừng ngần ngại liên hệ với chúng tôi. Đội ngũ của chúng tôi sẵn sàng giúp đỡ.
                 </p>
 
                 <div class="signature">
                     Trân trọng,
-                    <strong>Shop của bạn</strong>
+                    <strong>Đội ngũ hỗ trợ của chúng tôi</strong>
                 </div>
             </div>
         </div>
