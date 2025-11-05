@@ -11,19 +11,6 @@
     <div class="topbar-actions">
         <!-- Notifications -->
         <div class="dropdown">
-            <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                <i class="fas fa-bell"></i>
-                {{-- Sử dụng biến từ View Composer --}}
-                @if(isset($totalNotifications) && $totalNotifications > 0)
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {{ $totalNotifications > 9 ? '9+' : $totalNotifications }}
-                    </span>
-                @endif
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" style="min-width: 300px;">
-                <li class="dropdown-header"><strong>Thông Báo</strong></li>
-                @if(isset($totalNotifications) && $totalNotifications > 0)
             <button class="btn btn-light position-relative p-2" type="button" data-bs-toggle="dropdown"
                 aria-expanded="false">
                 <i class="fas fa-bell fs-5"></i>
@@ -58,19 +45,22 @@
                     <li>
                         <a class="dropdown-item d-flex align-items-center gap-3 px-4 py-3"
                             href="{{ route('admin.chat.index') }}">
-                            <div class="shrink-0">
+                            <div class="flex-shrink-0">
                                 <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-2">
                                     <i class="fas fa-comment-dots"></i>
                                 </div>
                             </div>
-                            <div class="grow">
+                            <div class="flex-grow-1">
                                 <div class="fw-semibold">{{ $totalNotifications }} tin nhắn mới</div>
                                 <small class="text-muted">Khách hàng đang chờ phản hồi</small>
                             </div>
                         </a>
                     </li>
                 @else
-
+                    <li class="px-4 py-5 text-center">
+                        <i class="fas fa-bell-slash text-muted opacity-50 mb-3" style="font-size: 36px;"></i>
+                        <p class="text-muted mb-0 small">Không có thông báo mới</p>
+                    </li>
                 @endif
             </ul>
         </div>
