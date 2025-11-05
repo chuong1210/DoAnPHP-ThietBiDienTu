@@ -6,7 +6,8 @@
         /* Nút Thêm Mới */
         .btn-add-product {
             background: var(--primary-gradient);
-            color: white;
+            color: rgb(4, 146, 233);
+
             border: none;
             border-radius: 12px;
             padding: 10px 20px;
@@ -88,7 +89,7 @@
 
         .action-buttons .btn-info {
             background-color: #cffafe;
-            color: #0e7490;
+            color:  rgb(4, 146, 233);
         }
 
         .action-buttons .btn-info:hover {
@@ -195,7 +196,7 @@
                             <tr>
                                 <td><strong><?php echo e($product->id); ?></strong></td>
                                 <td>
-                                    <img src="<?php echo e(asset($product->image ?? 'https://media.geeksforgeeks.org/wp-content/uploads/20230802153215/Error-404-768.png')); ?>"
+                                    <img src="<?php echo e(asset($product->image ?? 'https://cdn.presslabs.com/wp-content/uploads/2018/10/upload-error.png')); ?>"
                                         alt="<?php echo e($product->name); ?>" class="product-image">
                                 </td>
                                 <td>
@@ -274,4 +275,5 @@
         </div>
     </div>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\Nam4\PHP\DoAnPHP-ThietBiDienTu\resources\views/admin/products/index.blade.php ENDPATH**/ ?>

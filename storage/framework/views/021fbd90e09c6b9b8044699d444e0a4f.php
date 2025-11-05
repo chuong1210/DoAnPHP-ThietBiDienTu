@@ -1,11 +1,7 @@
-{{-- resources/views/admin/chat/index.blade.php --}}
+<?php $__env->startSection('title', 'Quản Lý Đơn Hàng'); ?>
+<?php $__env->startSection('page-title', 'Hỗ Trợ Khách Hàng'); ?>
 
-@extends('admin.layouts.admin')
-
-@section('title', 'Quản Lý Đơn Hàng')
-@section('page-title', 'Hỗ Trợ Khách Hàng')
-
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         :root {
             --primary: #0066FF;
@@ -433,9 +429,9 @@
             }
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid">
         <div class="chat-admin-container">
             <!-- Left Sidebar - Rooms List -->
@@ -444,50 +440,53 @@
                     <h5>
                         <i class="fas fa-comments"></i> Danh Sách Chat
                     </h5>
-                    <small>{{ count($rooms) }} cuộc hội thoại</small>
+                    <small><?php echo e(count($rooms)); ?> cuộc hội thoại</small>
                 </div>
 
                 <div class="chat-rooms-list" id="roomsList">
-                    @forelse($rooms as $room)
+                    <?php $__empty_1 = true; $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <div class="room-item"
-                             data-room-id="{{ $room['id'] }}"
-                             data-user-name="{{ $room['user']->full_name }}"
-                             data-user-email="{{ $room['user']->email }}"
-                             data-status="{{ $room['status'] }}">
+                             data-room-id="<?php echo e($room['id']); ?>"
+                             data-user-name="<?php echo e($room['user']->full_name); ?>"
+                             data-user-email="<?php echo e($room['user']->email); ?>"
+                             data-status="<?php echo e($room['status']); ?>">
                             <div class="room-item-header">
                                 <span class="room-user-name">
                                     <i class="fas fa-user-circle text-primary"></i>
-                                    {{ $room['user']->full_name }}
-                                    @if($room['unread_count'] > 0)
-                                        <span class="room-unread-badge">{{ $room['unread_count'] }}</span>
-                                    @endif
+                                    <?php echo e($room['user']->full_name); ?>
+
+                                    <?php if($room['unread_count'] > 0): ?>
+                                        <span class="room-unread-badge"><?php echo e($room['unread_count']); ?></span>
+                                    <?php endif; ?>
                                 </span>
-                                <span class="room-time">{{ \Carbon\Carbon::parse($room['updated_at'])->format('H:i') }}</span>
+                                <span class="room-time"><?php echo e(\Carbon\Carbon::parse($room['updated_at'])->format('H:i')); ?></span>
                             </div>
 
-                            @if($room['last_message'])
+                            <?php if($room['last_message']): ?>
                                 <div class="room-last-message">
-                                    @if($room['last_message']['is_admin'])
+                                    <?php if($room['last_message']['is_admin']): ?>
                                         <strong>Bạn:</strong>
-                                    @endif
-                                    {{ Str::limit($room['last_message']['message'], 50) }}
+                                    <?php endif; ?>
+                                    <?php echo e(Str::limit($room['last_message']['message'], 50)); ?>
+
                                 </div>
-                            @else
+                            <?php else: ?>
                                 <div class="room-last-message text-muted">
                                     <em>Chưa có tin nhắn</em>
                                 </div>
-                            @endif
+                            <?php endif; ?>
 
-                            <span class="room-status {{ $room['status'] }}">
-                                {{ $room['status'] === 'open' ? 'Đang mở' : 'Đã đóng' }}
+                            <span class="room-status <?php echo e($room['status']); ?>">
+                                <?php echo e($room['status'] === 'open' ? 'Đang mở' : 'Đã đóng'); ?>
+
                             </span>
                         </div>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <div class="text-center text-muted py-5">
                             <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
                             <p>Chưa có cuộc trò chuyện nào</p>
                         </div>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -525,7 +524,7 @@
 
                     <div class="chat-input-area" id="chatInputArea">
                         <form id="adminChatForm">
-                            @csrf
+                            <?php echo csrf_field(); ?>
                             <div class="input-group">
                                 <input type="text" class="form-control" id="adminMessageInput"
                                     placeholder="Nhập tin nhắn của bạn..." autocomplete="off">
@@ -542,9 +541,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -692,8 +691,8 @@
                     pusherChannel.unbind_all();
                 }
 
-                const pusher = new Pusher('{{ config('broadcasting.connections.pusher.key') }}', {
-                    cluster: '{{ config('broadcasting.connections.pusher.options.cluster') }}',
+                const pusher = new Pusher('<?php echo e(config('broadcasting.connections.pusher.key')); ?>', {
+                    cluster: '<?php echo e(config('broadcasting.connections.pusher.options.cluster')); ?>',
                     encrypted: true
                 });
 
@@ -797,4 +796,6 @@
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\Nam4\PHP\DoAnPHP-ThietBiDienTu\resources\views/admin/chat/index.blade.php ENDPATH**/ ?>

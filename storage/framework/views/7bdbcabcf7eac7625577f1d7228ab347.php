@@ -115,7 +115,7 @@
             <div class="row g-4">
                 <?php $__currentLoopData = $featuredProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="col-lg-3 col-md-6">
-                        <div class="product-card" style="animation-delay: <?php echo e($index * 0.1); ?>s">
+                        <div class="product-card" style="animation-delay: <?php echo e($index * 0.1); ?>">
                             <?php if($product->sale_price): ?>
                                 <div class="product-badge sale">
                                     -<?php echo e(round((($product->price - $product->sale_price) / $product->price) * 100)); ?>%
@@ -187,7 +187,7 @@
             <div class="row g-4">
                 <?php $__currentLoopData = $newProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="col-lg-3 col-md-6">
-                        <div class="product-card" style="animation-delay: <?php echo e($index * 0.1); ?>s">
+                        <div class="product-card" style="animation-delay: <?php echo e($index * 0.1); ?>W">
                             <div class="product-badge new">New</div>
 
                             <div class="product-image-wrapper">

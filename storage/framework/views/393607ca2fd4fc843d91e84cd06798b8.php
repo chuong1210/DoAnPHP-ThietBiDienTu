@@ -1,7 +1,6 @@
-@extends('admin.layouts.admin')
-@section('page-title', 'Hỗ trợ khách hàng')
+<?php $__env->startSection('page-title', 'Hỗ trợ khách hàng'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid" style="background: linear-gradient(135deg, #F8FAFC 0%, #E0F2FE 100%); min-height: 100vh; padding: 20px 0;">
         <!-- Tech Blue gradient header with icon -->
         <div class="mb-4" style=" color: #0066FF ">
@@ -27,27 +26,30 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($contacts as $contact)
+                            <?php $__currentLoopData = $contacts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $contact): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr style="border-bottom: 1px solid #CBD5E1;">
-                                <td style="color: #1E293B; padding: 16px;">{{ $contact->id }}</td>
-                                <td style="color: #1E293B; font-weight: 500; padding: 16px;">{{ $contact->name }}</td>
-                                <td style="color: #0066FF; padding: 16px;">{{ $contact->email }}</td>
+                                <td style="color: #1E293B; padding: 16px;"><?php echo e($contact->id); ?></td>
+                                <td style="color: #1E293B; font-weight: 500; padding: 16px;"><?php echo e($contact->name); ?></td>
+                                <td style="color: #0066FF; padding: 16px;"><?php echo e($contact->email); ?></td>
                                 <td style="padding: 16px;">
-                                    <span class="badge" style="background-color: {{ $contact->status == 'new' ? '#00B4D8' : '#CBD5E1' }}; color: white; padding: 6px 12px; border-radius: 4px;">
-                                        {{ $contact->status == 'new' ? 'Chưa trả lời' : 'Đã trả lời' }}
+                                    <span class="badge" style="background-color: <?php echo e($contact->status == 'new' ? '#00B4D8' : '#CBD5E1'); ?>; color: white; padding: 6px 12px; border-radius: 4px;">
+                                        <?php echo e($contact->status == 'new' ? 'Chưa trả lời' : 'Đã trả lời'); ?>
+
                                     </span>
                                 </td>
                                 <td style="padding: 16px;">
-                                    <a href="{{ route('admin.contact.show', $contact->id) }}" class="btn btn-sm" style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); color: white; border: none; text-decoration: none; padding: 6px 12px; border-radius: 6px;">
+                                    <a href="<?php echo e(route('admin.contact.show', $contact->id)); ?>" class="btn btn-sm" style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); color: white; border: none; text-decoration: none; padding: 6px 12px; border-radius: 6px;">
                                         <i class="fas fa-eye"></i> Xem
                                     </a>
                                 </td>
                             </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\Nam4\PHP\DoAnPHP-ThietBiDienTu\resources\views/admin/contacts/index.blade.php ENDPATH**/ ?>

@@ -27,7 +27,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\FaqController;
-use App\Http\Controllers\Admin\UserController;
+
+
 
 /*
 |--------------------------------------------------------------------------

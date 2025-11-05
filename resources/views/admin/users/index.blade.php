@@ -1,20 +1,13 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Quản Lý Người Dùng')
+@section('title', 'Danh Sách Người Dùng')
+@section('page-title', 'Quản Lý Người Dùng')
+
 
 @section('content')
     <div class="container-fluid py-4">
-        <!-- Header Section -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); padding: 30px; border-radius: 12px; color: white;">
-                    <h2 class="fw-bold mb-1" style="font-size: 28px;">👥 Quản Lý Người Dùng</h2>
-                    <p style="margin: 0; opacity: 0.95;">Quản lý tài khoản và quyền người dùng hệ thống</p>
-                </div>
-            </div>
-        </div>
 
-        <!-- Alert Messages -->
+        {{-- <!-- Alert Messages -->
         @if (session('success'))
             <div class="alert alert-success border-0 shadow-sm" style="background-color: #D1FAE5; color: #065F46; border-left: 4px solid #10B981;">
                 <i class="fas fa-check-circle"></i> {{ session('success') }}
@@ -24,7 +17,7 @@
             <div class="alert alert-danger border-0 shadow-sm" style="background-color: #FEE2E2; color: #991B1B; border-left: 4px solid #EF4444;">
                 <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
             </div>
-        @endif
+        @endif --}}
 
         <!-- Search Form -->
         <form class="row mb-4 g-2" method="GET">
@@ -85,14 +78,14 @@
                                     </td>
                                     <td style="color: #1E293B; padding: 15px; vertical-align: middle;">{{ $user->created_at->format('d/m/Y H:i') }}</td>
                                     <td class="text-center" style="padding: 15px; vertical-align: middle;">
-                                        <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm" style="background-color: #0066FF; color: white; border: none; border-radius: 6px; padding: 8px 12px; transition: all 0.2s;">
+                                        <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm" style="background-color: #ffedd5; color: #991b1b; border: none; border-radius: 6px; padding: 8px 12px; transition: all 0.2s;">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline"
                                             onsubmit="return confirm('Xóa người dùng này?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="btn btn-sm" style="background-color: #EF4444; color: white; border: none; border-radius: 6px; padding: 8px 12px; transition: all 0.2s;">
+                                            <button class="btn btn-sm" style="background-color: #fee2e2 ; color: #991b1b; border: none; border-radius: 6px; padding: 8px 12px; transition: all 0.2s;">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </form>

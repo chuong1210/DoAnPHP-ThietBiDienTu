@@ -8,7 +8,7 @@
         /* Nút Thêm Mới */
         .btn-add-product {
             background: var(--primary-gradient);
-            color: rgb(21, 177, 204);
+            color: rgb(4, 146, 233);
 
             border: none;
             border-radius: 12px;
@@ -91,7 +91,7 @@
 
         .action-buttons .btn-info {
             background-color: #cffafe;
-            color: #0e7490;
+            color:  rgb(4, 146, 233);
         }
 
         .action-buttons .btn-info:hover {

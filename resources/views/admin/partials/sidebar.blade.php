@@ -12,8 +12,8 @@
     <!-- Navigation -->
     <nav class="sidebar-nav mt-3">
         <!-- Main Section -->
-        <div class="nav-section-title">
-            <i class="fas fa-chart-line me-1"></i> Tổng Quan
+        <div class="nav-section-title" style="font-size: small; color: rgb(4, 146, 233);">
+           Tổng Quan
         </div>
 
         <a href="{{ route('admin.dashboard') }}"
@@ -23,8 +23,8 @@
         </a>
 
         <!-- Products Section -->
-        <div class="nav-section-title">
-            <i class="fas fa-shopping-bag me-1"></i> Sản Phẩm
+        <div class="nav-section-title" style="font-size: small ; color: rgb(4, 146, 233);">
+         Sản Phẩm
         </div>
 
         <a href="{{ route('admin.products.index') }}"
@@ -36,18 +36,18 @@
         <a href="{{ route('admin.categories.index') }}"
             class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
             <i class="fas fa-list"></i>
-            <span>Danh Mục</span>
+            <span>Quản Lý Danh Mục</span>
         </a>
 
         <a href="{{ route('admin.brands.index') }}"
             class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}">
             <i class="fas fa-tag"></i>
-            <span>Thương Hiệu</span>
+            <span>Quản Lý Thương Hiệu</span>
         </a>
 
         <!-- Orders Section -->
-        <div class="nav-section-title">
-            <i class="fas fa-receipt me-1"></i> Đơn Hàng
+        <div class="nav-section-title" style="font-size: small ; color: rgb(4, 146, 233);">
+             Đơn Hàng
         </div>
 
         <a href="{{ route('admin.orders.index') }}"
@@ -60,8 +60,8 @@
         </a>
 
         <!-- Communication Section -->
-        <div class="nav-section-title">
-            <i class="fas fa-users me-1"></i> Khách Hàng
+        <div class="nav-section-title" style="font-size: small ; color: rgb(4, 146, 233);">
+             Khách Hàng
         </div>
 
         <a href="{{ route('admin.chat.index') }}"
@@ -69,8 +69,8 @@
             <i class="fas fa-comments"></i>
             <span>Chat Hỗ Trợ</span>
             @php
-                $unreadCount = \App\Models\ChatMessage::whereHas('room', fn($q) => $q->where('status', 'open'))
-                    ->where('is_admin', false)->where('is_read', false)->count();
+$unreadCount = \App\Models\ChatMessage::whereHas('room', fn($q) => $q->where('status', 'open'))
+    ->where('is_admin', false)->where('is_read', false)->count();
             @endphp
             @if($unreadCount > 0)
                 <span class="nav-badge">{{ $unreadCount }}</span>
@@ -87,8 +87,8 @@
         <div class="nav-divider"></div>
 
         <!-- Settings Section -->
-        <div class="nav-section-title">
-            <i class="fas fa-cog me-1"></i> Hệ Thống
+        <div class="nav-section-title" style="font-size: small ; color: rgb(4, 146, 233);">
+            Hệ Thống
         </div>
 
         <a href="{{ route('admin.banners.index') }}"
@@ -112,7 +112,7 @@
         <a href="{{ route('admin.faqs.index') }}"
             class="nav-link {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}">
             <i class="fas fa-question-circle"></i>
-            <span>FAQ</span>
+            <span>Quản Lý FAQ</span>
         </a>
 
         <hr class="bg-secondary opacity-10 mx-3">
