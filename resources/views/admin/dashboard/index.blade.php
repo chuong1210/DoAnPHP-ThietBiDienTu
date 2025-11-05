@@ -22,7 +22,7 @@
 
         .filter-buttons .btn.active {
             background: var(--primary-gradient);
-            color: white;
+            color: rgb(23, 134, 208);
             border-color: transparent;
             box-shadow: 0 4px 12px rgba(255, 59, 63, 0.3);
         }
