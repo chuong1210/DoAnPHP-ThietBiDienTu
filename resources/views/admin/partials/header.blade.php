@@ -1,15 +1,19 @@
 {{-- resources/views/admin/partials/header.blade.php --}}
 
-<div class="top-bar">
-    <div class="top-bar-left">
-        <h2>@yield('page-title', 'Dashboard')</h2>
+<header class="top-bar">
+    <div class="d-flex align-items-center">
+        <button class="btn-toggle-sidebar me-3 d-lg-none">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="page-title">@yield('page-title', 'Dashboard')</h1>
     </div>
 
-    <div class="top-bar-actions">
+    <div class="topbar-actions">
         <!-- Notifications -->
         <div class="dropdown">
-            <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-bell"></i>
+            <button class="btn btn-light position-relative p-2" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <i class="fas fa-bell fs-5"></i>
                 @php
                     $totalNotifications = \App\Models\ChatMessage::whereHas('room', function ($q) {
                         $q->where('status', 'open');
@@ -19,25 +23,43 @@
                         ->count();
                 @endphp
                 @if($totalNotifications > 0)
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {{ $totalNotifications }}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="font-size: 10px; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">
+                        {{ $totalNotifications > 99 ? '99+' : $totalNotifications }}
                     </span>
                 @endif
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" style="min-width: 300px;">
-                <li class="dropdown-header">
-                    <strong>Thông Báo</strong>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg"
+                style="min-width: 320px; border-radius: 16px; border: none;">
+                <li class="dropdown-header px-4 py-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong class="fs-6">Thông Báo</strong>
+                        @if($totalNotifications > 0)
+                            <a href="{{ route('admin.chat.index') }}" class="small text-primary fw-medium">Xem tất cả</a>
+                        @endif
+                    </div>
                 </li>
+
                 @if($totalNotifications > 0)
                     <li>
-                        <a class="dropdown-item" href="{{ route('admin.chat.index') }}">
-                            <i class="fas fa-comment text-danger me-2"></i>
-                            <span>{{ $totalNotifications }} tin nhắn mới</span>
+                        <a class="dropdown-item d-flex align-items-center gap-3 px-4 py-3"
+                            href="{{ route('admin.chat.index') }}">
+                            <div class="flex-shrink-0">
+                                <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-2">
+                                    <i class="fas fa-comment-dots"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">{{ $totalNotifications }} tin nhắn mới</div>
+                                <small class="text-muted">Khách hàng đang chờ phản hồi</small>
+                            </div>
                         </a>
                     </li>
                 @else
-                    <li class="dropdown-item text-muted text-center">
-                        <small>Không có thông báo mới</small>
+                    <li class="px-4 py-5 text-center">
+                        <i class="fas fa-bell-slash text-muted opacity-50 mb-3" style="font-size: 36px;"></i>
+                        <p class="text-muted mb-0 small">Không có thông báo mới</p>
                     </li>
                 @endif
             </ul>
@@ -45,92 +67,190 @@
 
         <!-- User Profile -->
         <div class="dropdown">
-            <button class="btn btn-light d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-user-circle fs-5"></i>
-                <span class="d-none d-md-inline">{{ Auth::user()->full_name }}</span>
-                <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+            <button class="btn btn-light d-flex align-items-center gap-2 p-2 rounded-pill" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://cdn-icons-png.flaticon.com/512/8188/8188362.png" alt="Admin" class="user-avatar">
+                <span class="d-none d-md-inline fw-medium">{{ Auth::user()->full_name }}</span>
+                <i class="fas fa-chevron-down text-muted" style="font-size: 11px;"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
+
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg"
+                style="border-radius: 16px; border: none; min-width: 220px;">
+                <li class="dropdown-header px-4 py-3 text-center border-bottom">
+                    <img src="https://cdn-icons-png.flaticon.com/512/8188/8188362.png" alt="Admin"
+                        class="user-avatar mb-2">
+                    <div class="fw-bold">{{ Auth::user()->full_name }}</div>
+                    <small class="text-muted">{{ Auth::user()->email }}</small>
+                </li>
+                <li><a class="dropdown-item px-4 py-2" href="#"><i class="fas fa-user me-3 text-primary"></i> Hồ Sơ</a>
+                </li>
+                <li><a class="dropdown-item px-4 py-2" href="#"><i class="fas fa-cog me-3 text-secondary"></i> Cài
+                        Đặt</a></li>
                 <li>
-                    <a class="dropdown-item" href="#">
-                        <i class="fas fa-user me-2"></i> Hồ Sơ
-                    </a>
+                    <hr class="dropdown-divider mx-3">
                 </li>
                 <li>
-                    <a class="dropdown-item" href="#">
-                        <i class="fas fa-cog me-2"></i> Cài Đặt
+                    <a class="dropdown-item px-4 py-2 text-danger fw-medium" href="{{ route('logout') }}"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fas fa-sign-out-alt me-3"></i> Đăng Xuất
                     </a>
-                </li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li>
-                    <a class="dropdown-item text-danger" href="{{ route('logout') }}"
-                        onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
-                        <i class="fas fa-sign-out-alt me-2"></i> Đăng Xuất
-                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                 </li>
             </ul>
         </div>
     </div>
-</div>
+</header>
 
 <style>
-    .top-bar-left h2 {
-        background: var(--primary-gradient);
+    :root {
+        --primary: #0066FF;
+        --secondary: #00B4D8;
+        --bg-card: #FFFFFF;
+        --text-dark: #1E293B;
+        --text-muted: #64748B;
+        --border: #CBD5E1;
+        --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .top-bar {
+        height: 70px;
+        background: var(--bg-card);
+        padding: 0 30px;
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+    }
+
+    .page-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+        background: linear-gradient(135deg, var(--primary), #3388FF);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
 
+    .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-toggle-sidebar {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: var(--text-muted);
+        padding: 8px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .btn-toggle-sidebar:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: var(--primary);
+    }
+
     .btn-light {
-        background: var(--bg-white);
-        border: 1px solid var(--border-color);
+        background: transparent;
+        border: 1.5px solid var(--border);
         color: var(--text-dark);
-        border-radius: 10px;
-        padding: 10px 16px;
-        transition: all 0.3s ease;
+        border-radius: 12px;
+        padding: 8px;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .btn-light:hover {
-        background: var(--bg-main);
-        border-color: var(--secondary-color);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-color: var(--primary);
+        background: rgba(0, 102, 255, 0.05);
+        color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.15);
     }
 
+    .user-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2.5px solid var(--primary);
+        box-shadow: 0 2px 8px rgba(0, 102, 255, 0.2);
+    }
+
+    /* Dropdown Menu */
     .dropdown-menu {
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        padding: 8px;
+        padding: 0;
+        overflow: hidden;
+        animation: dropdownSlide 0.25s ease-out;
+    }
+
+    @keyframes dropdownSlide {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .dropdown-header {
-        color: var(--text-dark);
-        font-weight: 700;
-        padding: 12px 16px;
-        font-size: 14px;
+        background: linear-gradient(135deg, var(--primary), #3388FF);
+        color: white;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .dropdown-header .text-primary {
+        color: #CCE5FF !important;
     }
 
     .dropdown-item {
-        border-radius: 8px;
-        padding: 10px 16px;
+        border-radius: 10px;
+        margin: 4px 8px;
+        font-size: 14px;
+        font-weight: 500;
         transition: all 0.2s ease;
-        color: var(--text-dark);
     }
 
     .dropdown-item:hover {
-        background: var(--bg-main);
-        color: var(--primary-color);
+        background: rgba(0, 102, 255, 0.08);
+        color: var(--primary);
+        transform: translateX(4px);
     }
 
     .dropdown-item i {
         width: 20px;
+        text-align: center;
     }
 
     .badge {
-        font-size: 10px;
-        padding: 4px 6px;
+        font-weight: 700;
+    }
+
+    /* Responsive */
+    @media (max-width: 576px) {
+        .top-bar {
+            padding: 0 15px;
+        }
+
+        .page-title {
+            font-size: 18px;
+        }
+
+        .topbar-actions .btn-light span {
+            display: none;
+        }
     }
 </style>

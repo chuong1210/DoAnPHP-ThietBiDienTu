@@ -315,7 +315,7 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="<?php echo e(asset($product->image ?? 'https://via.placeholder.com/100')); ?>"
+                                                <img src="<?php echo e(asset($product->image ?? 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg')); ?>"
                                                     alt="<?php echo e($product->name); ?>" class="product-img me-3">
                                                 <div>
                                                     <a href="<?php echo e(route('admin.products.edit', $product->id)); ?>"
