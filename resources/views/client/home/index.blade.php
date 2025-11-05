@@ -117,7 +117,7 @@
             <div class="row g-4">
                 @foreach($featuredProducts as $index => $product)
                     <div class="col-lg-3 col-md-6">
-                        <div class="product-card" style="animation-delay: {{ $index * 0.1 }}s">
+                        <div class="product-card" style="animation-delay: {{ $index * 0.1 }}">
                             @if($product->sale_price)
                                 <div class="product-badge sale">
                                     -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}%
@@ -188,7 +188,7 @@
             <div class="row g-4">
                 @foreach($newProducts as $index => $product)
                     <div class="col-lg-3 col-md-6">
-                        <div class="product-card" style="animation-delay: {{ $index * 0.1 }}s">
+                        <div class="product-card" style="animation-delay: {{ $index * 0.1 }}W">
                             <div class="product-badge new">New</div>
 
                             <div class="product-image-wrapper">

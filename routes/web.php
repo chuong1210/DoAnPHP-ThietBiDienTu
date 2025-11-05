@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Client\BrandController as ClientBrandController;
 use App\Http\Controllers\Client\CartController;
@@ -183,14 +184,26 @@ Route::prefix('admin')
         Route::resource('categories', AdminCategoryController::class);
         Route::resource('brands', AdminBrandController::class);
         Route::resource('banners', BannerController::class);
-        Route::resource('reviews', AdminReviewController::class)->only(['index', 'destroy', 'show']);
-
-        // Quản lý User
+        // Route::resource('reviews', AdminReviewController::class)->only(['index', 'destroy', 'show']);
+        Route::resource('reviews', AdminReviewController::class);
         Route::resource('users', UserController::class);
-        // Quản lý đơn hàng (Orders)
+        // Resource
+
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+        Route::resource('banners', BannerController::class);
+        Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+        Route::get('reviews/{id}', [AdminReviewController::class, 'show'])->name('reviews.show');
+        Route::patch('reviews/{id}/status', [AdminReviewController::class, 'updateStatus'])->name('reviews.updateStatus');
+        Route::delete('reviews/{id}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
+
+        // Quản lý đơn hàng (Orders)
+
+        Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
+
+        // Route này cho phép form trong trang show gửi yêu cầu PUT đến controller
+        Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
         // --- Các Nhóm Route Chức Năng Riêng ---
 
         // Quản lý liên hệ (Contact)

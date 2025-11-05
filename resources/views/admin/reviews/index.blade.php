@@ -3,95 +3,180 @@
 @section('title', 'Quản Lý Đánh Giá')
 
 @section('content')
-<div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800">Quản Lý Đánh Giá</h1>
+<div class="container-fluid" style="background: linear-gradient(135deg, #F8FAFC 0%, #E0F2FE 100%); min-height: 100vh; padding: 20px 0;">
+    <!-- Header -->
+    <div class="mb-4" style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); color: white; padding: 28px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 102, 255, 0.2);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <h1 class="h3 mb-0">Quản Lý Đánh Giá</h1>
+        </div>
+    </div>
 
-    <form method="GET" action="{{ route('admin.reviews.index') }}" class="mb-4">
-        <div class="row g-2">
-            <div class="col-md-4">
-                <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm đánh giá..." value="{{ request('keyword') }}">
+    <!-- Lọc trạng thái -->
+    <div class="mb-4 d-flex gap-3 align-items-center flex-wrap">
+        <div class="d-flex align-items-center gap-2">
+            <label class="form-label mb-0" style="color: #1E293B; font-weight: 500; white-space: nowrap;">Lọc theo trạng thái:</label>
+            <select id="status-filter" class="form-select" style="width: auto; min-width: 200px; border-color: #CBD5E1; border-radius: 8px;">
+                <option value="">Tất cả</option>
+                <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Chờ duyệt</option>
+                <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Đã duyệt</option>
+                <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Từ chối</option>
+            </select>
+        </div>
+        <button id="clear-status-filter" class="btn btn-outline-secondary" style="border-color: #CBD5E1; color: #64748B; padding: 6px 16px; border-radius: 8px; display: none;">
+            Xóa lọc
+        </button>
+    </div>
+
+    <!-- JS Lọc trạng thái -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusSelect = document.getElementById('status-filter');
+            const clearStatusBtn = document.getElementById('clear-status-filter');
+            const currentUrl = new URL(window.location);
+
+            if (statusSelect) {
+                statusSelect.addEventListener('change', function () {
+                    const val = this.value;
+                    if (val) {
+                        currentUrl.searchParams.set('status', val);
+                    } else {
+                        currentUrl.searchParams.delete('status');
+                    }
+                    window.location = currentUrl;
+                });
+
+                if (statusSelect.value) {
+                    clearStatusBtn.style.display = 'inline-flex';
+                }
+
+                clearStatusBtn.addEventListener('click', function () {
+                    currentUrl.searchParams.delete('status');
+                    window.location = currentUrl;
+                });
+            }
+        });
+    </script>
+
+    <!-- Bảng đánh giá -->
+    <div class="card shadow-sm" style="border: 1px solid #CBD5E1; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" style="border-color: #CBD5E1;">
+                    <thead style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); color: white;">
+                        <tr>
+                            <th style="padding: 16px; font-weight: 600;">ID</th>
+                            <th style="padding: 16px; font-weight: 600;">Người dùng</th>
+                            <th style="padding: 16px; font-weight: 600;">Sản phẩm</th>
+                            <th style="padding: 16px; font-weight: 600;">Đánh giá</th>
+                            <th style="padding: 16px; font-weight: 600;">Nội dung</th>
+                            <th style="padding: 16px; font-weight: 600;">Trạng thái</th>
+                            <th style="padding: 16px; font-weight: 600;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($reviews as $review)
+                            <tr style="border-bottom: 1px solid #CBD5E1;">
+                                <td style="color: #1E293B; padding: 16px;">#{{ $review->id }}</td>
+                                <td style="color: #1E293B; font-weight: 500; padding: 16px;">
+                                    {{ $review->user_name }}
+                                    <small class="d-block text-muted">ID: {{ $review->user_id }}</small>
+                                </td>
+                                <td style="color: #1E293B; padding: 16px;">
+                                    {{ $review->product->name ?? 'Sản phẩm đã xóa' }}
+                                </td>
+                                <td style="padding: 16px;">
+                                    <div style="display: flex; gap: 2px; font-size: 16px;">
+                                        @for($i = 0; $i < $review->rating; $i++)
+                                            <span style="color: #FFB800;">★</span>
+                                        @endfor
+                                        @for($i = $review->rating; $i < 5; $i++)
+                                            <span style="color: #CBD5E1;">★</span>
+                                        @endfor
+                                    </div>
+                                </td>
+                                <td style="padding: 16px; max-width: 300px;">
+                                    <p class="text-muted mb-0" style="font-size: 0.875rem; line-height: 1.4;">
+                                        {{ Str::limit($review->comment, 80) }}
+                                    </p>
+                                </td>
+                                <td style="padding: 16px;">
+                                    <span class="badge" style="
+                                        background-color:
+                                            {{ $review->status === 'pending' ? '#F59E0B' :
+                                               ($review->status === 'approved' ? '#10B981' : '#EF4444') }};
+                                        color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem;">
+                                        {{ $review->status === 'pending' ? 'Chưa duyệt' :
+                                           ($review->status === 'approved' ? 'Đã duyệt' : 'Từ chối') }}
+                                    </span>
+                                </td>
+                                <td style="padding: 16px; display: flex; gap: 8px; align-items: center;">
+                                    <!-- Xem -->
+                                    <a href="{{ route('admin.reviews.show', $review->id) }}" class="btn btn-sm" style="background: #0066FF; color: white; padding: 6px 12px; border-radius: 6px;" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <!-- Xóa -->
+                                    <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Xóa đánh giá này vĩnh viễn?')">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-sm btn-danger" style="padding: 6px 12px; border-radius: 6px;" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center" style="color: #64748B; padding: 40px;">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                        </svg>
+                                        <p class="mb-0">Chưa có đánh giá nào</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-            <div class="col-md-3">
-                <select name="status" class="form-select">
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Chờ duyệt</option>
-                    <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Đã duyệt</option>
-                    <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Từ chối</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Lọc
-                </button>
+
+            <!-- Phân trang -->
+            <div class="px-4 py-3 bg-white border-top" style="border-color: #CBD5E1;">
+                {{ $reviews->appends(request()->query())->links() }}
             </div>
         </div>
-    </form>
-
-    <a href="{{ route('admin.reviews.create') }}" class="btn btn-success mb-4">
-        <i class="fas fa-plus"></i> Thêm Đánh Giá
-    </a>
-
-    <div class="card shadow mb-4">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nội dung</th>
-                        <th>Người dùng</th>
-                        <th>Sản phẩm</th>
-                        <th>Trạng thái</th>
-                        <th>Đánh giá</th> <!-- cột mới -->
-                        <th>Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($reviews as $review)
-                        <tr>
-                            <td>{{ $review->id }}</td>
-                            <td>{{ \Illuminate\Support\Str::limit($review->comment, 50) }}</td>
-                            <td>{{ $review->user_name }}</td>
-                            <td>{{ $review->product->name ?? 'N/A' }}</td>
-                            <td>
-                                <span class="badge {{ $review->is_active ? 'bg-success' : 'bg-danger' }}">
-                                    {{ $review->is_active ? 'Hiển thị' : 'Ẩn' }}
-                                </span>
-                            </td>
-
-                            <!-- Cột Đánh giá -->
-                            <td>
-                                @for ($i = 1; $i <= 5; $i++)
-                                    @if ($i <= $review->rating)
-                                        <i class="fas fa-star text-warning"></i>
-                                    @else
-                                        <i class="far fa-star text-warning"></i>
-                                    @endif
-                                @endfor
-                            </td>
-
-                            <td>
-                                <a href="{{ route('admin.reviews.edit', $review->id) }}" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-edit"></i> Sửa
-                                </a>
-                                <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đánh giá này?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i> Xóa
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center">Không có đánh giá nào.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        {{ $reviews->links() }}
     </div>
 </div>
-</div>
+
+<!-- JS Lọc sản phẩm -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const select = document.getElementById('product-filter');
+        const clearBtn = document.getElementById('clear-filter');
+        const currentUrl = new URL(window.location);
+
+        if (select) {
+            select.addEventListener('change', function () {
+                const val = this.value;
+                if (val) {
+                    currentUrl.searchParams.set('product_id', val);
+                } else {
+                    currentUrl.searchParams.delete('product_id');
+                }
+                window.location = currentUrl;
+            });
+
+            if (select.value) {
+                clearBtn.style.display = 'inline-flex';
+            }
+
+            clearBtn.addEventListener('click', function () {
+                currentUrl.searchParams.delete('product_id');
+                window.location = currentUrl;
+            });
+        }
+    });
+</script>
 @endsection

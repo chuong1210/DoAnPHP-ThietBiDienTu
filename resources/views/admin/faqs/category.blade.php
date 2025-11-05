@@ -1,45 +1,56 @@
 @extends('admin.layouts.admin')
 
-@section('title', "Câu hỏi về $category")
+@section('title', "Câu hỏi về $categoryName")
 
 @section('content')
-<div class="container py-4">
+<div class="container-fluid" style="background-color: #F8FAFC; min-height: 100vh; padding: 20px 0;">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="{{ route('admin.faqs.index') }}" class="btn btn-outline-secondary">
-            ← Quay lại tất cả câu hỏi
+        <a href="{{ route('admin.faqs.index') }}" class="btn"
+           style="background-color: #E0E7FF; color: #1E293B; border: none; padding: 0.75rem 1.5rem;">
+            ← Quay lại
         </a>
-        <a href="{{ route('admin.faqs.create') }}" class="btn btn-success">
+        <a href="{{ route('admin.faqs.create') }}" class="btn"
+           style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); color: white; border: none; padding: 0.75rem 1.5rem;">
             <i class="fas fa-plus"></i> Thêm FAQ
         </a>
     </div>
 
-    <h2 class="text-primary mb-4">💡 Câu hỏi về: {{ $category }}</h2>
+    <div class="mb-4" style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); color: white; padding: 25px; border-radius: 8px;">
+        <h2 class="h4 mb-0">📋 Câu hỏi về: <strong>{{ $categoryName }}</strong></h2>
+    </div>
 
     @if($faqs->isEmpty())
-        <div class="alert alert-info">Hiện chưa có câu hỏi nào trong danh mục này.</div>
+        <div class="alert text-center" style="background-color: #E0E7FF; border: 1px solid #CBD5E1; color: #1E293B; border-radius: 8px;">
+            <i class="fas fa-info-circle"></i> Chưa có câu hỏi nào trong danh mục này.
+        </div>
     @else
         <div class="accordion" id="accordionCategory">
             @foreach($faqs as $faq)
-                <div class="accordion-item mb-2 border rounded">
-                    <h2 class="accordion-header d-flex justify-content-between align-items-center" id="heading{{ $faq->id }}">
-                        <button class="accordion-button collapsed fw-semibold flex-grow-1" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#collapse{{ $faq->id }}">
+                <div class="accordion-item mb-3" style="border: 1px solid #CBD5E1; border-radius: 8px; overflow: hidden; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <h2 class="accordion-header" id="heading{{ $faq->id }}">
+                        <button class="accordion-button collapsed fw-medium" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#collapse{{ $faq->id }}"
+                                style="color: #1E293B; background-color: #ffffff;">
                             {{ $faq->question }}
                         </button>
-                        <div class="ms-2">
-                            <a href="{{ route('admin.faqs.edit', $faq->id) }}" class="btn btn-sm btn-warning">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('admin.faqs.destroy', $faq->id) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Bạn có chắc muốn xóa?')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
-                            </form>
-                        </div>
                     </h2>
                     <div id="collapse{{ $faq->id }}" class="accordion-collapse collapse" data-bs-parent="#accordionCategory">
-                        <div class="accordion-body">
+                        <div class="accordion-body" style="background-color: #F8FAFC; color: #1E293B;">
                             {!! nl2br(e($faq->answer)) !!}
+                            <div class="mt-3 d-flex gap-2">
+                                <a href="{{ route('admin.faqs.edit', $faq->id) }}" class="btn btn-sm"
+                                   style="background: linear-gradient(135deg, #0066FF 0%, #00B4D8 100%); color: white; border: none;">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <form action="{{ route('admin.faqs.destroy', $faq->id) }}" method="POST" class="d-inline"
+                                      onsubmit="return confirm('Xóa FAQ này?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-sm"
+                                            style="background-color: #00B4D8; color: white; border: none;">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

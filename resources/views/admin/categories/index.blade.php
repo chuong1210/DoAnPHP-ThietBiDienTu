@@ -8,7 +8,8 @@
         /* Nút Thêm Mới */
         .btn-add-category {
             background: var(--primary-gradient);
-            color: white;
+            color: rgb(4, 146, 233);
+
             border: none;
             border-radius: 12px;
             padding: 10px 20px;
@@ -129,7 +130,7 @@
                                 <td><strong>{{ $category->id }}</strong></td>
                                 <td>
                                     {{-- THÊM HIỂN THỊ ẢNH --}}
-                                    <img src="{{ asset($category->image ?? 'https://via.placeholder.com/60') }}"
+                                    <img src="{{ asset($category->image ?? 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg') }}"
                                         alt="{{ $category->name }}" class="category-image">
                                 </td>
                                 <td>

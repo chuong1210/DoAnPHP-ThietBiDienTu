@@ -40,28 +40,29 @@ class BannerController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpg,png,jpeg|max:2048',
-            'link' => 'nullable|url|max:255',
-            'sort_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
+        $validated = $request->validate([
+            'title'       => 'required|string|max:255',
+            'image'       => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'link'        => 'nullable|url',
+            'sort_order'  => 'nullable|integer|min:0',
+            'is_active'   => 'nullable|boolean',
         ]);
 
-        $data = $request->only(['title', 'link', 'sort_order', 'is_active']);
+        $data = $validated;
         $data['is_active'] = $request->has('is_active') ? 1 : 0;
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('images'), $filename);
-            $data['image'] = $filename;
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images'), $fileName);
+            $data['image'] = $fileName;
         }
 
-        $this->bannerRepository->create($data);
+        $banner = \App\Models\Banner::create($data);
 
-        return redirect()->route('admin.banners.index')
-            ->with('success', 'Banner đã được thêm thành công.');
+        return redirect()
+            ->route('admin.banners.edit', $banner->id)  // ← CHUYỂN NGAY VỀ EDIT
+            ->with('success', 'Thêm banner thành công! Bạn có thể xem hoặc chỉnh sửa ngay.');
     }
 
     public function edit($id)

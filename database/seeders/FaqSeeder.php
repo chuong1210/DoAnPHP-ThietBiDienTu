@@ -57,7 +57,7 @@ class FaqSeeder extends Seeder
                 'question' => 'Phí vận chuyển là bao nhiêu?',
                 'answer' => "<strong>30.000đ</strong> cho mọi đơn hàng<br>
                              <strong class='text-success'>MIỄN PHÍ</strong> cho đơn từ <strong>1.000.000đ</strong><br>
-                             <strong class='text-success'>MIỄN PHÍ 100%</strong> cho đơn từ <strong>2.000.000đ</strong>",
+<strong class='text-success'>MIỄN PHÍ 100%</strong> cho đơn từ <strong>2.000.000đ</strong>",
                 'sort_order' => 2,
                 'is_active' => true,
             ],
@@ -113,7 +113,7 @@ class FaqSeeder extends Seeder
             [
                 'category' => 'return',
                 'question' => 'Làm sao để đổi trả sản phẩm?',
-                'answer' => "1. Liên hệ Zalo <strong>0901 234 567</strong><br>
+'answer' => "1. Liên hệ Zalo <strong>0901 234 567</strong><br>
                              2. Gửi ảnh lỗi + video (nếu có)<br>
                              3. Chúng tôi sẽ hướng dẫn gửi hàng về<br>
                              4. Hoàn tiền hoặc đổi mới trong 48h",
@@ -173,7 +173,7 @@ class FaqSeeder extends Seeder
             ],
             [
                 'category' => 'promotion',
-                'question' => 'Mã giảm giá dùng được bao lâu?',
+'question' => 'Mã giảm giá dùng được bao lâu?',
                 'answer' => "Tùy chương trình:<br>
                              • Mã mới: 7 ngày<br>
                              • Flash Sale: 24h<br>

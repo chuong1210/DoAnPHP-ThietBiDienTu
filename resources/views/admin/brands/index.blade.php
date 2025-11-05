@@ -8,7 +8,7 @@
         /* Nút Thêm Mới */
         .btn-add-brand {
             background: var(--primary-gradient);
-            color: white;
+            color: rgb(4, 146, 233);
             border: none;
             border-radius: 12px;
             padding: 10px 20px;
@@ -157,7 +157,7 @@
                             <tr>
                                 <td><strong>{{ $brand->id }}</strong></td>
                                 <td>
-                                    <img src="{{ asset($brand->logo ?? 'https://via.placeholder.com/50') }}"
+                                    <img src="{{ asset($brand->logo ?? 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg') }}"
                                         alt="{{ $brand->name }}" class="brand-logo">
                                 </td>
                                 <td>{{ $brand->name }}</td>
