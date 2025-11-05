@@ -13,37 +13,37 @@
         <!-- Categories List -->
         <div class="sidebar-content" id="sidebarContent">
             <div class="category-list">
-                @foreach($categories as $index => $category)
-                    <div class="category-item" data-category="{{ $category->id }}">
-                        <a href="{{ route('client.product.category.index', $category->slug) }}"
-                            class="category-link {{ request()->segment(3) == $category->slug ? 'active' : '' }}">
+                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <div class="category-item" data-category="<?php echo e($category->id); ?>">
+                        <a href="<?php echo e(route('client.product.category.index', $category->slug)); ?>"
+                            class="category-link <?php echo e(request()->segment(3) == $category->slug ? 'active' : ''); ?>">
                             <span class="category-icon">
-                                @if($category->icon)
-                                    <i class="{{ $category->icon }}"></i>
-                                @else
+                                <?php if($category->icon): ?>
+                                    <i class="<?php echo e($category->icon); ?>"></i>
+                                <?php else: ?>
                                     <i class="fas fa-cube"></i>
-                                @endif
+                                <?php endif; ?>
                             </span>
-                            <span class="category-name">{{ $category->name }}</span>
-                            @if($category->children->count() > 0)
+                            <span class="category-name"><?php echo e($category->name); ?></span>
+                            <?php if($category->children->count() > 0): ?>
                                 <i class="fas fa-chevron-down toggle-icon"></i>
-                            @endif
+                            <?php endif; ?>
                         </a>
 
-                        {{-- Subcategories --}}
-                        @if($category->children->count() > 0)
+                        
+                        <?php if($category->children->count() > 0): ?>
                             <div class="subcategory-list">
-                                @foreach($category->children as $child)
-                                    <a href="{{ route('client.product.category.index', $child->slug) }}"
-                                        class="subcategory-link {{ request()->segment(3) == $child->slug ? 'active' : '' }}">
+                                <?php $__currentLoopData = $category->children; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $child): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <a href="<?php echo e(route('client.product.category.index', $child->slug)); ?>"
+                                        class="subcategory-link <?php echo e(request()->segment(3) == $child->slug ? 'active' : ''); ?>">
                                         <i class="fas fa-angle-right"></i>
-                                        <span>{{ $child->name }}</span>
+                                        <span><?php echo e($child->name); ?></span>
                                     </a>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
             <!-- Price Filter -->
@@ -51,18 +51,18 @@
                 <h6 class="filter-title">
                     <i class="fas fa-filter"></i> Lọc Giá
                 </h6>
-                <form action="{{ route('client.product.index') }}" method="GET" class="filter-form">
+                <form action="<?php echo e(route('client.product.index')); ?>" method="GET" class="filter-form">
                     <div class="price-inputs">
                         <div class="price-input-group">
                             <label>Từ (VNĐ)</label>
                             <input type="number" name="price_from" class="form-control" placeholder="0"
-                                value="{{ request('price_from') }}">
+                                value="<?php echo e(request('price_from')); ?>">
                         </div>
                         <div class="price-separator">-</div>
                         <div class="price-input-group">
                             <label>Đến (VNĐ)</label>
                             <input type="number" name="price_to" class="form-control" placeholder="10,000,000"
-                                value="{{ request('price_to') }}">
+                                value="<?php echo e(request('price_to')); ?>">
                         </div>
                     </div>
                     <button type="submit" class="btn-filter">
@@ -72,25 +72,27 @@
             </div>
 
             <!-- Brand Filter -->
-            @if(isset($brands) && $brands !== false && $brands->count() > 0)
+            <?php if(isset($brands) && $brands !== false && $brands->count() > 0): ?>
                 <div class="filter-box">
                     <h6 class="filter-title">
                         <i class="fas fa-tags"></i> Thương Hiệu
                     </h6>
                     <div class="brand-list">
-                        @foreach($brands as $brand)
+                        <?php $__currentLoopData = $brands; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $brand): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="brand-item">
-                                <input class="form-check-input" type="checkbox" id="brand{{ $brand->id }}"
-                                    {{ in_array($brand->id, request('brand', [])) ? 'checked' : '' }}
-                                    onchange="filterByBrand({{ $brand->id }})">
-                                <label class="form-check-label" for="brand{{ $brand->id }}">
-                                    {{ $brand->name }}
+                                <input class="form-check-input" type="checkbox" id="brand<?php echo e($brand->id); ?>"
+                                    <?php echo e(in_array($brand->id, request('brand', [])) ? 'checked' : ''); ?>
+
+                                    onchange="filterByBrand(<?php echo e($brand->id); ?>)">
+                                <label class="form-check-label" for="brand<?php echo e($brand->id); ?>">
+                                    <?php echo e($brand->name); ?>
+
                                 </label>
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
-            @endif
+            <?php endif; ?>
 
             <!-- Quick Links -->
             <div class="quick-links">
@@ -561,3 +563,4 @@
         }
     });
 </script>
+<?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/client/partials/sidebar-category.blade.php ENDPATH**/ ?>
