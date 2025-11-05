@@ -72,23 +72,28 @@
             <i class="fas fa-comments"></i>
             <span>Chat Hỗ Trợ</span>
             @php
-                $unreadCount = \App\Models\ChatMessage::whereHas('room', function ($q) {
-                    $q->where('status', 'open');
-                })
-                    ->where('is_admin', false)
-                    ->where('is_read', false)
-                    ->count();
+$unreadCount = \App\Models\ChatMessage::whereHas('room', function ($q) {
+    $q->where('status', 'open');
+})
+    ->where('is_admin', false)
+    ->where('is_read', false)
+    ->count();
             @endphp
             @if($unreadCount > 0)
                 <span class="nav-badge">{{ $unreadCount }}</span>
             @endif
         </a>
 
-        {{-- <a href="{{ route('admin.users.index') }}"
-            class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-            <i class="fas fa-user-friends"></i>
-            <span>Quản Lý User</span>
-        </a> --}}
+                <!-- User Management Section -->
+                <div class="nav-section-title">
+                    <i class="fas fa-user-cog me-1"></i> User
+                </div>
+
+                <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                    <i class="fas fa-user-friends"></i>
+                    <span>Quản Lý User</span>
+                </a>
+
 
         <!-- Divider -->
         <div class="nav-divider"></div>

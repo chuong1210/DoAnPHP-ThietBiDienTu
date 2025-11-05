@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,6 +114,7 @@ Route::middleware('auth')->group(function () {
         });
     });
 
+
     // Chat Widget Routes
     Route::prefix('chat')->name('chat.')->group(function () {
         Route::get('/room', [ClientChatController::class, 'getRoom'])->name('room');
@@ -183,6 +185,8 @@ Route::prefix('admin')
         Route::resource('banners', BannerController::class);
         Route::resource('reviews', AdminReviewController::class)->only(['index', 'destroy', 'show']);
 
+        // Quản lý User
+        Route::resource('users', UserController::class);
         // Quản lý đơn hàng (Orders)
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
