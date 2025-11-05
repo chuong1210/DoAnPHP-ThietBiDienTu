@@ -1,9 +1,7 @@
-@extends('admin.layouts.admin')
+<?php $__env->startSection('title', 'Chi Tiết Sản Phẩm'); ?>
+<?php $__env->startSection('page-title', 'Chi Tiết Sản Phẩm'); ?>
 
-@section('title', 'Chi Tiết Sản Phẩm')
-@section('page-title', 'Chi Tiết Sản Phẩm')
-
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         /* === PAGE HEADER === */
         .page-header {
@@ -324,9 +322,9 @@
             font-size: 0.875rem;
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Page Header -->
     <div class="page-header">
         <div class="d-flex justify-content-between align-items-start">
@@ -334,17 +332,17 @@
                 <h1><i class="fas fa-cube me-2"></i>Chi Tiết Sản Phẩm</h1>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" style="color: rgba(255,255,255,0.8);">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}" style="color: rgba(255,255,255,0.8);">Sản phẩm</a></li>
-                        <li class="breadcrumb-item active">Chi tiết #{{ $product->id }}</li>
+                        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.dashboard')); ?>" style="color: rgba(255,255,255,0.8);">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.products.index')); ?>" style="color: rgba(255,255,255,0.8);">Sản phẩm</a></li>
+                        <li class="breadcrumb-item active">Chi tiết #<?php echo e($product->id); ?></li>
                     </ol>
                 </nav>
             </div>
             <div class="header-actions">
-                <a href="{{ route('admin.products.edit', $product->id) }}" class="btn">
+                <a href="<?php echo e(route('admin.products.edit', $product->id)); ?>" class="btn">
                     <i class="fas fa-edit me-2"></i>Chỉnh sửa
                 </a>
-                <a href="{{ route('admin.products.index') }}" class="btn">
+                <a href="<?php echo e(route('admin.products.index')); ?>" class="btn">
                     <i class="fas fa-arrow-left me-2"></i>Quay lại
                 </a>
             </div>
@@ -360,80 +358,80 @@
                     <div class="row">
                         <div class="col-md-5">
                             <div class="product-image-container">
-                                @if($product->image)
-                                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}">
-                                @else
+                                <?php if($product->image): ?>
+                                    <img src="<?php echo e(asset($product->image)); ?>" alt="<?php echo e($product->name); ?>">
+                                <?php else: ?>
                                     <div class="no-image">
                                         <i class="fas fa-image"></i>
                                         <p>Không có hình ảnh</p>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="col-md-7">
-                            <h2 class="product-title">{{ $product->name }}</h2>
+                            <h2 class="product-title"><?php echo e($product->name); ?></h2>
 
                             <div class="product-badges">
-                                @if($product->is_featured)
+                                <?php if($product->is_featured): ?>
                                     <span class="badge badge-featured">
                                         <i class="fas fa-star me-1"></i>Nổi bật
                                     </span>
-                                @endif
-                                @if($product->status === 'active')
+                                <?php endif; ?>
+                                <?php if($product->status === 'active'): ?>
                                     <span class="badge badge-active">Đang hoạt động</span>
-                                @else
+                                <?php else: ?>
                                     <span class="badge badge-inactive">Không hoạt động</span>
-                                @endif
+                                <?php endif; ?>
                             </div>
 
                             <table class="info-table">
                                 <tr>
                                     <th>Danh mục:</th>
-                                    <td>{{ $product->category->name ?? 'N/A' }}</td>
+                                    <td><?php echo e($product->category->name ?? 'N/A'); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Thương hiệu:</th>
-                                    <td>{{ $product->brand->name ?? 'N/A' }}</td>
+                                    <td><?php echo e($product->brand->name ?? 'N/A'); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Giá:</th>
                                     <td>
                                         <div class="price-display">
-                                            <span class="price-current">{{ number_format($product->price) }}đ</span>
-                                            @if($product->sale_price)
-                                                <span class="price-original">{{ number_format($product->sale_price) }}đ</span>
+                                            <span class="price-current"><?php echo e(number_format($product->price)); ?>đ</span>
+                                            <?php if($product->sale_price): ?>
+                                                <span class="price-original"><?php echo e(number_format($product->sale_price)); ?>đ</span>
                                                 <span class="discount-badge">
-                                                    -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}%
+                                                    -<?php echo e(round((($product->price - $product->sale_price) / $product->price) * 100)); ?>%
                                                 </span>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Tồn kho:</th>
                                     <td>
-                                        @if($product->quantity > 10)
+                                        <?php if($product->quantity > 10): ?>
                                             <span class="stock-badge stock-available">
-                                                <i class="fas fa-check-circle me-1"></i>{{ $product->quantity }} sản phẩm
+                                                <i class="fas fa-check-circle me-1"></i><?php echo e($product->quantity); ?> sản phẩm
                                             </span>
-                                        @elseif($product->quantity > 0)
+                                        <?php elseif($product->quantity > 0): ?>
                                             <span class="stock-badge stock-low">
-                                                <i class="fas fa-exclamation-triangle me-1"></i>Còn {{ $product->quantity }} sản phẩm
+                                                <i class="fas fa-exclamation-triangle me-1"></i>Còn <?php echo e($product->quantity); ?> sản phẩm
                                             </span>
-                                        @else
+                                        <?php else: ?>
                                             <span class="stock-badge stock-out">
                                                 <i class="fas fa-times-circle me-1"></i>Hết hàng
                                             </span>
-                                        @endif
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Lượt xem:</th>
-                                    <td><i class="fas fa-eye me-2" style="color: #00B4D8;"></i>{{ number_format($product->view_count) }}</td>
+                                    <td><i class="fas fa-eye me-2" style="color: #00B4D8;"></i><?php echo e(number_format($product->view_count)); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Đã bán:</th>
-                                    <td><i class="fas fa-shopping-cart me-2" style="color: #0066FF;"></i>{{ number_format($product->sold_count) }}</td>
+                                    <td><i class="fas fa-shopping-cart me-2" style="color: #0066FF;"></i><?php echo e(number_format($product->sold_count)); ?></td>
                                 </tr>
                             </table>
                         </div>
@@ -447,13 +445,13 @@
                     <h5><i class="fas fa-align-left me-2"></i>Mô Tả Chi Tiết</h5>
                 </div>
                 <div class="card-body">
-                    @if($product->description)
-                        <p class="product-description">{{ $product->description }}</p>
-                    @else
+                    <?php if($product->description): ?>
+                        <p class="product-description"><?php echo e($product->description); ?></p>
+                    <?php else: ?>
                         <p class="text-muted" style="text-align: center; padding: 2rem;">
                             <i class="fas fa-info-circle me-2"></i>Chưa có mô tả chi tiết
                         </p>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -469,11 +467,11 @@
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-label">Lượt Xem</div>
-                            <div class="stat-value">{{ number_format($product->view_count) }}</div>
+                            <div class="stat-value"><?php echo e(number_format($product->view_count)); ?></div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Đã Bán</div>
-                            <div class="stat-value">{{ number_format($product->sold_count) }}</div>
+                            <div class="stat-value"><?php echo e(number_format($product->sold_count)); ?></div>
                         </div>
                     </div>
                 </div>
@@ -488,23 +486,23 @@
                     <div class="meta-info">
                         <div class="meta-item">
                             <span class="meta-label">ID Sản Phẩm:</span>
-                            <span class="meta-value">#{{ $product->id }}</span>
+                            <span class="meta-value">#<?php echo e($product->id); ?></span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">SKU:</span>
-                            <span class="meta-value">PRO-{{ $product->id }}</span>
+                            <span class="meta-value">PRO-<?php echo e($product->id); ?></span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">Slug:</span>
-                            <span class="meta-value">{{ $product->slug }}</span>
+                            <span class="meta-value"><?php echo e($product->slug); ?></span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">Ngày tạo:</span>
-                            <span class="meta-value">{{ optional($product->created_at)->format('d/m/Y H:i') ?? 'N/A' }}</span>
+                            <span class="meta-value"><?php echo e(optional($product->created_at)->format('d/m/Y H:i') ?? 'N/A'); ?></span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">Cập nhật:</span>
-                            <span class="meta-value">{{ optional($product->updated_at)->format('d/m/Y H:i') ?? 'N/A' }}</span>
+                            <span class="meta-value"><?php echo e(optional($product->updated_at)->format('d/m/Y H:i') ?? 'N/A'); ?></span>
                         </div>
                     </div>
                 </div>
@@ -516,35 +514,37 @@
                     <h5><i class="fas fa-star me-2"></i>Đánh Giá</h5>
                 </div>
                 <div class="card-body">
-                    @php
+                    <?php
                         $averageRating = $product->reviews->avg('rating');
                         $reviewCount = $product->reviews->count();
-                    @endphp
+                    ?>
 
                     <div class="review-stats">
-                        @if($averageRating > 0)
-                            <div class="rating-number">{{ number_format($averageRating, 1) }}</div>
+                        <?php if($averageRating > 0): ?>
+                            <div class="rating-number"><?php echo e(number_format($averageRating, 1)); ?></div>
                             <div class="rating-stars">
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($i <= floor($averageRating))
+                                <?php for($i = 1; $i <= 5; $i++): ?>
+                                    <?php if($i <= floor($averageRating)): ?>
                                         <i class="fas fa-star"></i>
-                                    @elseif($i - $averageRating < 1)
+                                    <?php elseif($i - $averageRating < 1): ?>
                                         <i class="fas fa-star-half-alt"></i>
-                                    @else
+                                    <?php else: ?>
                                         <i class="far fa-star"></i>
-                                    @endif
-                                @endfor
+                                    <?php endif; ?>
+                                <?php endfor; ?>
                             </div>
-                            <div class="rating-count">{{ $reviewCount }} đánh giá</div>
-                        @else
+                            <div class="rating-count"><?php echo e($reviewCount); ?> đánh giá</div>
+                        <?php else: ?>
                             <div style="padding: 2rem; color: #94A3B8;">
                                 <i class="far fa-star" style="font-size: 3rem; margin-bottom: 1rem;"></i>
                                 <p style="margin: 0;">Chưa có đánh giá nào</p>
                             </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/admin/products/show.blade.php ENDPATH**/ ?>

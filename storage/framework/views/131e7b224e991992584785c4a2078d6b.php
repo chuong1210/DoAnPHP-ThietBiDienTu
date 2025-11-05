@@ -1,9 +1,7 @@
-@extends('admin.layouts.admin')
+<?php $__env->startSection('title', 'Chỉnh Sửa Sản Phẩm'); ?>
+<?php $__env->startSection('page-title', 'Chỉnh Sửa Sản Phẩm'); ?>
 
-@section('title', 'Chỉnh Sửa Sản Phẩm')
-@section('page-title', 'Chỉnh Sửa Sản Phẩm')
-
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         /* Sử dụng lại style từ create.blade.php */
         .page-header {
@@ -262,29 +260,29 @@
             margin-left: 1rem;
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Page Header -->
     <div class="page-header">
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1>
                     <i class="fas fa-edit me-2"></i>Chỉnh Sửa Sản Phẩm
-                    <span class="product-id-badge">#{{ $product->id }}</span>
+                    <span class="product-id-badge">#<?php echo e($product->id); ?></span>
                 </h1>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" style="color: rgba(255,255,255,0.8);">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}" style="color: rgba(255,255,255,0.8);">Sản phẩm</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.dashboard')); ?>" style="color: rgba(255,255,255,0.8);">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo e(route('admin.products.index')); ?>" style="color: rgba(255,255,255,0.8);">Sản phẩm</a></li>
                         <li class="breadcrumb-item active">Chỉnh sửa</li>
                     </ol>
                 </nav>
             </div>
-            <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
+            <form action="<?php echo e(route('admin.products.destroy', $product->id)); ?>" method="POST"
                   onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
-                @csrf
-                @method('DELETE')
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('DELETE'); ?>
                 <button type="submit" class="btn btn-danger">
                     <i class="fas fa-trash me-2"></i>Xóa Sản Phẩm
                 </button>
@@ -292,9 +290,9 @@
         </div>
     </div>
 
-    <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
+    <form action="<?php echo e(route('admin.products.update', $product->id)); ?>" method="POST" enctype="multipart/form-data">
+        <?php echo csrf_field(); ?>
+        <?php echo method_field('PUT'); ?>
 
         <div class="row">
             <!-- Left Column -->
@@ -308,52 +306,122 @@
                         <div class="mb-4">
                             <label class="form-label">Tên Sản Phẩm <span class="text-danger">*</span></label>
                             <input type="text" name="name"
-                                   class="form-control @error('name') is-invalid @enderror"
-                                   value="{{ old('name', $product->name) }}">
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                                   class="form-control <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                   value="<?php echo e(old('name', $product->name)); ?>">
+                            <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">Mô Tả Chi Tiết</label>
                             <textarea name="description"
-                                      class="form-control @error('description') is-invalid @enderror"
-                                      rows="6">{{ old('description', $product->description) }}</textarea>
-                            @error('description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                                      class="form-control <?php $__errorArgs = ['description'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                      rows="6"><?php echo e(old('description', $product->description)); ?></textarea>
+                            <?php $__errorArgs = ['description'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Giá Gốc (VNĐ) <span class="text-danger">*</span></label>
                                 <input type="number" name="price"
-                                       class="form-control @error('price') is-invalid @enderror"
-                                       value="{{ old('price', $product->price) }}"
+                                       class="form-control <?php $__errorArgs = ['price'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                       value="<?php echo e(old('price', $product->price)); ?>"
                                        step="1000">
-                                @error('price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <?php $__errorArgs = ['price'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Giá Khuyến Mãi (VNĐ)</label>
                                 <input type="number" name="sale_price"
-                                       class="form-control @error('sale_price') is-invalid @enderror"
-                                       value="{{ old('sale_price', $product->sale_price) }}"
+                                       class="form-control <?php $__errorArgs = ['sale_price'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                       value="<?php echo e(old('sale_price', $product->sale_price)); ?>"
                                        step="1000">
-                                @error('sale_price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <?php $__errorArgs = ['sale_price'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Số Lượng <span class="text-danger">*</span></label>
                                 <input type="number" name="quantity"
-                                       class="form-control @error('quantity') is-invalid @enderror"
-                                       value="{{ old('quantity', $product->quantity) }}">
-                                @error('quantity')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                       class="form-control <?php $__errorArgs = ['quantity'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                       value="<?php echo e(old('quantity', $product->quantity)); ?>">
+                                <?php $__errorArgs = ['quantity'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
                     </div>
@@ -372,17 +440,31 @@
                                 <p class="upload-text">Nhấn để thay đổi ảnh đại diện</p>
                             </div>
                             <input type="file" id="main-image" name="image"
-                                   class="d-none @error('image') is-invalid @enderror"
+                                   class="d-none <?php $__errorArgs = ['image'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                    accept="image/*">
-                            @error('image')
-                                <div class="invalid-feedback d-block mt-2">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['image'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback d-block mt-2"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             <div id="main-image-preview" class="image-preview-container">
-                                @if($product->image)
+                                <?php if($product->image): ?>
                                     <div class="preview-item">
-                                        <img src="{{ asset($product->image) }}" alt="Current Image">
+                                        <img src="<?php echo e(asset($product->image)); ?>" alt="Current Image">
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
 
@@ -397,13 +479,13 @@
                                    accept="image/*"
                                    multiple>
                             <div id="extra-images-preview" class="image-preview-container">
-                                @if(is_array($product->images) && !empty($product->images))
-                                    @foreach($product->images as $img)
+                                <?php if(is_array($product->images) && !empty($product->images)): ?>
+                                    <?php $__currentLoopData = $product->images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $img): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <div class="preview-item">
-                                            <img src="{{ asset($img) }}" alt="Extra Image">
+                                            <img src="<?php echo e(asset($img)); ?>" alt="Extra Image">
                                         </div>
-                                    @endforeach
-                                @endif
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -420,34 +502,64 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label">Danh Mục <span class="text-danger">*</span></label>
-                            <select name="category_id" class="form-select @error('category_id') is-invalid @enderror">
+                            <select name="category_id" class="form-select <?php $__errorArgs = ['category_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
                                 <option value="">-- Chọn danh mục --</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}"
-                                        {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
+                                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($category->id); ?>"
+                                        <?php echo e(old('category_id', $product->category_id) == $category->id ? 'selected' : ''); ?>>
+                                        <?php echo e($category->name); ?>
+
                                     </option>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
-                            @error('category_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['category_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div>
                             <label class="form-label">Thương Hiệu <span class="text-danger">*</span></label>
-                            <select name="brand_id" class="form-select @error('brand_id') is-invalid @enderror">
+                            <select name="brand_id" class="form-select <?php $__errorArgs = ['brand_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
                                 <option value="">-- Chọn thương hiệu --</option>
-                                @foreach($brands as $brand)
-                                    <option value="{{ $brand->id }}"
-                                        {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>
-                                        {{ $brand->name }}
+                                <?php $__currentLoopData = $brands; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $brand): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($brand->id); ?>"
+                                        <?php echo e(old('brand_id', $product->brand_id) == $brand->id ? 'selected' : ''); ?>>
+                                        <?php echo e($brand->name); ?>
+
                                     </option>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
-                            @error('brand_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <?php $__errorArgs = ['brand_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
                 </div>
@@ -461,10 +573,10 @@
                         <div class="mb-4">
                             <label class="form-label">Trạng Thái <span class="text-danger">*</span></label>
                             <select name="status" class="form-select">
-                                <option value="active" {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>
+                                <option value="active" <?php echo e(old('status', $product->status) == 'active' ? 'selected' : ''); ?>>
                                     Hoạt động (Đang bán)
                                 </option>
-                                <option value="inactive" {{ old('status', $product->status) == 'inactive' ? 'selected' : '' }}>
+                                <option value="inactive" <?php echo e(old('status', $product->status) == 'inactive' ? 'selected' : ''); ?>>
                                     Không hoạt động (Ngừng bán)
                                 </option>
                             </select>
@@ -474,7 +586,7 @@
                             <input type="checkbox" name="is_featured" value="1"
                                    class="form-check-input"
                                    id="is_featured"
-                                   {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
+                                   <?php echo e(old('is_featured', $product->is_featured) ? 'checked' : ''); ?>>
                             <label class="form-check-label " for="is_featured">
                                 Đánh dấu là sản phẩm nổi bật
                             </label>
@@ -482,8 +594,8 @@
 
                         <div style="padding: 1rem; background: #F8FAFC; border-radius: 10px; font-size: 0.875rem; color: #64748B;">
                             <p style="margin: 0 0 0.5rem 0;"><strong>Thống kê:</strong></p>
-                            <p style="margin: 0;">Lượt xem: <strong>{{ $product->view_count }}</strong></p>
-                            <p style="margin: 0;">Đã bán: <strong>{{ $product->sold_count }}</strong></p>
+                            <p style="margin: 0;">Lượt xem: <strong><?php echo e($product->view_count); ?></strong></p>
+                            <p style="margin: 0;">Đã bán: <strong><?php echo e($product->sold_count); ?></strong></p>
                         </div>
                     </div>
                 </div>
@@ -495,7 +607,7 @@
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-save me-2"></i>Cập Nhật Sản Phẩm
                             </button>
-                            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
+                            <a href="<?php echo e(route('admin.products.index')); ?>" class="btn btn-secondary">
                                 <i class="fas fa-times me-2"></i>Hủy Bỏ
                             </a>
                         </div>
@@ -504,9 +616,9 @@
             </div>
         </div>
     </form>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         // Preview main image when changed
         document.getElementById('main-image').addEventListener('change', function(e) {
@@ -546,4 +658,6 @@
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/admin/products/edit.blade.php ENDPATH**/ ?>
