@@ -1,16 +1,16 @@
 {{-- resources/views/admin/partials/sidebar.blade.php --}}
 
 <div class="sidebar">
-    <!-- Brand -->
+    <!-- Brand with Logo -->
     <div class="brand">
-        <h4>
-            <i class="fas fa-gem"></i>
-            Admin Panel
-        </h4>
+        <div class="d-flex align-items-center justify-content-center">
+            <img src="https://cdn-icons-png.flaticon.com/512/2304/2304226.png" alt="Logo" class="brand-logo me-2">
+            <h4 class="mb-0 fw-bold">Admin Panel</h4>
+        </div>
     </div>
 
     <!-- Navigation -->
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav mt-3">
         <!-- Main Section -->
         <div class="nav-section-title">
             <i class="fas fa-chart-line me-1"></i> Tổng Quan
@@ -54,7 +54,6 @@
             class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
             <i class="fas fa-shopping-cart"></i>
             <span>Quản Lý Đơn Hàng</span>
-            {{-- Sử dụng biến đã được View Composer chia sẻ --}}
             @if(isset($pendingOrdersCount) && $pendingOrdersCount > 0)
                 <span class="nav-badge">{{ $pendingOrdersCount }}</span>
             @endif
@@ -70,23 +69,19 @@
             <i class="fas fa-comments"></i>
             <span>Chat Hỗ Trợ</span>
             @php
-                $unreadCount = \App\Models\ChatMessage::whereHas('room', function ($q) {
-                    $q->where('status', 'open');
-                })
-                    ->where('is_admin', false)
-                    ->where('is_read', false)
-                    ->count();
+                $unreadCount = \App\Models\ChatMessage::whereHas('room', fn($q) => $q->where('status', 'open'))
+                    ->where('is_admin', false)->where('is_read', false)->count();
             @endphp
             @if($unreadCount > 0)
                 <span class="nav-badge">{{ $unreadCount }}</span>
             @endif
         </a>
 
-        {{-- <a href="{{ route('admin.users.index') }}"
+        <a href="{{ route('admin.users.index') }}"
             class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
             <i class="fas fa-user-friends"></i>
             <span>Quản Lý User</span>
-        </a> --}}
+        </a>
 
         <!-- Divider -->
         <div class="nav-divider"></div>
@@ -95,73 +90,46 @@
         <div class="nav-section-title">
             <i class="fas fa-cog me-1"></i> Hệ Thống
         </div>
+
         <a href="{{ route('admin.banners.index') }}"
             class="nav-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
-            <i class="fas fa-image"></i> Quản Lý Banner
+            <i class="fas fa-image"></i>
+            <span>Quản Lý Banners</span>
         </a>
+
         <a href="{{ route('admin.reviews.index') }}"
             class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
-            <i class="fas fa-image"></i> Quản Lý Reviews
+            <i class="fas fa-star"></i>
+            <span>Quản Lý Reviews</span>
         </a>
 
         <a href="{{ route('admin.contact.index') }}"
             class="nav-link {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}">
-            <i class="fas fa-headset"></i> Quản Lý Liên Hệ
+            <i class="fas fa-headset"></i>
+            <span>Quản Lý Liên Hệ</span>
         </a>
+
         <a href="{{ route('admin.faqs.index') }}"
             class="nav-link {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}">
-            <i class="fas fa-question-circle"></i> Quản Lý Câu Hỏi Thường Gặp
+            <i class="fas fa-question-circle"></i>
+            <span>FAQ</span>
         </a>
-        <hr class="bg-secondary">
+
+        <hr class="bg-secondary opacity-10 mx-3">
 
         <a href="{{ route('client.home.index') }}" class="nav-link" target="_blank">
             <i class="fas fa-globe"></i>
             <span>Xem Trang Client</span>
-            <i class="fas fa-external-link-alt ms-auto" style="font-size: 12px; opacity: 0.6;"></i>
+            <i class="fas fa-external-link-alt ms-auto" style="font-size: 11px; opacity: 0.6;"></i>
         </a>
 
-        <a href="{{ route('logout') }}" class="nav-link" onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
+        <a href="{{ route('logout') }}" class="nav-link text-danger"
+            onclick="event.preventDefault(); if(confirm('Bạn có chắc muốn đăng xuất?')) document.getElementById('logout-form').submit();">
             <i class="fas fa-sign-out-alt"></i>
             <span>Đăng Xuất</span>
         </a>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+            @csrf
+        </form>
     </nav>
 </div>
-
-
-{{--
-
-<body>
-    <!-- Sidebar -->
-    @include('admin.partials.sidebar')
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Top Bar -->
-        @include('admin.partials.header')
-
-        <!-- Content -->
-        <div class="content-wrapper">
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-
-            @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-
-            @yield('content')
-        </div>
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    @yield('scripts')
-</body>
-
-</html> --}}

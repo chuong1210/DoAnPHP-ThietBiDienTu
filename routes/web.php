@@ -185,6 +185,15 @@ Route::prefix('admin')
         // Route::resource('reviews', AdminReviewController::class)->only(['index', 'destroy', 'show']);
         Route::resource('reviews', AdminReviewController::class);
         Route::resource('users', UserController::class);
+        // Resource
+
+        Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
+        Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+        Route::resource('banners', BannerController::class);
+        Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+        Route::get('reviews/{id}', [AdminReviewController::class, 'show'])->name('reviews.show');
+        Route::patch('reviews/{id}/status', [AdminReviewController::class, 'updateStatus'])->name('reviews.updateStatus');
+        Route::delete('reviews/{id}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
 
         // Quản lý đơn hàng (Orders)

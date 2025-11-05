@@ -195,7 +195,7 @@
                             <tr>
                                 <td><strong>{{ $product->id }}</strong></td>
                                 <td>
-                                    <img src="{{ asset($product->image ?? 'https://media.geeksforgeeks.org/wp-content/uploads/20230802153215/Error-404-768.png') }}"
+                                    <img src="{{ asset($product->image ?? 'https://cdn.presslabs.com/wp-content/uploads/2018/10/upload-error.png') }}"
                                         alt="{{ $product->name }}" class="product-image">
                                 </td>
                                 <td>

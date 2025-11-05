@@ -6,180 +6,246 @@
 
 @section('styles')
     <style>
+        :root {
+            --primary: #0066FF;
+            --secondary: #00B4D8;
+            --bg-main: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --border: #CBD5E1;
+            --radius: 16px;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
         .chat-admin-container {
             display: flex;
             height: calc(100vh - 150px);
-            background: white;
-            border-radius: 12px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
         }
 
-        /* Left Sidebar - Room List */
+        /* === LEFT SIDEBAR - ROOM LIST === */
         .chat-rooms-sidebar {
-            width: 350px;
-            border-right: 2px solid #e9ecef;
+            width: 360px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            background: #f8f9fa;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
         }
 
         .chat-rooms-header {
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 22px 20px;
+            background: linear-gradient(135deg, var(--primary), #3388FF);
             color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .chat-rooms-header h5 {
             margin: 0;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-rooms-header small {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 500;
         }
 
         .chat-rooms-list {
             flex: 1;
             overflow-y: auto;
-            padding: 10px;
+            padding: 12px;
         }
 
         .room-item {
-            padding: 15px;
-            margin-bottom: 8px;
-            background: white;
-            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 10px;
+            background: var(--bg-main);
+            border-radius: 14px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
             border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .room-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
         }
 
         .room-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            background: white;
+            border-color: rgba(0, 102, 255, 0.1);
+        }
+
+        .room-item:hover::before {
+            transform: scaleY(1);
         }
 
         .room-item.active {
-            border-color: #667eea;
-            background: #f0f4ff;
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.08), rgba(0, 180, 216, 0.05));
+            border-color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0, 102, 255, 0.15);
+        }
+
+        .room-item.active::before {
+            transform: scaleY(1);
         }
 
         .room-item-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .room-user-name {
             font-weight: 600;
-            color: #333;
+            color: var(--text-dark);
             font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .room-time {
             font-size: 11px;
-            color: #999;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         .room-last-message {
-            font-size: 13px;
-            color: #666;
+            font-size: 13.5px;
+            color: #475569;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            line-height: 1.4;
         }
 
         .room-unread-badge {
-            background: #dc3545;
+            background: #EF4444;
             color: white;
-            border-radius: 12px;
-            padding: 2px 8px;
+            border-radius: 50px;
+            padding: 3px 8px;
             font-size: 11px;
-            font-weight: bold;
-            margin-left: 8px;
+            font-weight: 700;
+            min-width: 20px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
         }
 
         .room-status {
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 50px;
             font-size: 11px;
-            font-weight: 500;
-            margin-top: 5px;
+            font-weight: 600;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .room-status.open {
-            background: #d4edda;
-            color: #155724;
+            background: #DCFCE7;
+            color: #166534;
         }
 
         .room-status.closed {
-            background: #f8d7da;
-            color: #721c24;
+            background: #FECACA;
+            color: #991B1B;
         }
 
-        /* Right Panel - Chat Area */
+        /* === RIGHT PANEL - CHAT AREA === */
         .chat-area {
             flex: 1;
             display: flex;
             flex-direction: column;
+            background: var(--bg-main);
         }
 
         .chat-area-empty {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100%;
-            color: #999;
-            flex-direction: column;
+            color: var(--text-muted);
+            font-size: 16px;
         }
 
         .chat-area-empty i {
-            font-size: 80px;
+            font-size: 72px;
             margin-bottom: 20px;
+            color: #CBD5E1;
+        }
+
+        .chat-area-empty h5 {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
         }
 
         .chat-header {
-            padding: 20px 25px;
-            background: white;
-            border-bottom: 2px solid #e9ecef;
+            padding: 20px 28px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
 
         .chat-user-info h5 {
-            margin: 0 0 5px 0;
-            font-weight: 600;
-            color: #333;
+            margin: 0;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 17px;
         }
 
         .chat-user-info small {
-            color: #666;
+            color: var(--text-muted);
+            font-size: 13px;
         }
 
         .chat-messages-area {
             flex: 1;
             overflow-y: auto;
-            padding: 25px;
-            background: #f8f9fa;
+            padding: 28px;
+            background: var(--bg-main);
         }
 
         .chat-message {
             display: flex;
-            margin-bottom: 20px;
-            animation: messageSlide 0.3s ease;
+            margin-bottom: 22px;
+            animation: messageSlide 0.35s ease-out;
         }
 
         @keyframes messageSlide {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .chat-message.admin {
@@ -191,97 +257,179 @@
         }
 
         .message-bubble {
-            max-width: 60%;
-            padding: 12px 16px;
-            border-radius: 16px;
+            max-width: 65%;
+            padding: 14px 18px;
+            border-radius: 18px;
             word-wrap: break-word;
             position: relative;
+            box-shadow: var(--shadow-sm);
+            line-height: 1.5;
         }
 
         .chat-message.admin .message-bubble {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary), #3388FF);
             color: white;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 6px;
         }
 
         .chat-message.user .message-bubble {
             background: white;
-            color: #333;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            color: var(--text-dark);
+            border-bottom-left-radius: 6px;
+            border: 1px solid var(--border);
+  }
+
+        .message-sender {
+            font-size: 12.5px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            opacity: 0.9;
         }
 
         .message-time {
             font-size: 11px;
-            opacity: 0.7;
-            margin-top: 6px;
+            opacity: 0.75;
+            margin-top: 8px;
             display: block;
-        }
-
-        .message-sender {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            opacity: 0.9;
+            font-weight: 500;
         }
 
         .chat-input-area {
-            padding: 20px 25px;
-            background: white;
-            border-top: 2px solid #e9ecef;
+            padding: 22px 28px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
         }
 
         .chat-input-area .form-control {
-            border-radius: 25px;
-            border: 2px solid #e9ecef;
-            padding: 12px 20px;
-            font-size: 14px;
+            border-radius: 50px;
+            border: 2px solid var(--border);
+            padding: 14px 20px;
+            font-size: 15px;
+            background: var(--bg-main);
+            transition: all 0.25s ease;
         }
 
         .chat-input-area .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 102, 255, 0.2);
+            background: white;
         }
 
         .chat-input-area .btn-primary {
-            border-radius: 25px;
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--primary), #3388FF);
             border: none;
             font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+            transition: all 0.25s ease;
+        }
+
+        .chat-input-area .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 102, 255, 0.4);
+        }
+
+        .chat-input-area .btn-primary i {
+            margin-right: 6px;
+        }
+
+        #closedWarning {
+            font-size: 13px;
+            color: #DC2626;
+            font-weight: 500;
         }
 
         /* Scrollbar */
         .chat-rooms-list::-webkit-scrollbar,
         .chat-messages-area::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         .chat-rooms-list::-webkit-scrollbar-track,
         .chat-messages-area::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: transparent;
         }
 
         .chat-rooms-list::-webkit-scrollbar-thumb,
         .chat-messages-area::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
+            background: rgba(0, 102, 255, 0.3);
+            border-radius: 10px;
         }
 
         .chat-rooms-list::-webkit-scrollbar-thumb:hover,
         .chat-messages-area::-webkit-scrollbar-thumb:hover {
-            background: #555;
+            background: var(--primary);
         }
 
         /* Loading */
         .loading-spinner {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 30px;
         }
 
         .loading-spinner.active {
             display: block;
+        }
+
+        .spinner-border {
+            width: 2.5rem;
+            height: 2.5rem;
+            color: var(--primary);
+        }
+
+        /* Button Group */
+        .btn-group .btn {
+            border-radius: 50px !important;
+            font-size: 13px;
+            padding: 6px 14px;
+            font-weight: 600;
+        }
+
+        .btn-success {
+            background: #10B981;
+            border: none;
+        }
+
+        .btn-danger {
+            background: #EF4444;
+            border: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .chat-admin-container {
+                flex-direction: column;
+                height: auto;
+                min-height: calc(100vh - 160px);
+            }
+
+            .chat-rooms-sidebar {
+                width: 100%;
+                max-height: 300px;
+            }
+
+            .chat-area {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .chat-header {
+                padding: 16px;
+            }
+
+            .chat-messages-area,
+            .chat-input-area {
+                padding: 20px 16px;
+            }
+
+            .room-item {
+                padding: 14px;
+            }
         }
     </style>
 @endsection
@@ -292,22 +440,28 @@
             <!-- Left Sidebar - Rooms List -->
             <div class="chat-rooms-sidebar">
                 <div class="chat-rooms-header">
-                    <h5><i class="fas fa-comments"></i> Danh Sách Chat</h5>
+                    <h5>
+                        <i class="fas fa-comments"></i> Danh Sách Chat
+                    </h5>
                     <small>{{ count($rooms) }} cuộc hội thoại</small>
                 </div>
 
                 <div class="chat-rooms-list" id="roomsList">
                     @forelse($rooms as $room)
-                        <div class="room-item" data-room-id="{{ $room['id'] }}" data-user-name="{{ $room['user']->full_name }}"
-                            data-user-email="{{ $room['user']->email }}" data-status="{{ $room['status'] }}">
+                        <div class="room-item"
+                             data-room-id="{{ $room['id'] }}"
+                             data-user-name="{{ $room['user']->full_name }}"
+                             data-user-email="{{ $room['user']->email }}"
+                             data-status="{{ $room['status'] }}">
                             <div class="room-item-header">
                                 <span class="room-user-name">
-                                    <i class="fas fa-user-circle"></i> {{ $room['user']->full_name }}
+                                    <i class="fas fa-user-circle text-primary"></i>
+                                    {{ $room['user']->full_name }}
                                     @if($room['unread_count'] > 0)
                                         <span class="room-unread-badge">{{ $room['unread_count'] }}</span>
                                     @endif
                                 </span>
-                                <span class="room-time">{{ $room['updated_at'] }}</span>
+                                <span class="room-time">{{ \Carbon\Carbon::parse($room['updated_at'])->format('H:i') }}</span>
                             </div>
 
                             @if($room['last_message'])
@@ -315,7 +469,7 @@
                                     @if($room['last_message']['is_admin'])
                                         <strong>Bạn:</strong>
                                     @endif
-                                    {{ $room['last_message']['message'] }}
+                                    {{ Str::limit($room['last_message']['message'], 50) }}
                                 </div>
                             @else
                                 <div class="room-last-message text-muted">
@@ -329,7 +483,7 @@
                         </div>
                     @empty
                         <div class="text-center text-muted py-5">
-                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                            <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
                             <p>Chưa có cuộc trò chuyện nào</p>
                         </div>
                     @endforelse
@@ -340,29 +494,29 @@
             <div class="chat-area">
                 <div class="chat-area-empty" id="emptyState">
                     <i class="fas fa-comments"></i>
-                    <h5>Chọn một cuộc trò chuyện để bắt đầu</h5>
-                    <p class="text-muted">Chọn khách hàng từ danh sách bên trái</p>
+                    <h5>Chọn một cuộc trò chuyện</h5>
+                    <p class="text-muted">Nhấn vào khách hàng bên trái để bắt đầu</p>
                 </div>
 
-                <div id="chatPanel" style="display: none; height: 100%; flex-direction: column; flex: 1;">
+                <div id="chatPanel" style="display: none; height: 100%; display: flex; flex-direction: column;">
                     <div class="chat-header">
                         <div class="chat-user-info">
-                            <h5 id="chatUserName"></h5>
-                            <small id="chatUserEmail" class="text-muted"></small>
+                            <h5 id="chatUserName">—</h5>
+                            <small id="chatUserEmail" class="text-muted">—</small>
                         </div>
-                        <div>
-                            <button class="btn btn-sm btn-success" id="openRoomBtn" style="display: none;">
+                        <div class="btn-group">
+                            <button class="btn btn-success btn-sm" id="openRoomBtn" style="display: none;">
                                 <i class="fas fa-lock-open"></i> Mở lại
                             </button>
-                            <button class="btn btn-sm btn-danger" id="closeRoomBtn" style="display: none;">
-                                <i class="fas fa-lock"></i> Đóng chat
+                            <button class="btn btn-danger btn-sm" id="closeRoomBtn" style="display: none;">
+                                <i class="fas fa-lock"></i> Đóng
                             </button>
                         </div>
                     </div>
 
                     <div class="chat-messages-area" id="chatMessagesArea">
                         <div class="loading-spinner active">
-                            <div class="spinner-border text-primary" role="status">
+                            <div class="spinner-border" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
@@ -373,14 +527,14 @@
                             @csrf
                             <div class="input-group">
                                 <input type="text" class="form-control" id="adminMessageInput"
-                                    placeholder="Nhập tin nhắn..." autocomplete="off">
+                                    placeholder="Nhập tin nhắn của bạn..." autocomplete="off">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-paper-plane"></i> Gửi
                                 </button>
                             </div>
                         </form>
-                        <div class="text-center text-danger mt-2" id="closedWarning" style="display: none;">
-                            <small><i class="fas fa-lock"></i> Phòng chat đã đóng. Mở lại để gửi tin nhắn.</small>
+                        <div class="text-center mt-2" id="closedWarning" style="display: none;">
+                            <small><i class="fas fa-lock text-danger"></i> Phòng chat đã đóng. Vui lòng mở lại để gửi tin nhắn.</small>
                         </div>
                     </div>
                 </div>
@@ -411,7 +565,6 @@
             let currentRoomStatus = null;
             let pusherChannel = null;
 
-            // Handle room selection
             roomItems.forEach(item => {
                 item.addEventListener('click', function () {
                     const roomId = this.dataset.roomId;
@@ -421,40 +574,29 @@
 
                     selectRoom(roomId, userName, userEmail, status);
 
-                    // Update active state
                     roomItems.forEach(r => r.classList.remove('active'));
                     this.classList.add('active');
 
-                    // Remove unread badge
                     const badge = this.querySelector('.room-unread-badge');
                     if (badge) badge.remove();
                 });
             });
 
-            // Select room and load messages
             async function selectRoom(roomId, userName, userEmail, status) {
                 currentRoomId = roomId;
                 currentRoomStatus = status;
 
-                // Show chat panel
                 emptyState.style.display = 'none';
                 chatPanel.style.display = 'flex';
 
-                // Update header
                 chatUserName.textContent = userName;
                 chatUserEmail.textContent = userEmail;
 
-                // Update status buttons
                 updateStatusButtons(status);
-
-                // Load messages
                 await loadMessages(roomId);
-
-                // Setup Pusher for this room
                 setupPusher(roomId);
             }
 
-            // Load messages
             async function loadMessages(roomId) {
                 try {
                     const response = await fetch(`/admin/chat/rooms/${roomId}/messages`, {
@@ -472,17 +614,16 @@
                 }
             }
 
-            // Display messages
             function displayMessages(messages) {
                 chatMessagesArea.innerHTML = '';
 
                 if (messages.length === 0) {
                     chatMessagesArea.innerHTML = `
-                            <div class="text-center text-muted py-5">
-                                <i class="fas fa-comments fa-3x mb-3"></i>
-                                <p>Chưa có tin nhắn nào</p>
-                            </div>
-                        `;
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-comments fa-3x mb-3 opacity-50"></i>
+                            <p>Chưa có tin nhắn nào</p>
+                        </div>
+                    `;
                 } else {
                     messages.forEach(msg => addMessageToUI(msg));
                 }
@@ -490,13 +631,10 @@
                 scrollToBottom();
             }
 
-            // Add message to UI
             function addMessageToUI(data) {
-                // Remove empty state if exists
                 const emptyMsg = chatMessagesArea.querySelector('.text-center');
                 if (emptyMsg) emptyMsg.remove();
 
-                // Remove loading
                 const loading = chatMessagesArea.querySelector('.loading-spinner');
                 if (loading) loading.remove();
 
@@ -504,18 +642,17 @@
                 messageDiv.className = `chat-message ${data.is_admin ? 'admin' : 'user'}`;
 
                 messageDiv.innerHTML = `
-                        <div class="message-bubble">
-                            <div class="message-sender">${data.user.full_name}</div>
-                            ${escapeHtml(data.message)}
-                            <span class="message-time">${data.created_at}</span>
-                        </div>
-                    `;
+                    <div class="message-bubble">
+                        <div class="message-sender">${data.user.full_name}</div>
+                        ${escapeHtml(data.message)}
+                        <span class="message-time">${formatTime(data.created_at)}</span>
+                    </div>
+                `;
 
                 chatMessagesArea.appendChild(messageDiv);
                 scrollToBottom();
             }
 
-            // Send message
             adminChatForm.addEventListener('submit', async function (e) {
                 e.preventDefault();
 
@@ -541,7 +678,6 @@
                     const result = await response.json();
 
                     if (result.success) {
-                        // addMessageToUI(result.message);
                         adminMessageInput.value = '';
                     }
                 } catch (error) {
@@ -550,9 +686,7 @@
                 }
             });
 
-            // Setup Pusher
             function setupPusher(roomId) {
-                // Unsubscribe previous channel
                 if (pusherChannel) {
                     pusherChannel.unbind_all();
                 }
@@ -565,12 +699,10 @@
                 pusherChannel = pusher.subscribe('chat.' + roomId);
 
                 pusherChannel.bind('message.sent', function (data) {
-                    console.log('New message received:', data);
                     addMessageToUI(data);
                 });
             }
 
-            // Close room
             closeRoomBtn.addEventListener('click', async function () {
                 if (!currentRoomId || !confirm('Bạn có chắc muốn đóng phòng chat này?')) return;
 
@@ -589,7 +721,6 @@
                         updateStatusButtons('closed');
                         alert('Đã đóng phòng chat');
 
-                        // Update room item status
                         const roomItem = document.querySelector(`[data-room-id="${currentRoomId}"]`);
                         if (roomItem) {
                             roomItem.dataset.status = 'closed';
@@ -603,7 +734,6 @@
                 }
             });
 
-            // Open room
             openRoomBtn.addEventListener('click', async function () {
                 if (!currentRoomId) return;
 
@@ -622,7 +752,6 @@
                         updateStatusButtons('open');
                         alert('Đã mở lại phòng chat');
 
-                        // Update room item status
                         const roomItem = document.querySelector(`[data-room-id="${currentRoomId}"]`);
                         if (roomItem) {
                             roomItem.dataset.status = 'open';
@@ -636,7 +765,6 @@
                 }
             });
 
-            // Update status buttons
             function updateStatusButtons(status) {
                 if (status === 'open') {
                     closeRoomBtn.style.display = 'inline-block';
@@ -653,7 +781,6 @@
                 }
             }
 
-            // Utility functions
             function scrollToBottom() {
                 chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
             }
@@ -662,6 +789,10 @@
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
+            }
+
+            function formatTime(time) {
+                return new Date(time).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
             }
         });
     </script>

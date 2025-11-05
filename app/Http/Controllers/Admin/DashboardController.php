@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class DashboardController extends Controller
 {
@@ -57,7 +58,7 @@ class DashboardController extends Controller
             'revenue_change' => $revenuePreviousPeriod > 0 ? (($revenueCurrentPeriod - $revenuePreviousPeriod) / $revenuePreviousPeriod) * 100 : ($revenueCurrentPeriod > 0 ? 100 : 0),
             'orders' => $ordersCurrentPeriod,
             'orders_change' => $ordersPreviousPeriod > 0 ? (($ordersCurrentPeriod - $ordersPreviousPeriod) / $ordersPreviousPeriod) * 100 : ($ordersCurrentPeriod > 0 ? 100 : 0),
-            'new_users' => User::where('role', 'user')->whereBetween('created_at', [$startDate, $endDate])->count(),
+            'new_users' => AuthUser::where('role', 'user')->whereBetween('created_at', [$startDate, $endDate])->count(),
             'avg_order_value' => $ordersCurrentPeriod > 0 ? $revenueCurrentPeriod / $ordersCurrentPeriod : 0,
         ];
 

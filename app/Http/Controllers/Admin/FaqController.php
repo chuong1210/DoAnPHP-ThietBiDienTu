@@ -11,7 +11,7 @@ class FaqController extends Controller
     public function index()
     {
         $faqs = Faq::active()->get();
-    $categories = Faq::getCategoryOptions(); // Lấy danh sách nhóm (đặt hàng, thanh toán, ...)
+    $categories = Faq::getCategoryOptions(); // hoặc danh sách động
     return view('admin.faqs.index', compact('faqs', 'categories'));
 
     }
@@ -26,9 +26,17 @@ class FaqController extends Controller
     // Form tạo mới FAQ
     public function create()
     {
-        return view('admin.faqs.create'); // đúng rồi
-    }
+        // Đảm bảo chỉ trả về mảng chuỗi
+        $categories = Faq::getCategoryOptions(); // hoặc tự định nghĩa
 
+        // Nếu getCategoryOptions() trả về mảng key-value, chỉ lấy value
+        $categories = is_array($categories) ? array_values($categories) : $categories;
+
+        // Hoặc ép kiểu thành mảng chuỗi
+        $categories = collect($categories)->flatten()->unique()->values()->all();
+
+        return view('admin.faqs.create', compact('categories'));
+    }
     // Lưu FAQ mới
     public function store(Request $request)
     {

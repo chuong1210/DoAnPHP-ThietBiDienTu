@@ -268,6 +268,20 @@
                                             <span
                                                 class="status-badge status-badge-{{ $order->status }}">{{ $order->status }}</span>
                                         </td>
+                                        <td>{{ $order->order_number }}</td>
+                                        <td>{{ $order->customer_name }}</td>
+                                        <td>{{ number_format($order->total) }}đ</td>
+                                        <td>
+                                            <span class="badge bg-{{ $order->status === 'pending' ? 'warning' : 'success' }}">
+                                                {{ ucfirst($order->status) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
