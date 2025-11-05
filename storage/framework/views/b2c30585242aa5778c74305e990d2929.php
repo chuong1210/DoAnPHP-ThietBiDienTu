@@ -1,8 +1,6 @@
-@extends('admin.layouts.admin')
+<?php $__env->startSection('title', 'Quản Lý Người Dùng'); ?>
 
-@section('title', 'Quản Lý Người Dùng')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid py-4">
         <!-- Header Section -->
         <div class="row mb-4">
@@ -16,18 +14,7 @@
         </div>
 
         <!-- Alert Messages -->
-        {{-- @if (session('success'))
-            <div class="alert alert-success border-0 shadow-sm"
-                style="background-color: #D1FAE5; color: #065F46; border-left: 4px solid #10B981;">
-                <i class="fas fa-check-circle"></i> {{ session('success') }}
-            </div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger border-0 shadow-sm"
-                style="background-color: #FEE2E2; color: #991B1B; border-left: 4px solid #EF4444;">
-                <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
-            </div>
-        @endif --}}
+        
 
         <!-- Search Form -->
         <form class="row mb-4 g-2" method="GET">
@@ -37,7 +24,7 @@
                         style="background-color: #F8FAFC; border: 1px solid #CBD5E1; color: #0066FF;">
                         <i class="fas fa-search"></i>
                     </span>
-                    <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                    <input type="text" name="search" value="<?php echo e(request('search')); ?>" class="form-control"
                         placeholder="Tìm kiếm theo tên hoặc email..."
                         style="border: 1px solid #CBD5E1; background-color: #F8FAFC;">
                 </div>
@@ -73,40 +60,43 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($users as $user)
+                            <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr style="border-bottom: 1px solid #CBD5E1; transition: background-color 0.2s;">
-                                    <td style="color: #1E293B; padding: 15px; vertical-align: middle;">{{ $user->id }}</td>
-                                    <td style="color: #1E293B; padding: 15px; vertical-align: middle;">{{ $user->email }}</td>
+                                    <td style="color: #1E293B; padding: 15px; vertical-align: middle;"><?php echo e($user->id); ?></td>
+                                    <td style="color: #1E293B; padding: 15px; vertical-align: middle;"><?php echo e($user->email); ?></td>
                                     <td style="color: #1E293B; padding: 15px; vertical-align: middle; font-weight: 500;">
-                                        {{ $user->full_name }}</td>
-                                    <td style="color: #1E293B; padding: 15px; vertical-align: middle;">{{ $user->phone ?? '-' }}
+                                        <?php echo e($user->full_name); ?></td>
+                                    <td style="color: #1E293B; padding: 15px; vertical-align: middle;"><?php echo e($user->phone ?? '-'); ?>
+
                                     </td>
                                     <td style="padding: 15px; vertical-align: middle;">
                                         <span class="badge"
-                                            style="background-color: {{ $user->role === 'admin' ? '#0066FF' : '#00B4D8' }}; color: white; padding: 6px 12px; border-radius: 6px; font-weight: 500;">
-                                            <i class="fas {{ $user->role === 'admin' ? 'fa-crown' : 'fa-user' }}"></i>
-                                            {{ ucfirst($user->role) }}
+                                            style="background-color: <?php echo e($user->role === 'admin' ? '#0066FF' : '#00B4D8'); ?>; color: white; padding: 6px 12px; border-radius: 6px; font-weight: 500;">
+                                            <i class="fas <?php echo e($user->role === 'admin' ? 'fa-crown' : 'fa-user'); ?>"></i>
+                                            <?php echo e(ucfirst($user->role)); ?>
+
                                         </span>
                                     </td>
                                     <td style="padding: 15px; vertical-align: middle;">
                                         <span class="badge"
-                                            style="background-color: {{ $user->status === 'active' ? '#10B981' : '#F59E0B' }}; color: white; padding: 6px 12px; border-radius: 6px; font-weight: 500;">
+                                            style="background-color: <?php echo e($user->status === 'active' ? '#10B981' : '#F59E0B'); ?>; color: white; padding: 6px 12px; border-radius: 6px; font-weight: 500;">
                                             <i
-                                                class="fas {{ $user->status === 'active' ? 'fa-check-circle' : 'fa-clock' }}"></i>
-                                            {{ ucfirst($user->status) }}
+                                                class="fas <?php echo e($user->status === 'active' ? 'fa-check-circle' : 'fa-clock'); ?>"></i>
+                                            <?php echo e(ucfirst($user->status)); ?>
+
                                         </span>
                                     </td>
                                     <td style="color: #1E293B; padding: 15px; vertical-align: middle;">
-                                        {{ $user->created_at->format('d/m/Y H:i') }}</td>
+                                        <?php echo e($user->created_at->format('d/m/Y H:i')); ?></td>
                                     <td class="text-center" style="padding: 15px; vertical-align: middle;">
-                                        <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm"
+                                        <a href="<?php echo e(route('admin.users.edit', $user->id)); ?>" class="btn btn-sm"
                                             style="background-color: #0066FF; color: white; border: none; border-radius: 6px; padding: 8px 12px; transition: all 0.2s;">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
+                                        <form action="<?php echo e(route('admin.users.destroy', $user->id)); ?>" method="POST"
                                             class="d-inline" onsubmit="return confirm('Xóa người dùng này?')">
-                                            @csrf
-                                            @method('DELETE')
+                                            <?php echo csrf_field(); ?>
+                                            <?php echo method_field('DELETE'); ?>
                                             <button class="btn btn-sm"
                                                 style="background-color: #EF4444; color: white; border: none; border-radius: 6px; padding: 8px 12px; transition: all 0.2s;">
                                                 <i class="fas fa-trash-alt"></i>
@@ -114,14 +104,17 @@
                                         </form>
                                     </td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="card-footer" style="background-color: #F8FAFC; border-top: 1px solid #CBD5E1; padding: 20px;">
-                {{ $users->links() }}
+                <?php echo e($users->links()); ?>
+
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\chuon\PHP\doanPHP\resources\views/admin/users/index.blade.php ENDPATH**/ ?>

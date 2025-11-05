@@ -46,12 +46,12 @@
                     <li>
                         <a class="dropdown-item d-flex align-items-center gap-3 px-4 py-3"
                             href="<?php echo e(route('admin.chat.index')); ?>">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-2">
                                     <i class="fas fa-comment-dots"></i>
                                 </div>
                             </div>
-                            <div class="flex-grow-1">
+                            <div class="grow">
                                 <div class="fw-semibold"><?php echo e($totalNotifications); ?> tin nhắn mới</div>
                                 <small class="text-muted">Khách hàng đang chờ phản hồi</small>
                             </div>

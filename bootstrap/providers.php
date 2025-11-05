@@ -7,4 +7,5 @@ return [
     App\Providers\BroadcastServiceProvider::class,
     App\Providers\ViewServiceProvider::class,
 
+
 ];
